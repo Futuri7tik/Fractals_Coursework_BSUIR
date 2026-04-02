@@ -1,61 +1,54 @@
-#ifndef KURSACH_LIBRARY_H
-#define KURSACH_LIBRARY_H
+#ifndef KURSACH_FUNCTIONS_H
+#define KURSACH_FUNCTIONS_H
 
-#include <SFML/Graphics.h>
-#include <stdio.h>
+#include "raylib.h"
+#include "raymath.h"
 
-#define MAX_VERTICES 10000000
-extern sfVertex vertices[MAX_VERTICES];
-extern int vertex_count;
-
+// === Параметры фракталов ===
 typedef struct {
     int depth;
+    int max_depth;
     int start_depth;
-    double angle;
-    double length_factor;
+    float angle;
+    float length_factor;
 } TreeParameters;
 
 typedef struct {
     int depth;
     int max_depth;
-    double start_length;
+    float start_length;
 } CarpetParameters;
 
 typedef struct {
     int depth;
     int max_depth;
-    double start_length;
+    float start_length;
 } TriangleParameters;
 
-void flush_fractal(sfRenderWindow* window, sfPrimitiveType primitive);
+typedef struct {
+    int iterations;
+    int max_iterations;
+    float zoom;
+    float offset_x;
+    float offset_y;
+} MandelbrotParameters;
 
-sfColor get_color_tree(int depth, const TreeParameters* parameters);
+// === Дерево ===
+Color get_color_tree(int depth, const TreeParameters* params);
+void draw_tree(float x_start, float y_start, float length, float angle,
+               int depth, TreeParameters* params);
 
-void add_line(double x_start, double y_start, double x_end, double y_end, sfColor color);
+// === Ковёр ===
+Color get_color_carpet(int depth, CarpetParameters* params);
+void draw_square(float x, float y, float length, Color color);
+void draw_carpet(float x_left, float y_left, float length,
+                 int depth, CarpetParameters* params);
 
-void draw_tree(sfRenderWindow* window, double x_start,
-    double y_start, double length, double angle, int depth,
-    TreeParameters* parameters);
+// === Треугольник ===
+Color get_color_triangle(int depth, TriangleParameters* params);
+void draw_triangle_base(float x, float y, float length, Color color);
+void draw_center_triangle(float x, float y, float length, Color color);  // ← Добавить!
+void draw_sierpinski_triangle(float x, float y, float length,
+                              int depth, TriangleParameters* params);
 
-int render_tree(void);
-
-void add_square( double x, double y, double length, sfColor color);
-
-sfColor get_color_carpet(int depth, CarpetParameters* params);
-
-void draw_carpet (sfRenderWindow* window, double x_left, double y_left, double length, int depth, CarpetParameters* carpet);
-
-int render_carpet(void);
-
-void add_base(double x, double y, double length, sfColor color);
-
-void add_triangle(double x, double y, double length, sfColor color);
-
-sfColor get_color_triangle(int depth, TriangleParameters* params);
-
-void draw_sierpinski_triangle(sfRenderWindow* window, double x, double y,
-    double length, int depth, TriangleParameters* params);
-
-int render_triangle(void);
-
-#endif // KURSACH_LIBRARY_H
+#endif
