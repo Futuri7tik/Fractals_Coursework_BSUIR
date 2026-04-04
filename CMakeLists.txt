@@ -1,12 +1,11 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.20)
 project(KURSACH C)
 
 set(CMAKE_C_STANDARD 11)
-
-# === ПУТИ К БИБЛИОТЕКАМ ===
-set(CSFML_DIR "D:/LIBS/CSFML" CACHE PATH "Путь к CSFML")
 set(RAYLIB_DIR "D:/LIBS/raylib" CACHE PATH "Путь к raylib")
 set(RAYGUI_DIR "D:/LIBS/raygui" CACHE PATH "Путь к raygui")
+
+find_package(OpenMP REQUIRED)
 
 # === ИСХОДНЫЕ ФАЙЛЫ ===
 add_executable(KURSACH
@@ -14,41 +13,33 @@ add_executable(KURSACH
         tree.c
         sierpinski_carpet.c
         sierpinski_triangle.c
-        # globals.c
         main.c
+        mandel.c
 )
+
+if(OpenMP_C_FOUND)
+    target_link_libraries(KURSACH PRIVATE OpenMP::OpenMP_C)
+    set_target_properties(KURSACH PROPERTIES COMPILE_FLAGS "${OpenMP_C_FLAGS}")
+    set_target_properties(KURSACH PROPERTIES LINK_FLAGS "${OpenMP_C_FLAGS}")
+endif()
 
 # === ПУТИ INCLUDE ===
 target_include_directories(KURSACH PRIVATE
         ${CSFML_DIR}/include
         ${RAYLIB_DIR}/include
-        ${RAYGUI_DIR}/src        # ← Изменено: добавлен /src
+        ${RAYGUI_DIR}/src
 )
 
 # === ПУТИ К БИБЛИОТЕКАМ ===
 target_link_directories(KURSACH PRIVATE
-        ${CSFML_DIR}/lib/gcc
         ${RAYLIB_DIR}/lib
 )
 
 # === ЛИНКОВКА ===
-target_link_libraries(KURSACH
-        csfml-graphics
-        csfml-window
-        csfml-system
+target_link_libraries(KURSACH PRIVATE
         raylib
         opengl32
         gdi32
         winmm
         m
-)
-
-# === КОПИРОВАНИЕ DLL ===
-add_custom_command(TARGET KURSACH POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CSFML_DIR}/bin/csfml-graphics-2.dll"
-        "${CSFML_DIR}/bin/csfml-window-2.dll"
-        "${CSFML_DIR}/bin/csfml-system-2.dll"
-        "${RAYLIB_DIR}/lib/raylib.dll"
-        "$<TARGET_FILE_DIR:KURSACH>"
 )

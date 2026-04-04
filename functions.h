@@ -4,6 +4,14 @@
 #include "raylib.h"
 #include "raymath.h"
 
+typedef enum {
+    STATE_GALLERY,
+    STATE_TREE,
+    STATE_CARPET,
+    STATE_TRIANGLE,
+    STATE_MANDELBROT
+} AppState;
+
 // === Параметры фракталов ===
 typedef struct {
     int depth;
@@ -50,5 +58,12 @@ void draw_triangle_base(float x, float y, float length, Color color);
 void draw_center_triangle(float x, float y, float length, Color color);  // ← Добавить!
 void draw_sierpinski_triangle(float x, float y, float length,
                               int depth, TriangleParameters* params);
+
+// === Множество мандельброта
+int mandelbrot_iterations(float re_c, float im_c, int max_iterations);
+Color get_color_mandelbrot(int iteration, int max_iterations);
+Texture2D render_mandelbrot(int width, int height, float zoom, float offset_x,
+    float offset_y, int max_iterations);
+
 
 #endif

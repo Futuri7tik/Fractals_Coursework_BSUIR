@@ -1,6 +1,4 @@
 #include "raylib.h"
-#include "raymath.h"
-#include "stdio.h"
 #include "math.h"
 #include "functions.h"
 
@@ -54,10 +52,6 @@ void draw_sierpinski_triangle(float x, float y, float length,
     // 1. Рисуем центральный (перевернутый) треугольник
     Color color = get_color_triangle(depth, params);
 
-    // Вершины должны идти против часовой стрелки:
-    // v1: Середина левой стороны
-    // v2: Середина основания (низ)
-    // v3: Середина правой стороны
     DrawTriangle(
         (Vector2){ x + l4, y - h2 },
         (Vector2){ x + l2, y },
