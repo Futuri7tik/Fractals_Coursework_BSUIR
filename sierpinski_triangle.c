@@ -1,8 +1,7 @@
 #include "raylib.h"
-#include "math.h"
 #include "functions.h"
+#define SQRT3 0.866025f
 
-// Базовый треугольник (жёлтое основание)
 void draw_triangle_base(float x, float y, float length, Color color) {
     float height = length * sqrtf(3.0f) / 2.0f;
     DrawTriangle(

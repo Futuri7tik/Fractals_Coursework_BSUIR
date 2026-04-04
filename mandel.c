@@ -2,15 +2,25 @@
 #include "functions.h"
 
 int mandelbrot_iterations(const float re_c, const float im_c, const int max_iterations) {
+    const float q = (re_c - 0.25f) * (re_c - 0.25f) + im_c * im_c;
+    if (q * (q + (re_c - 0.25f)) < 0.25f * im_c * im_c) {
+        return max_iterations;
+    }
+
+    if ((re_c + 1.0f) * (re_c + 1.0f) + im_c * im_c < 0.0625f) {
+        return max_iterations;
+    }
+
     int iterations = 0;
     float a = 0.0f, b = 0.0f;
+    float a2 = 0.0f, b2 = 0.0f;
 
-    while (a * a + b * b < 4.0f && iterations < max_iterations) {
-        const float a1 = a * a - b * b + re_c;
-        const float b1 = 2 * a * b + im_c;
+    while (a2 + b2 < 4.0f && iterations < max_iterations) {
+        b = 2 * a * b + im_c;
+        a = a2 - b2 + re_c;
 
-        a = a1;
-        b = b1;
+        a2 = a * a;
+        b2 = b * b;
         iterations++;
     }
 
@@ -35,7 +45,8 @@ Texture2D render_mandelbrot(const int width, const int height, float zoom, float
     Image img = GenImageColor(width, height, BLACK);
     Color* pixels = (Color*)img.data;
 
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for schedule(dynamic) default(none) \
+    shared(pixels, width, height, zoom, offset_x, offset_y, max_iterations)
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             const float re_c = ((float)x - (float)width / 1.5f) * (4.0f / ((float) width * zoom)) + offset_x;

@@ -77,20 +77,21 @@ int main(void) {
 
         // Навигация камеры (только в режиме рендера)
         if (state != STATE_GALLERY) {
+            float current_speed = 20.0f / camera.zoom;
             if (IsKeyPressedRepeat(KEY_UP)) {
-                camera.target.y -= camera_offset;
+                camera.target.y -= current_speed;
                 needs_update = true;
             }
             if (IsKeyPressedRepeat(KEY_DOWN)) {
-                camera.target.y += camera_offset;
+                camera.target.y += current_speed;
                 needs_update = true;
             }
             if (IsKeyPressedRepeat(KEY_LEFT)) {
-                camera.target.x -= camera_offset;
+                camera.target.x -= current_speed;
                 needs_update = true;
             }
             if (IsKeyPressedRepeat(KEY_RIGHT)) {
-                camera.target.x += camera_offset;
+                camera.target.x += current_speed;
                 needs_update = true;
             }
 
@@ -109,14 +110,14 @@ int main(void) {
                 }
 
             // Ограничения камеры
-            if (camera.zoom < 0.1f)
-                camera.zoom = 0.1f;
-            if (camera.zoom > 100.0f)
-                camera.zoom = 100.0f;
-            if (camera_offset < 1.0f)
-                camera_offset = 1.0f;
-            if (camera_offset > 1000.0f)
-                camera_offset = 1000.0f;
+            // if (camera.zoom < 0.1f)
+            //     camera.zoom = 0.1f;
+            // if (camera.zoom > 100.0f)
+            //     camera.zoom = 100.0f;
+            // if (camera_offset < 1.0f)
+            //     camera_offset = 1.0f;
+            // if (camera_offset > 1000.0f)
+            //     camera_offset = 1000.0f;
         }
 
         // === Отрисовка ===
@@ -148,6 +149,7 @@ int main(void) {
                 state = STATE_MANDELBROT;
                 needs_update = true;
                 mandel_params.zoom = camera.zoom;
+                camera.target = (Vector2){WIDTH / 2.0f + 300.0f, HEIGHT / 2.0f};
                 mandel_params.offset_x = (camera.target.x - WIDTH/2.0f) / WIDTH;
                 mandel_params.offset_y = (camera.target.y - HEIGHT/2.0f) / HEIGHT;
             }
@@ -165,7 +167,7 @@ int main(void) {
                case STATE_CARPET: {
                    float x_start = (WIDTH - carpet_params.start_length) / 2.0f;
                    float y_start = (HEIGHT - carpet_params.start_length) / 2.0f;
-                   draw_square(x_start, y_start, carpet_params.start_length, BLUE);
+                   draw_square(x_start, y_start, carpet_params.start_length, VIOLET);
                    draw_carpet(x_start, y_start, carpet_params.start_length,
                               carpet_params.depth, &carpet_params);
                    break;
@@ -186,8 +188,8 @@ int main(void) {
                        if (mandelbrot_texture.id > 0)
                            UnloadTexture(mandelbrot_texture);
                        mandel_params.zoom = camera.zoom;
-                       mandel_params.offset_x = (camera.target.x - WIDTH / 2.0f) / (WIDTH * camera.zoom);
-                       mandel_params.offset_y = (camera.target.y - HEIGHT / 2.0f) / (HEIGHT * camera.zoom);
+                       mandel_params.offset_x = (camera.target.x - WIDTH / 1.5f) * (4.0f / WIDTH);
+                       mandel_params.offset_y = (camera.target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
 
                        mandelbrot_texture = render_mandelbrot(WIDTH, HEIGHT,
                                               mandel_params.zoom,
@@ -268,7 +270,9 @@ int main(void) {
                     break;
                 case STATE_MANDELBROT:
                     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", mandel_params.iterations));
-                    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL, &mandelbrot_iterations_float, 50, 500)) {
+                    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+                        &mandelbrot_iterations_float, 0, 300)) {
+
                         mandel_params.iterations = (int)mandelbrot_iterations_float;
                         needs_update = true;
                     }
@@ -280,7 +284,7 @@ int main(void) {
                         mandel_params.zoom = 1.0f;
                         mandel_params.offset_x = 0.0f;
                         mandel_params.offset_y = 0.0f;
-                        camera.target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+                        camera.target = (Vector2){WIDTH / 2.0f + 300.0f, HEIGHT / 2.0f};
                         camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
                         camera.rotation = 0.0f;
                         camera.zoom = 1.0f;
