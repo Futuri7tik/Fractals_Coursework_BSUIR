@@ -21,6 +21,11 @@ void draw_carpet(float x_left, float y_left, float length,
     depth -= 1;
     if (depth < 0) return;
 
+    if (x_left + length < 0 || x_left > GetScreenWidth() ||
+        y_left + length < 0 || y_left > GetScreenHeight()) {
+        return;
+    }
+
     float new_length = length / 3.0f;
     float x_draw = x_left + new_length;
     float y_draw = y_left + new_length;
@@ -36,4 +41,41 @@ void draw_carpet(float x_left, float y_left, float length,
             }
         }
     }
+}
+
+
+void draw_carpet_to_image(Image* img, float x, float y, float length, int depth) {
+    if (depth < 0) return;
+
+    float new_length = length / 3.0f;
+    float x_draw = x + new_length;
+    float y_draw = y + new_length;
+
+    // Вырезаем центральный квадрат (чёрный)
+    ImageDrawRectangle(img, x_draw, y_draw, new_length, new_length, BLACK);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if (i != 1 || j != 1) {
+                draw_carpet_to_image(img, x + i * new_length, y + j * new_length,
+                                    new_length, depth - 1);
+            }
+        }
+    }
+}
+
+Texture2D render_carpet_to_texture(int width, int height, int depth, float start_length) {
+    Image img = GenImageColor(width, height, BLACK);
+
+    // Рисуем основание
+    float x_start = ((float) width - start_length) / 2.0f;
+    float y_start = ((float) height - start_length) / 2.0f;
+    ImageDrawRectangle(&img, (int) x_start, (int) y_start, (int) start_length, (int) start_length, VIOLET);
+
+    // Рекурсивно рисуем ковёр
+    draw_carpet_to_image(&img, x_start, y_start, start_length, depth);
+
+    Texture2D texture = LoadTextureFromImage(img);
+    UnloadImage(img);
+    return texture;
 }

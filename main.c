@@ -1,5 +1,4 @@
 #include "raylib.h"
-#include "raymath.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
@@ -28,6 +27,7 @@ int main(void) {
 
     TreeParameters tree_params = {
         .depth = 14,
+        .max_depth = 18,
         .start_depth = 14,
         .angle = 25.0f * DEG2RAD,
         .length_factor = 0.75f
@@ -36,7 +36,8 @@ int main(void) {
     CarpetParameters carpet_params = {
         .depth = 7,
         .max_depth = 8,
-        .start_length = HEIGHT - 200
+        .start_length = HEIGHT - 200,
+        .texture = {0}
     };
 
     TriangleParameters triangle_params = {
@@ -51,8 +52,11 @@ int main(void) {
         .zoom = 1.0f,
         .offset_x = 0.0f,
         .offset_y = 0.0f,
+        .red = 9,
+        .green = 15,
+        .blue = 8.5f,
+        .texture = {0}
     };
-    Texture2D mandelbrot_texture = {0};
 
     Camera2D camera = {0};
     camera.target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
@@ -71,11 +75,11 @@ int main(void) {
     // === Главный цикл ===
     while (!WindowShouldClose()) {
         // === Обработка клавиш ===
-        if (IsKeyPressed(KEY_ESCAPE)) {
+        if (IsKeyPressed(KEY_TAB)) {
             state = STATE_GALLERY;
         }
 
-        // Навигация камеры (только в режиме рендера)
+        // Навигация камеры
         if (state != STATE_GALLERY) {
             float current_speed = 20.0f / camera.zoom;
             if (IsKeyPressedRepeat(KEY_UP)) {
@@ -108,16 +112,6 @@ int main(void) {
                     camera_offset *= 1.05f;
                     needs_update = true;
                 }
-
-            // Ограничения камеры
-            // if (camera.zoom < 0.1f)
-            //     camera.zoom = 0.1f;
-            // if (camera.zoom > 100.0f)
-            //     camera.zoom = 100.0f;
-            // if (camera_offset < 1.0f)
-            //     camera_offset = 1.0f;
-            // if (camera_offset > 1000.0f)
-            //     camera_offset = 1000.0f;
         }
 
         // === Отрисовка ===
@@ -140,6 +134,7 @@ int main(void) {
             if (GuiButton((Rectangle){WIDTH/2.0f - 250, HEIGHT/2.0f - 30, 500, 50}, "Sierpinski Carpet")) {
                 state = STATE_CARPET;
                 carpet_depth_float = (float)carpet_params.depth;
+                needs_update = true;
             }
             if (GuiButton((Rectangle){WIDTH/2.0f - 250, HEIGHT/2.0f + 40, 500, 50}, "Sierpinski Triangle")) {
                 state = STATE_TRIANGLE;
@@ -149,11 +144,11 @@ int main(void) {
                 state = STATE_MANDELBROT;
                 needs_update = true;
                 mandel_params.zoom = camera.zoom;
-                camera.target = (Vector2){WIDTH / 2.0f + 300.0f, HEIGHT / 2.0f};
+                camera.target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
                 mandel_params.offset_x = (camera.target.x - WIDTH/2.0f) / WIDTH;
                 mandel_params.offset_y = (camera.target.y - HEIGHT/2.0f) / HEIGHT;
             }
-            DrawText("Press ESC to return to gallery", WIDTH/2 - 150, HEIGHT - 50, 16, GRAY);
+            DrawText("Press ESC to exit", WIDTH/2 - 150, HEIGHT - 50, 16, GRAY);
 
         }
         else {
@@ -165,11 +160,18 @@ int main(void) {
                          tree_params.depth, &tree_params);
                     break;
                case STATE_CARPET: {
-                   float x_start = (WIDTH - carpet_params.start_length) / 2.0f;
-                   float y_start = (HEIGHT - carpet_params.start_length) / 2.0f;
-                   draw_square(x_start, y_start, carpet_params.start_length, VIOLET);
-                   draw_carpet(x_start, y_start, carpet_params.start_length,
-                              carpet_params.depth, &carpet_params);
+                   if (needs_update) {
+                       if (carpet_params.texture.id > 0)
+                           UnloadTexture(carpet_params.texture);
+                       carpet_params.texture = render_carpet_to_texture(WIDTH, HEIGHT,
+                                                  carpet_params.depth,
+                                                  carpet_params.start_length);
+                       needs_update = false;
+                   }
+
+                   if (carpet_params.texture.id > 0)
+                       DrawTexture(carpet_params.texture, 0, 0, WHITE);
+
                    break;
                }
                case STATE_TRIANGLE: {
@@ -185,22 +187,23 @@ int main(void) {
                    EndMode2D();
 
                    if (needs_update == true) {
-                       if (mandelbrot_texture.id > 0)
-                           UnloadTexture(mandelbrot_texture);
+                       if (mandel_params.texture.id > 0)
+                           UnloadTexture(mandel_params.texture);
                        mandel_params.zoom = camera.zoom;
-                       mandel_params.offset_x = (camera.target.x - WIDTH / 1.5f) * (4.0f / WIDTH);
+                       mandel_params.offset_x = (camera.target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
                        mandel_params.offset_y = (camera.target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
 
-                       mandelbrot_texture = render_mandelbrot(WIDTH, HEIGHT,
+                       mandel_params.texture = render_mandelbrot(WIDTH, HEIGHT,
                                               mandel_params.zoom,
                                               mandel_params.offset_x,
                                               mandel_params.offset_y,
-                                              mandel_params.iterations);
+                                              mandel_params.iterations,
+                                              &mandel_params);
                        needs_update = false;
                    }
 
-                   if (mandelbrot_texture.id > 0)
-                       DrawTexture(mandelbrot_texture, 0, 0, WHITE);
+                   if (mandel_params.texture.id > 0)
+                       DrawTexture(mandel_params.texture, 0, 0, WHITE);
 
                    BeginMode2D(camera);
                    break;
@@ -218,7 +221,7 @@ int main(void) {
                     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", tree_params.depth));
 
                     GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
-                        &tree_depth_float, 1,18);
+                        &tree_depth_float, 1,(float)tree_params.max_depth);
                     tree_params.depth = (int)tree_depth_float;
 
                     float angle_deg = tree_params.angle * RAD2DEG;
@@ -227,7 +230,7 @@ int main(void) {
                     tree_params.angle = angle_deg * DEG2RAD;
 
                     GuiLabel((Rectangle){20, 190, 200, 20}, TextFormat("Length Factor: %.2f", tree_params.length_factor));
-                    GuiSlider((Rectangle){20, 220, 200, 20}, NULL, NULL, &tree_factor_float, 0, 0.9);
+                    GuiSlider((Rectangle){20, 220, 200, 20}, NULL, NULL, &tree_factor_float, 0, 0.9f);
                     tree_params.length_factor = tree_factor_float;
 
                     if (GuiButton((Rectangle){20, 260, 110, 30}, "Reset")) {
@@ -244,7 +247,10 @@ int main(void) {
                     break;
                 case STATE_CARPET:
                     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", carpet_params.depth));
-                    GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL, &carpet_depth_float, 0, 8);
+                    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+                        &carpet_depth_float, 0, (float) carpet_params.max_depth))
+                        needs_update = true;
+
                     carpet_params.depth = (int)carpet_depth_float;
 
                     if (GuiButton((Rectangle){20, 120, 110, 30}, "Reset")) {
@@ -253,11 +259,13 @@ int main(void) {
                         camera.zoom = 1.0f;
                         camera.target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
                         camera_offset = 20.0f;
+                        needs_update = true;
                     }
                     break;
                 case STATE_TRIANGLE:
                     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", triangle_params.depth));
-                    GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL, &triangle_depth_float, 0, 13);
+                    GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+                        &triangle_depth_float, 0, (float) triangle_params.max_depth);
                     triangle_params.depth = (int)triangle_depth_float;
 
                     if (GuiButton((Rectangle){20, 120, 110, 30}, "Reset")) {
@@ -271,23 +279,45 @@ int main(void) {
                 case STATE_MANDELBROT:
                     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", mandel_params.iterations));
                     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
-                        &mandelbrot_iterations_float, 0, 300)) {
+                        &mandelbrot_iterations_float, 0, 500)) {
 
                         mandel_params.iterations = (int)mandelbrot_iterations_float;
                         needs_update = true;
                     }
 
-                    if (GuiButton((Rectangle){20, 160, 110, 30}, "Reset")) {
+                    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
+                    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: "));
+                    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+                        &mandel_params.red, 0, 255)) {
+                        needs_update = true;
+                    }
+
+                    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor:"));
+                    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+                        &mandel_params.green, 0, 255)) {
+                        needs_update = true;
+                    }
+
+                    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor:"));
+                    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                        &mandel_params.blue, 0, 255)) {
+                        needs_update = true;
+                    }
+
+                    if (GuiButton((Rectangle){20, 280, 110, 30}, "Reset")) {
                         mandel_params.iterations = 200;
                         mandelbrot_iterations_float = (float)mandel_params.iterations;
                         mandel_params.max_iterations = 800;
                         mandel_params.zoom = 1.0f;
                         mandel_params.offset_x = 0.0f;
                         mandel_params.offset_y = 0.0f;
-                        camera.target = (Vector2){WIDTH / 2.0f + 300.0f, HEIGHT / 2.0f};
+                        camera.target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
                         camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
                         camera.rotation = 0.0f;
                         camera.zoom = 1.0f;
+                        mandel_params.red = 9.0f;
+                        mandel_params.green = 15.f;
+                        mandel_params.blue = 8.5f;
                         needs_update = true;
                     }
                     break;
@@ -298,7 +328,7 @@ int main(void) {
             }
         }
 
-        // DrawFPS(WIDTH - 100, HEIGHT - 30);
+        DrawFPS(160, 15);
         EndDrawing();
     }
 

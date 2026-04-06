@@ -1,9 +1,9 @@
 #ifndef KURSACH_FUNCTIONS_H
 #define KURSACH_FUNCTIONS_H
 #include "raylib.h"
-#include "raymath.h"
 
 typedef enum {
+    STATE_MENU,
     STATE_GALLERY,
     STATE_TREE,
     STATE_CARPET,
@@ -24,6 +24,7 @@ typedef struct {
     int depth;
     int max_depth;
     float start_length;
+    Texture2D texture;
 } CarpetParameters;
 
 typedef struct {
@@ -38,6 +39,10 @@ typedef struct {
     float zoom;
     float offset_x;
     float offset_y;
+    float red;
+    float green;
+    float blue;
+    Texture2D texture;
 } MandelbrotParameters;
 
 // === Дерево ===
@@ -50,6 +55,8 @@ Color get_color_carpet(int depth, CarpetParameters* params);
 void draw_square(float x, float y, float length, Color color);
 void draw_carpet(float x_left, float y_left, float length,
                  int depth, CarpetParameters* params);
+void draw_carpet_to_image(Image* img, float x, float y, float length, int depth);
+Texture2D render_carpet_to_texture(int width, int height, int depth, float start_length);
 
 // === Треугольник ===
 Color get_color_triangle(int depth, TriangleParameters* params);
@@ -60,9 +67,9 @@ void draw_sierpinski_triangle(float x, float y, float length,
 
 // === Множество мандельброта
 int mandelbrot_iterations(float re_c, float im_c, int max_iterations);
-Color get_color_mandelbrot(int iteration, int max_iterations);
+Color get_color_mandelbrot(int iteration, int max_iterations, const MandelbrotParameters* params);
 Texture2D render_mandelbrot(int width, int height, float zoom, float offset_x,
-    float offset_y, int max_iterations);
-
+    float offset_y, int max_iterations, const MandelbrotParameters* params);
+int mandelbrot_fourth_iterations(float re_c, float im_c, int max_iterations);
 
 #endif

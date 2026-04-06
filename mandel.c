@@ -27,33 +27,33 @@ int mandelbrot_iterations(const float re_c, const float im_c, const int max_iter
     return iterations;
 }
 
-Color get_color_mandelbrot(const int iteration, const int max_iterations) {
+Color get_color_mandelbrot(const int iteration, const int max_iterations, const MandelbrotParameters* params) {
     if (iteration == max_iterations) {
         return BLACK;
     }
 
-    // Более яркие цвета
-    unsigned char r = iteration * 4 % 255;
-    unsigned char g = iteration * 8 % 255;
-    unsigned char b = iteration * 12 % 255;
+    const float t = (float)iteration / (float)max_iterations;
+    unsigned char r = (unsigned char)(params->red * (1-t) * t * t * t * 255);
+    unsigned char g = (unsigned char)(params->green * (1-t) * (1-t) * t * t * 255);
+    unsigned char b = (unsigned char)(params->blue * (1-t) * (1-t) * (1-t) * t * 255);
 
     return (Color) {r, g, b, 255};
 }
 
 Texture2D render_mandelbrot(const int width, const int height, float zoom, float offset_x,
-    float offset_y, const int max_iterations) {
+    float offset_y, const int max_iterations, const MandelbrotParameters* params) {
     Image img = GenImageColor(width, height, BLACK);
-    Color* pixels = (Color*)img.data;
+    Color* pixels = img.data;
 
     #pragma omp parallel for schedule(dynamic) default(none) \
-    shared(pixels, width, height, zoom, offset_x, offset_y, max_iterations)
+    shared(pixels, width, height, zoom, offset_x, offset_y, max_iterations, params)
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            const float re_c = ((float)x - (float)width / 1.5f) * (4.0f / ((float) width * zoom)) + offset_x;
+            const float re_c = ((float)x - (float)width / 2.0f) * (4.0f / ((float) width * zoom)) + offset_x;
             const float im_c = ((float)y - (float)height / 2.0f) * (4.0f / ((float) width * zoom)) + offset_y;
 
             const int iterations = mandelbrot_iterations(re_c, im_c, max_iterations);
-            pixels[y * width + x] = get_color_mandelbrot(iterations, max_iterations);
+            pixels[y * width + x] = get_color_mandelbrot(iterations, max_iterations, params);
         }
     }
 
@@ -61,4 +61,32 @@ Texture2D render_mandelbrot(const int width, const int height, float zoom, float
     UnloadImage(img);
 
     return texture;
+}
+
+
+int mandelbrot_fourth_iterations(const float re_c, const float im_c, const int max_iterations) {
+    // const float q = (re_c - 0.25f) * (re_c - 0.25f) + im_c * im_c;
+    // if (q * (q + (re_c - 0.25f)) < 0.25f * im_c * im_c) {
+    //     return max_iterations;
+    // }
+    //
+    // if ((re_c + 1.0f) * (re_c + 1.0f) + im_c * im_c < 0.0625f) {
+    //     return max_iterations;
+    // }
+
+    int iterations = 0;
+    float a = 0.0f, b = 0.0f;
+    float a2 = 0.0f, b2 = 0.0f, ab = 0.0f;
+
+    while (a2 + b2 < 4.0f && iterations < max_iterations) {
+        b = 4 * (a2 * ab - b2 * ab) + im_c;
+        a = a2 * a2 - 6 * ab * ab + b2 * b2 + re_c;
+
+        a2 = a * a;
+        b2 = b * b;
+        ab = a * b;
+        iterations++;
+    }
+
+    return iterations;
 }

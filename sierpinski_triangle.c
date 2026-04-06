@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "functions.h"
+#include "raymath.h"
 #define SQRT3 0.866025f
 
 void draw_triangle_base(float x, float y, float length, Color color) {
@@ -41,7 +42,7 @@ Color get_color_triangle(const int depth, TriangleParameters* params) {
 
 void draw_sierpinski_triangle(float x, float y, float length,
                               int depth, TriangleParameters* params) {
-    if (depth <= 0 || length < 2.0f) return;
+    if (depth <= 0) return;
 
     float height = length * sqrtf(3.0f) / 2.0f;
     float h2 = height / 2.0f;
