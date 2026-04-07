@@ -11,6 +11,12 @@ typedef enum {
     STATE_MANDELBROT
 } AppState;
 
+typedef struct {
+    float min;
+    float max;
+    float value;
+} SliderParameters;
+
 // === Параметры фракталов ===
 typedef struct {
     int depth;

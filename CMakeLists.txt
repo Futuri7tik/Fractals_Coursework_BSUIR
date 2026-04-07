@@ -15,6 +15,7 @@ add_executable(KURSACH
         sierpinski_triangle.c
         main.c
         mandel.c
+        ui.c
 )
 
 if(OpenMP_C_FOUND)

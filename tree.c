@@ -15,6 +15,7 @@ Color get_color_tree(const int depth, const TreeParameters* params) {
 
 void draw_tree(float x_start, float y_start, float length, float angle,
                int depth, TreeParameters* params) {
+
     depth -= 1;
     if (depth < 0) return;
 
@@ -23,7 +24,6 @@ void draw_tree(float x_start, float y_start, float length, float angle,
 
     Color color = get_color_tree(depth, params);
 
-    // Рисуем линию напрямую (без vertex buffer)
     DrawLine((int) x_start, (int) y_start, (int)x_end, (int) y_end, color);
 
     float new_length = length * params->length_factor;
