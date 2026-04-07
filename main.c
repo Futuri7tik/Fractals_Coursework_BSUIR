@@ -24,28 +24,14 @@ int main(void) {
     AppState state = STATE_GALLERY;
 
     TreeParameters tree_params;
-    init_tree_parameters(&tree_params);
-
     CarpetParameters carpet_params;
+    TriangleParameters triangle_params;
+    MandelbrotParameters mandel_params;
+
+    init_tree_parameters(&tree_params);
     init_carpet_parameters(&carpet_params);
-
-    TriangleParameters triangle_params = {
-        .depth = 9,
-        .max_depth = 13,
-        .start_length = HEIGHT - 50
-    };
-
-    MandelbrotParameters mandel_params = {
-        .iterations = 200,
-        .max_iterations = 800,
-        .zoom = 1.0f,
-        .offset_x = 0.0f,
-        .offset_y = 0.0f,
-        .red = 9,
-        .green = 15,
-        .blue = 8.5f,
-        .texture = {0}
-    };
+    init_triangle_parameters(&triangle_params);
+    init_mandelbrot_parameters(&mandel_params);
 
     Camera2D camera = {0};
     camera.target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};

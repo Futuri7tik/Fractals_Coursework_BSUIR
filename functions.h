@@ -57,6 +57,8 @@ typedef struct {
 // === UI ===
 void init_tree_parameters(TreeParameters* params);
 void init_carpet_parameters(CarpetParameters* params);
+void init_triangle_parameters(TriangleParameters* params);
+void init_mandelbrot_parameters(MandelbrotParameters* params);
 
 // === Дерево ===
 Color get_color_tree(int depth, const TreeParameters* params);
