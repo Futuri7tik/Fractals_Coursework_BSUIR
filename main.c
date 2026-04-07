@@ -18,10 +18,11 @@ static float TextToFloat(const char *text) {
 int main(void) {
     InitWindow(WIDTH, HEIGHT, "Fractal Gallery");
     bool needs_update = true;
+    bool show_message_box = false;
 
     SetTargetFPS(144);
 
-    AppState state = STATE_GALLERY;
+    AppState state = STATE_MENU;
 
     TreeParameters tree_params;
     CarpetParameters carpet_params;
@@ -40,17 +41,15 @@ int main(void) {
     camera.zoom = 1.0f;
     float camera_offset = 20.0f;
 
-    // float mandelbrot_iterations_float = (float)mandel_params.iterations;
-
     // === Главный цикл ===
     while (!WindowShouldClose()) {
         // === Обработка клавиш ===
-        if (IsKeyPressed(KEY_TAB)) {
+        // Навигация камеры
+        if (IsKeyPressed(KEY_TAB) && state != STATE_MENU) {
             state = STATE_GALLERY;
         }
 
-        // Навигация камеры
-        if (state != STATE_GALLERY) {
+        if (state != STATE_GALLERY && state != STATE_MENU) {
             float current_speed = 20.0f / camera.zoom;
             if (IsKeyPressedRepeat(KEY_UP)) {
                 camera.target.y -= current_speed;
@@ -88,8 +87,61 @@ int main(void) {
         BeginDrawing();
         ClearBackground(BLACK);
 
+        if (state == STATE_MENU) {
+            DrawRectangleGradientV(0, 0, WIDTH, HEIGHT,
+                    (Color){255, 255, 255, 255}, (Color){106, 85, 242, 255});
+            int fontSize = 80, button_text = 30;
+            char* text= "FRACTAL GALLERY";
+            int textWidth = MeasureText(text, fontSize);
+            int x_coord = (WIDTH - textWidth) / 2, y_coord = HEIGHT/2 - 350;
+            DrawText(text, x_coord, y_coord, fontSize, BLACK);
+
+            int gallery_button = GuiButton((Rectangle){WIDTH / 2.0f - 200, HEIGHT / 2.0f - 200, 400, 60}, "GALLERY");
+            GuiSetStyle(gallery_button, TEXT_SIZE, button_text);
+
+            if (gallery_button)
+                state = STATE_GALLERY;
+
+            int about_button = GuiButton((Rectangle){WIDTH / 2.0f - 200, HEIGHT / 2.0f - 130, 400, 60}, "ABOUT");
+            if (about_button)
+                show_message_box = true;
+
+            if (show_message_box) {
+                GuiLoadStyleDefault();
+                int result = GuiMessageBox(
+                (Rectangle){WIDTH/2.0f - 300, HEIGHT/2.0f - 200, 600, 400},
+                    "About",
+                "Fractal Gallery v1.0\n\n"
+                     "Interactive Fractal Explorer\n\n"
+                     "Features:\n"
+                     "- Pythagoras Tree\n"
+                     "- Sierpinski Carpet\n"
+                     "- Sierpinski Triangle\n"
+                     "- Mandelbrot Set\n\n"
+                     "Controls:\n"
+                     "- Mouse Wheel: Zoom\n"
+                     "- Arrow Keys: Pan\n"
+                     "- Sliders: Fractal parameters"
+                     "- Tab - go back to gallery\n"
+                     "- ESC: Exit",
+                "OK");
+
+                if (result >= 0) {
+                    show_message_box = false;
+                    GuiSetStyle(gallery_button, TEXT_SIZE, button_text);
+                }
+
+            }
+
+            if (GuiButton((Rectangle){WIDTH / 2.0f - 200, HEIGHT / 2.0f - 60, 400, 60}, "EXIT")) {
+                break;
+            }
+        }
+        else
+
         if (state == STATE_GALLERY) {
-            GuiPanel((Rectangle){WIDTH/2.0f - 600, HEIGHT/2.0f - 400, 1200, 800}, "Fractal Gallery");
+            GuiLoadStyleDefault();
+            GuiPanel((Rectangle){0, 10, WIDTH, HEIGHT - 10}, "Fractal Gallery");
             camera.zoom = 1.0f;
             camera.target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
             camera_offset = 20.0f;
@@ -112,70 +164,66 @@ int main(void) {
                 mandel_params.offset_x = (camera.target.x - WIDTH/2.0f) / WIDTH;
                 mandel_params.offset_y = (camera.target.y - HEIGHT/2.0f) / HEIGHT;
             }
-            DrawText("Press ESC to exit", WIDTH/2 - 150, HEIGHT - 50, 16, GRAY);
-
         }
         else {
-            BeginMode2D(camera);
-
             switch (state) {
                 case STATE_TREE:
+                    BeginMode2D(camera);
                     draw_tree(WIDTH/2.0f, HEIGHT - 220, 200, -PI/2.0f,
                          (int) tree_params.depth, &tree_params);
+                    EndMode2D();
                     break;
-               case STATE_CARPET: {
-                   if (needs_update) {
-                       if (carpet_params.texture.id > 0)
-                           UnloadTexture(carpet_params.texture);
-                       carpet_params.texture = render_carpet_to_texture(WIDTH, HEIGHT,
+                case STATE_CARPET: {
+                    BeginMode2D(camera);
+                    if (needs_update) {
+                        if (carpet_params.texture.id > 0)
+                            UnloadTexture(carpet_params.texture);
+                        carpet_params.texture = render_carpet_to_texture(WIDTH, HEIGHT,
                                                   (int) carpet_params.depth,
                                                   carpet_params.start_length);
-                       needs_update = false;
-                   }
+                        needs_update = false;
+                    }
 
-                   if (carpet_params.texture.id > 0)
-                       DrawTexture(carpet_params.texture, 0, 0, WHITE);
-
-                   break;
-               }
-               case STATE_TRIANGLE: {
-                   float start_height = triangle_params.start_length * sqrtf(3.0f) / 2.0f;
-                   float x_start = (WIDTH - triangle_params.start_length) / 2.0f;
-                   float y_start = HEIGHT - (HEIGHT - start_height) / 2.0f;
-                   draw_triangle_base(x_start, y_start, triangle_params.start_length, YELLOW);
-                   draw_sierpinski_triangle(x_start, y_start, triangle_params.start_length,
+                    if (carpet_params.texture.id > 0)
+                        DrawTexture(carpet_params.texture, 0, 0, WHITE);
+                    EndMode2D();
+                    break;
+                }
+                case STATE_TRIANGLE: {
+                    BeginMode2D(camera);
+                    float start_height = triangle_params.start_length * sqrtf(3.0f) / 2.0f;
+                    float x_start = (WIDTH - triangle_params.start_length) / 2.0f;
+                    float y_start = HEIGHT - (HEIGHT - start_height) / 2.0f;
+                    draw_triangle_base(x_start, y_start, triangle_params.start_length, YELLOW);
+                    draw_sierpinski_triangle(x_start, y_start, triangle_params.start_length,
                                            (int) triangle_params.depth, &triangle_params);
-                   break;
-               }
+                    EndMode2D();
+                    break;
+                }
                 case STATE_MANDELBROT: {
-                   EndMode2D();
+                    if (needs_update == true) {
+                        if (mandel_params.texture.id > 0)
+                            UnloadTexture(mandel_params.texture);
+                        mandel_params.zoom = camera.zoom;
+                        mandel_params.offset_x = (camera.target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
+                        mandel_params.offset_y = (camera.target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
 
-                   if (needs_update == true) {
-                       if (mandel_params.texture.id > 0)
-                           UnloadTexture(mandel_params.texture);
-                       mandel_params.zoom = camera.zoom;
-                       mandel_params.offset_x = (camera.target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
-                       mandel_params.offset_y = (camera.target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
-
-                       mandel_params.texture = render_mandelbrot(WIDTH, HEIGHT,
+                        mandel_params.texture = render_mandelbrot(WIDTH, HEIGHT,
                                               mandel_params.zoom,
                                               mandel_params.offset_x,
                                               mandel_params.offset_y,
                                               (int) mandel_params.iterations,
                                               &mandel_params);
-                       needs_update = false;
-                   }
+                        needs_update = false;
+                    }
 
-                   if (mandel_params.texture.id > 0)
-                       DrawTexture(mandel_params.texture, 0, 0, WHITE);
-
-                   BeginMode2D(camera);
-                   break;
-               }
+                    if (mandel_params.texture.id > 0)
+                        DrawTexture(mandel_params.texture, 0, 0, WHITE);
+                    break;
+                }
+                default:
+                    break;
             }
-
-
-            EndMode2D();
 
             // === UI ПАНЕЛЬ ===
             GuiPanel((Rectangle){10, 10, 280, 380}, "Controls");
@@ -198,10 +246,7 @@ int main(void) {
                         &tree_params.length_factor, 0, 0.9f);
 
                     if (GuiButton((Rectangle){20, 260, 110, 30}, "Reset")) {
-                        tree_params.depth = 14;
-                        tree_params.angle = 25.0f * DEG2RAD;
-                        tree_params.angle_degrees = 25.0f;
-                        tree_params.length_factor = 0.75f;
+                        init_tree_parameters(&tree_params);
                         camera.zoom = 1.0f;
                         camera.target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
                         camera_offset = 20.0f;
@@ -216,7 +261,7 @@ int main(void) {
                     carpet_params.depth = (float) (int) carpet_params.depth;
 
                     if (GuiButton((Rectangle){20, 120, 110, 30}, "Reset")) {
-                        carpet_params.depth = 7;
+                        init_carpet_parameters(&carpet_params);
                         camera.zoom = 1.0f;
                         camera.target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
                         camera_offset = 20.0f;
@@ -230,7 +275,7 @@ int main(void) {
                     triangle_params.depth = (float) (int) triangle_params.depth;
 
                     if (GuiButton((Rectangle){20, 120, 110, 30}, "Reset")) {
-                        triangle_params.depth = 9;
+                        init_triangle_parameters(&triangle_params);
                         camera.zoom = 1.0f;
                         camera.target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
                         camera_offset = 20.0f;
@@ -265,29 +310,25 @@ int main(void) {
                     }
 
                     if (GuiButton((Rectangle){20, 280, 110, 30}, "Reset")) {
-                        mandel_params.iterations = 200;
-                        mandel_params.max_iterations = 800;
-                        mandel_params.zoom = 1.0f;
-                        mandel_params.offset_x = 0.0f;
-                        mandel_params.offset_y = 0.0f;
+                        init_mandelbrot_parameters(&mandel_params);
                         camera.target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
                         camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
                         camera.rotation = 0.0f;
                         camera.zoom = 1.0f;
-                        mandel_params.red = 9.0f;
-                        mandel_params.green = 15.f;
-                        mandel_params.blue = 8.5f;
                         needs_update = true;
                     }
+                    break;
+                default:
                     break;
             }
 
             if (GuiButton((Rectangle){20, 330, 110, 30}, "<- Gallery")) {
                 state = STATE_GALLERY;
             }
+            DrawFPS(WIDTH - 90, 15);
         }
 
-        DrawFPS(WIDTH - 90, 15);
+
         EndDrawing();
     }
 

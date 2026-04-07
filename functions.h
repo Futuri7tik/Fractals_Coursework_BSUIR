@@ -10,7 +10,7 @@ typedef enum {
     STATE_TREE,
     STATE_CARPET,
     STATE_TRIANGLE,
-    STATE_MANDELBROT
+    STATE_MANDELBROT,
 } AppState;
 
 typedef struct {
