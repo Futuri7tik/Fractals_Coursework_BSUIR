@@ -33,7 +33,7 @@ Color get_color_triangle(const int depth, TriangleParameters* params) {
         return (Color){0, 0, 153, 255};
     }
 
-    const float t = 1.0f - (float)depth / (float)params->max_depth;
+    const float t = 1.0f - (float)depth / params->depth;
     const unsigned char r = color_1[0] * (1.0f - t) + color_2[0] * t;
     const unsigned char g = color_1[1] * (1.0f - t) + color_2[1] * t;
     const unsigned char b = color_1[2] * (1.0f - t) + color_2[2] * t;

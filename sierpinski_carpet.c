@@ -1,16 +1,5 @@
 #include "raylib.h"
-#include "stdio.h"
 #include "functions.h"
-
-Color get_color_carpet(const int depth, CarpetParameters* params) {
-    const int color_1[3] = {0, 0, 0};
-    const int color_2[3] = {0, 0, 153};
-    const float t = 1.0f - (float) depth / (float) params->max_depth;
-    const unsigned char r = color_1[0] * (1 - t) + color_2[0] * t;
-    const unsigned char g = color_1[1] * (1 - t) + color_2[1] * t;
-    const unsigned char b = color_1[2] * (1 - t) + color_2[2] * t;
-    return (Color){r, g, b, 255};
-}
 
 void draw_carpet_to_image(Image* img, float x, float y, float length, int depth) {
     if (depth < 0) return;
