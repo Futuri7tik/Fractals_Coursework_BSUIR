@@ -94,6 +94,7 @@ int main(void) {
         if (state == STATE_MENU) {
             DrawRectangleGradientV(0, 0, WIDTH, HEIGHT,
                     (Color){255, 255, 255, 255}, (Color){106, 85, 242, 255});
+
             int fontSize = 80, button_text = 30;
             char* text= "FRACTAL GALLERY";
             int textWidth = MeasureText(text, fontSize);
@@ -129,7 +130,7 @@ int main(void) {
                      "Controls:\n"
                      "- Mouse Wheel: Zoom\n"
                      "- Arrow Keys: Pan\n"
-                     "- Sliders: Fractal parameters"
+                     "- Sliders: Fractal parameters\n"
                      "- Tab - go back to gallery from render or to menu from gallery\n"
                      "- ESC: Exit",
                 "OK");
