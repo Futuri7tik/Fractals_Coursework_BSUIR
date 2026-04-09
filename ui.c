@@ -32,3 +32,17 @@ void init_mandelbrot_parameters(MandelbrotParameters* params) {
     params->blue = 8.5f;
     params->texture = (Texture2D) {0};
 }
+
+void init_julia_parameters(JuliaParameters* params) {
+    params->iterations = 200;
+    params->max_iterations = 800;
+    params->zoom = 1.0f;
+    params->offset_x = 0.0f;
+    params->offset_y = 0.0f;
+    params->re_c = -0.8f; // 0.7269
+    params->im_c = 0.156f; // 0.1889
+    params->red = 9;
+    params->green = 15;
+    params->blue = 8.5f;
+    params->texture = (Texture2D) {0};
+}

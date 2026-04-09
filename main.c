@@ -28,11 +28,13 @@ int main(void) {
     CarpetParameters carpet_params;
     TriangleParameters triangle_params;
     MandelbrotParameters mandel_params;
+    JuliaParameters julia_params;
 
     init_tree_parameters(&tree_params);
     init_carpet_parameters(&carpet_params);
     init_triangle_parameters(&triangle_params);
     init_mandelbrot_parameters(&mandel_params);
+    init_julia_parameters(&julia_params);
 
     Camera2D camera = {0};
     camera.target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
@@ -46,6 +48,7 @@ int main(void) {
         // === Обработка клавиш ===
         // Навигация камеры
         if (IsKeyPressed(KEY_TAB)) {
+            GuiLoadStyleDefault();
             if (state == STATE_GALLERY)
                 state = STATE_MENU;
             else
@@ -72,7 +75,6 @@ int main(void) {
                 needs_update = true;
             }
 
-            // Зум колесом мыши
             float wheel = GetMouseWheelMove();
             if (wheel > 0) {
                 camera.zoom *= 1.05f;
@@ -150,17 +152,48 @@ int main(void) {
                 camera.target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
                 camera_offset = 20.0f;
 
-                if (GuiButton((Rectangle){WIDTH/2.0f - 250, HEIGHT/2.0f - 100, 500, 50}, "Pythagoras Tree")) {
-                    state = STATE_TREE;
-                }
-                if (GuiButton((Rectangle){WIDTH/2.0f - 250, HEIGHT/2.0f - 30, 500, 50}, "Sierpinski Carpet")) {
-                    state = STATE_CARPET;
-                    needs_update = true;
-                }
-                if (GuiButton((Rectangle){WIDTH/2.0f - 250, HEIGHT/2.0f + 40, 500, 50}, "Sierpinski Triangle")) {
-                    state = STATE_TRIANGLE;
-                }
-                if (GuiButton((Rectangle){WIDTH/2.0f - 250, HEIGHT/2.0f + 110, 500, 50}, "Mandelbrot Set")) {
+                Image mandelbrot_image = LoadImage("mandelbrot.png");
+                ImageResize(&mandelbrot_image, 280, 230);
+
+                Image tree_image = LoadImage("tree.png");
+                ImageResize(&tree_image, 280, 230);
+
+                Image carpet_image = LoadImage("carpet.png");
+                ImageResize(&carpet_image, 280, 230);
+
+                Image triangle_image = LoadImage("triangle.png");
+                ImageResize(&triangle_image, 280, 230);
+
+                Image julia_image = LoadImage("julia.png");
+                ImageResize(&julia_image, 280, 230);
+
+                Texture2D mandel_texture = LoadTextureFromImage(mandelbrot_image);
+                Texture2D tree_texture = LoadTextureFromImage(tree_image);
+                Texture2D carpet_texture = LoadTextureFromImage(carpet_image);
+                Texture2D triangle_texture = LoadTextureFromImage(triangle_image);
+                Texture2D julia_texture = LoadTextureFromImage(julia_image);
+
+                UnloadImage(mandelbrot_image);
+                UnloadImage(tree_image);
+                UnloadImage(carpet_image);
+                UnloadImage(triangle_image);
+                UnloadImage(julia_image);
+
+                DrawTexture(mandel_texture, 150, 100, WHITE);
+                DrawTexture(tree_texture, 500, 100, WHITE);
+                DrawTexture(carpet_texture, 850, 100, WHITE);
+                DrawTexture(triangle_texture, 1200, 100, WHITE);
+                DrawTexture(julia_texture, 1550, 100, WHITE);
+
+                DrawText("Mandelbrot Set", 195, 75, 24, GRAY);
+                Rectangle mandel_field = {150, 100, 280, 230};
+                Rectangle tree_field = {500, 100, 280, 230};
+                Rectangle carpet_field = {850, 100, 280, 230};
+                Rectangle triangle_field = {1200, 100, 280, 230};
+                Rectangle julia_field = {1550, 100, 280, 230};
+
+                GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, 0x00000000);
+                if (GuiButton(mandel_field, "")) {
                     state = STATE_MANDELBROT;
                     needs_update = true;
                     mandel_params.zoom = camera.zoom;
@@ -168,6 +201,29 @@ int main(void) {
                     mandel_params.offset_x = (camera.target.x - WIDTH/2.0f) / WIDTH;
                     mandel_params.offset_y = (camera.target.y - HEIGHT/2.0f) / HEIGHT;
                 }
+
+                if (GuiButton(tree_field, ""))
+                    state = STATE_TREE;
+
+                if (GuiButton(carpet_field, "")) {
+                    state = STATE_CARPET;
+                    needs_update = true;
+                }
+
+                if (GuiButton(triangle_field, "")) {
+                    state = STATE_TRIANGLE;
+                }
+
+                if (GuiButton(julia_field, "")) {
+                    state = STATE_JULIA;
+                    needs_update = true;
+                    julia_params.zoom = camera.zoom;
+                    camera.target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+                    julia_params.offset_x = (camera.target.x - WIDTH/2.0f) / WIDTH;
+                    julia_params.offset_y = (camera.target.y - HEIGHT/2.0f) / HEIGHT;
+                }
+
+                GuiLoadStyleDefault();
             }
             else {
                 switch (state) {
@@ -225,12 +281,34 @@ int main(void) {
                             DrawTexture(mandel_params.texture, 0, 0, WHITE);
                         break;
                     }
+                    case STATE_JULIA: {
+                        if (needs_update == true) {
+                            if (julia_params.texture.id > 0)
+                                UnloadTexture(julia_params.texture);
+
+                            julia_params.zoom = camera.zoom;
+                            julia_params.offset_x = (camera.target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
+                            julia_params.offset_y = (camera.target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
+
+                            julia_params.texture = render_julia(WIDTH, HEIGHT,
+                                             julia_params.zoom,
+                                             julia_params.offset_x,
+                                                  julia_params.offset_y,
+                                                  (int) julia_params.iterations,
+                                                  &julia_params);
+                            needs_update = false;
+                        }
+
+                        if (julia_params.texture.id > 0)
+                            DrawTexture(julia_params.texture, 0, 0, WHITE);
+                        break;
+                    }
                     default:
                         break;
                 }
 
                 // === UI ПАНЕЛЬ ===
-                GuiPanel((Rectangle){10, 10, 280, 380}, "Controls");
+                GuiPanel((Rectangle){10, 10, 280, 450}, "Controls");
 
                 switch (state) {
                     case STATE_TREE:
@@ -273,7 +351,7 @@ int main(void) {
                         }
                         break;
                     case STATE_TRIANGLE:
-                        GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", triangle_params.depth));
+                        GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) triangle_params.depth));
                         GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
                             &triangle_params.depth, 0, (float) triangle_params.max_depth);
                         triangle_params.depth = (float) (int) triangle_params.depth;
@@ -316,6 +394,43 @@ int main(void) {
                         if (GuiButton((Rectangle){20, 280, 110, 30}, "Reset")) {
                             init_mandelbrot_parameters(&mandel_params);
                             camera.target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
+                            camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+                            camera.rotation = 0.0f;
+                            camera.zoom = 1.0f;
+                            needs_update = true;
+                        }
+                        break;
+                    case STATE_JULIA:
+                        GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) julia_params.iterations));
+                        if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+                            &julia_params.iterations, 0, 500)) {
+
+                            julia_params.iterations = (float)(int) julia_params.iterations;
+                            needs_update = true;
+                            }
+
+                        GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
+                        GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: "));
+                        if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+                            &julia_params.red, 0, 20)) {
+                            needs_update = true;
+                            }
+
+                        GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor:"));
+                        if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+                            &julia_params.green, 0, 20)) {
+                            needs_update = true;
+                            }
+
+                        GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor:"));
+                        if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                            &julia_params.blue, 0, 20)) {
+                            needs_update = true;
+                            }
+
+                        if (GuiButton((Rectangle){20, 280, 110, 30}, "Reset")) {
+                            init_julia_parameters(&julia_params);
+                            camera.target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
                             camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
                             camera.rotation = 0.0f;
                             camera.zoom = 1.0f;

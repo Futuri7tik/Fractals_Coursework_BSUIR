@@ -27,7 +27,7 @@ Texture2D render_carpet_to_texture(int width, int height, int depth, float start
     // Рисуем основание
     float x_start = ((float) width - start_length) / 2.0f;
     float y_start = ((float) height - start_length) / 2.0f;
-    ImageDrawRectangle(&img, (int) x_start, (int) y_start, (int) start_length, (int) start_length, RED);
+    ImageDrawRectangle(&img, (int) x_start, (int) y_start, (int) start_length, (int) start_length, SKYBLUE);
     // Рекурсивно рисуем ковёр
     draw_carpet_to_image(&img, x_start, y_start, start_length, depth);
 

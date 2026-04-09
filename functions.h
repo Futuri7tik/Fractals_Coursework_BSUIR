@@ -11,6 +11,7 @@ typedef enum {
     STATE_CARPET,
     STATE_TRIANGLE,
     STATE_MANDELBROT,
+    STATE_JULIA,
 } AppState;
 
 typedef struct {
@@ -53,12 +54,26 @@ typedef struct {
     Texture2D texture;
 } MandelbrotParameters;
 
+typedef struct {
+    float iterations;
+    int max_iterations;
+    float re_c;
+    float im_c;
+    float zoom;
+    float offset_x;
+    float offset_y;
+    float red;
+    float green;
+    float blue;
+    Texture2D texture;
+} JuliaParameters;
 
 // === UI ===
 void init_tree_parameters(TreeParameters* params);
 void init_carpet_parameters(CarpetParameters* params);
 void init_triangle_parameters(TriangleParameters* params);
 void init_mandelbrot_parameters(MandelbrotParameters* params);
+void init_julia_parameters(JuliaParameters* params);
 
 // === Дерево ===
 Color get_color_tree(int depth, const TreeParameters* params);
@@ -86,4 +101,9 @@ Texture2D render_mandelbrot(int width, int height, float zoom, float offset_x,
     float offset_y, int max_iterations, const MandelbrotParameters* params);
 int mandelbrot_fourth_iterations(float re_c, float im_c, int max_iterations);
 
+// === Множество Джулии
+int julia_iterations(float re_z, float im_z, float re_c, float im_c, int max_iterations);
+Color get_color_julia(int iteration, int max_iterations, const JuliaParameters* params);
+Texture2D render_julia(int width, int height, float zoom, float offset_x,
+    float offset_y, int max_iterations, const JuliaParameters* params);
 #endif
