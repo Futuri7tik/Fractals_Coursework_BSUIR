@@ -1,11 +1,13 @@
 #ifndef KURSACH_FUNCTIONS_H
 #define KURSACH_FUNCTIONS_H
 #include "raylib.h"
+#include <stddef.h>
 #define WIDTH 1920
 #define HEIGHT 1080
 
 typedef enum {
     STATE_MENU,
+    STATE_SLIDESHOW,
     STATE_GALLERY,
     STATE_TREE,
     STATE_CARPET,
@@ -19,6 +21,14 @@ typedef struct {
     float max;
     float value;
 } SliderParameters;
+
+typedef struct ImageNode {
+    char* fract_name;
+    char* img_name;
+    Rectangle field;
+    Texture2D texture;
+    struct ImageNode* next;
+} ImageNode;
 
 // === Параметры фракталов ===
 typedef struct {
@@ -74,6 +84,9 @@ void init_carpet_parameters(CarpetParameters* params);
 void init_triangle_parameters(TriangleParameters* params);
 void init_mandelbrot_parameters(MandelbrotParameters* params);
 void init_julia_parameters(JuliaParameters* params);
+ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture);
+void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
+void draw_pics(ImageNode* head);
 
 // === Дерево ===
 Color get_color_tree(int depth, const TreeParameters* params);

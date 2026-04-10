@@ -14,13 +14,15 @@ int mandelbrot_iterations(const float re_c, const float im_c, const int max_iter
     int iterations = 0;
     float a = 0.0f, b = 0.0f;
     float a2 = 0.0f, b2 = 0.0f;
+    float ab = a * b;
 
     while (a2 + b2 < 4.0f && iterations < max_iterations) {
-        b = 2 * a * b + im_c;
+        b = 2 * ab + im_c;
         a = a2 - b2 + re_c;
 
         a2 = a * a;
         b2 = b * b;
+        ab = a * b;
         iterations++;
     }
 
@@ -47,8 +49,8 @@ Texture2D render_mandelbrot(const int width, const int height, float zoom, float
 
     #pragma omp parallel for schedule(dynamic) default(none) \
     shared(pixels, width, height, zoom, offset_x, offset_y, max_iterations, params)
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
             const float re_c = ((float)x - (float)width / 2.0f) * (4.0f / ((float) width * zoom)) + offset_x;
             const float im_c = ((float)y - (float)height / 2.0f) * (4.0f / ((float) width * zoom)) + offset_y;
 
