@@ -4,6 +4,14 @@
 
 #include "functions.h"
 
+void init_fractals_parameters(FractalParameters* params) {
+    init_tree_parameters(&params->tree);
+    init_carpet_parameters(&params->carpet);
+    init_triangle_parameters(&params->triangle);
+    init_mandelbrot_parameters(&params->mandelbrot);
+    init_julia_parameters(&params->julia);
+}
+
 void init_tree_parameters(TreeParameters* params) {
     params->depth = 14;
     params->max_depth = 18;
@@ -51,7 +59,7 @@ void init_julia_parameters(JuliaParameters* params) {
     params->texture = (Texture2D) {0};
 }
 
-void menu_gui(int* state, int* show_msg_box, bool* should_close) {
+void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
     DrawRectangleGradientV(0, 0, WIDTH, HEIGHT,
                     (Color){255, 255, 255, 255}, (Color){106, 85, 242, 255});
 
@@ -79,7 +87,7 @@ void menu_gui(int* state, int* show_msg_box, bool* should_close) {
         *should_close = true;
     }
 
-    if (show_msg_box) {
+    if (*show_msg_box) {
         GuiLoadStyleDefault();
         int result = GuiMessageBox(
         (Rectangle){WIDTH/2.0f - 300, HEIGHT/2.0f - 200, 600, 400},
@@ -101,10 +109,221 @@ void menu_gui(int* state, int* show_msg_box, bool* should_close) {
         "OK");
 
         if (result >= 0) {
-            show_msg_box = false;
+            *show_msg_box = false;
             GuiSetStyle(gallery_button, TEXT_SIZE, button_text);
         }
+    }
+}
 
+void handle_movement(float speed, float* offset, Camera2D* cam, bool* update) {
+    // Вычисляем вектор движения: (Вправо - Влево, Вниз - Вверх)
+    int moveX = IsKeyPressedRepeat(KEY_RIGHT) - IsKeyPressedRepeat(KEY_LEFT);
+    int moveY = IsKeyPressedRepeat(KEY_DOWN) - IsKeyPressedRepeat(KEY_UP);
+
+    if (moveX != 0 || moveY != 0) {
+        cam->target.x += (float) moveX * speed;
+        cam->target.y += (float) moveY * speed;
+        *update = true;
+    }
+
+    float wheel = GetMouseWheelMove();
+    if (wheel > 0) {
+        cam->zoom *= 1.05f;
+        *offset *= 0.95f;
+        *update = true;
+    }
+    else
+        if (wheel < 0) {
+            cam->zoom *= 0.95f;
+            *offset *= 1.05f;
+            *update = true;
+        }
+}
+
+void gallery_gui(AppState* state, FractalParameters* params, Camera2D* cam, float* offset, ImageNode** head_img, bool* update) {
+    GuiPanel((Rectangle){0, 10, WIDTH, HEIGHT - 10}, "Fractal Gallery");
+    cam->zoom = 1.0f;
+    cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
+    *offset = 20.0f;
+
+    char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle", "Julia Set"};
+    char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png"};
+    Rectangle fields[] = {{0, 0,0,0}, {0, 0,0,0},{0, 0,0,0},
+        {0, 0,0,0}, {0, 0,0,0}};
+    size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
+
+    load_gallery(head_img, fractal_names, image_names, size, fields);
+    draw_pics(*head_img);
+
+    GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, 0x00000000);
+    if (GuiButton(fields[0], "")) {
+        *state = STATE_MANDELBROT;
+        *update = true;
+                    params->mandelbrot.zoom = cam->zoom;
+                    cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
+                    params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) / WIDTH;
+                    params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) / HEIGHT;
+                }
+
+                if (GuiButton(fields[1], ""))
+                    *state = STATE_TREE;
+
+                if (GuiButton(fields[2], "")) {
+                    *state = STATE_CARPET;
+                    *update = true;
+                }
+
+                if (GuiButton(fields[3], "")) {
+                    *state = STATE_TRIANGLE;
+                }
+
+                if (GuiButton(fields[4], "")) {
+                    *state = STATE_JULIA;
+                    *update = true;
+                    params->julia.zoom = cam->zoom;
+                    cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+                    params->julia.offset_x = (cam->target.x - WIDTH/2.0f) / WIDTH;
+                    params->julia.offset_y = (cam->target.y - HEIGHT/2.0f) / HEIGHT;
+                }
+}
+
+void tree_gui(FractalParameters* params, Camera2D* cam, float* offset) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->tree.depth));
+
+    GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+        &params->tree.depth, 1,(float)params->tree.max_depth);
+    params->tree.depth = (float) (int)params->tree.depth;
+
+    GuiLabel((Rectangle){20, 120, 200, 20}, TextFormat("Angle: %.1f°", params->tree.angle_degrees));
+    GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+        &params->tree.angle_degrees, 0, 90);
+    params->tree.angle = params->tree.angle_degrees * DEG2RAD;
+
+    GuiLabel((Rectangle){20, 190, 200, 20}, TextFormat("Length Factor: %.2f", params->tree.length_factor));
+    GuiSlider((Rectangle){20, 220, 200, 20}, NULL, NULL,
+        &params->tree.length_factor, 0, 0.9f);
+
+    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+        init_tree_parameters(&params->tree);
+        cam->zoom = 1.0f;
+        cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
+        *offset = 20.0f;
+    }
+}
+
+void carpet_gui(FractalParameters* params, Camera2D* cam, float* offset, bool* update) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->carpet.depth));
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+        &params->carpet.depth, 0, (float) params->carpet.max_depth))
+        *update = true;
+
+    params->carpet.depth = (float) (int) params->carpet.depth;
+
+    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+        init_carpet_parameters(&params->carpet);
+        cam->zoom = 1.0f;
+        cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
+        *offset = 20.0f;
+        *update = true;
+    }
+}
+
+void triangle_gui(FractalParameters* params, Camera2D* cam, float* offset) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->triangle.depth));
+    GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+        &params->triangle.depth, 0, (float) params->triangle.max_depth);
+    params->triangle.depth = (float) (int) params->triangle.depth;
+
+    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+        init_triangle_parameters(&params->triangle);
+        cam->zoom = 1.0f;
+        cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
+        *offset = 20.0f;
+    }
+}
+
+void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->mandelbrot.iterations));
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+                  &params->mandelbrot.iterations, 0, 500)) {
+        params->mandelbrot.iterations = (float) (int) params->mandelbrot.iterations;
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: "));
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+                  &params->mandelbrot.red, 0, 20)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor:"));
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+                  &params->mandelbrot.green, 0, 20)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor:"));
+    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                  &params->mandelbrot.blue, 0, 20)) {
+        *update = true;
+    }
+
+    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+        init_mandelbrot_parameters(&params->mandelbrot);
+        cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
+        cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        cam->zoom = 1.0f;
+        *update = true;
+    }
+}
+
+void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->julia.iterations));
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+                  &params->julia.iterations, 0, 500)) {
+        params->julia.iterations = (float) (int) params->julia.iterations;
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: "));
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+                  &params->julia.red, 0, 20)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor:"));
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+                  &params->julia.green, 0, 20)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor:"));
+    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                  &params->julia.blue, 0, 20)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 260, 200, 20}, TextFormat("Constant c: "));
+    GuiLabel((Rectangle){20, 280, 200, 20}, TextFormat("Real part:"));
+    if (GuiSlider((Rectangle){20, 300, 200, 20}, NULL, NULL,
+                  &params->julia.re_c, -1, 1)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 320, 200, 20}, TextFormat("Complex part:"));
+    if (GuiSlider((Rectangle){20, 340, 200, 20}, NULL, NULL,
+                  &params->julia.im_c, -1, 1)) {
+        *update = true;
+    }
+
+    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+        init_julia_parameters(&params->julia);
+        cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        cam->zoom = 1.0f;
+        *update = true;
     }
 }
 
@@ -130,7 +349,7 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
 
         Image temp_img = LoadImage(img_names[i]);
         ImageResize(&temp_img, img_width, img_height);
-        Rectangle field = (Rectangle) {x_start + (float) (i % 5) * 350, y_start + (int) (i / 5) * 350, img_width, img_height};
+        const Rectangle field = (Rectangle) {x_start + (float) (i % 5) * 350, y_start + (int) (i / 5) * 350, img_width, img_height};
         img_fields[i] = field;
         ImageNode* temp = create_image_node(fract_names[i], img_names[i],
             field, LoadTextureFromImage(temp_img));
@@ -142,13 +361,15 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
 }
 
 void draw_pics(ImageNode* head) {
-    int font_size = 24;
-    ImageNode* temp = head;
+    const ImageNode* temp = head;
 
     while (temp->next != NULL) {
+        const int font_size = 24;
+
         temp = temp->next;
-        char* text = temp->fract_name;
-        int textWidth = MeasureText(text, font_size);
+        const char* text = temp->fract_name;
+        const int textWidth = MeasureText(text, font_size);
+
         DrawText(text, (temp->field.width - textWidth) / 2 + temp->field.x, (int) temp->field.y - 25, font_size, GRAY);
         DrawTexture(temp->texture, (int) temp->field.x, (int) temp->field.y, WHITE);
     }

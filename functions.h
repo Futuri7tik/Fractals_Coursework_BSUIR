@@ -78,12 +78,32 @@ typedef struct {
     Texture2D texture;
 } JuliaParameters;
 
-// === UI ===
+typedef struct FractalParameters {
+    TreeParameters tree;
+    CarpetParameters carpet;
+    TriangleParameters triangle;
+    MandelbrotParameters mandelbrot;
+    JuliaParameters julia;
+} FractalParameters;
+
+// === Initialization
+void init_fractals_parameters(FractalParameters* params);
 void init_tree_parameters(TreeParameters* params);
 void init_carpet_parameters(CarpetParameters* params);
 void init_triangle_parameters(TriangleParameters* params);
 void init_mandelbrot_parameters(MandelbrotParameters* params);
 void init_julia_parameters(JuliaParameters* params);
+
+// === UI ===
+void handle_movement(float speed, float* offset, Camera2D* cam, bool* update);
+void menu_gui(AppState* state, bool* show_msg_box, bool* should_close);
+void gallery_gui(AppState* state, FractalParameters* params, Camera2D* cam, float* offset, ImageNode** head_img, bool* update);
+void tree_gui(FractalParameters* params, Camera2D* cam, float* offset);
+void carpet_gui(FractalParameters* params, Camera2D* cam, float* offset, bool* update);
+void triangle_gui(FractalParameters* params, Camera2D* cam, float* offset);
+void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update);
+void julia_gui(FractalParameters* params, Camera2D* cam, bool* update);
+
 ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture);
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
 void draw_pics(ImageNode* head);
