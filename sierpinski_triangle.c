@@ -49,7 +49,6 @@ void draw_sierpinski_triangle(float x, float y, float length,
     float l2 = length / 2.0f;
     float l4 = length / 4.0f;
 
-    // 1. Рисуем центральный (перевернутый) треугольник
     Color color = get_color_triangle(depth, params);
 
     DrawTriangle(
@@ -59,7 +58,6 @@ void draw_sierpinski_triangle(float x, float y, float length,
         color
     );
 
-    // 2. Рекурсия для трех угловых треугольников
     // Левый нижний
     draw_sierpinski_triangle(x, y, l2, depth - 1, params);
     // Правый нижний

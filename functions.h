@@ -43,13 +43,21 @@ typedef struct {
     float depth;
     int max_depth;
     float start_length;
+    float red;
+    float green;
+    float blue;
     Texture2D texture;
 } CarpetParameters;
 
 typedef struct {
     float depth;
+    float x_start;
+    float y_start;
     int max_depth;
     float start_length;
+    float red;
+    float green;
+    float blue;
 } TriangleParameters;
 
 typedef struct {
@@ -95,12 +103,12 @@ void init_mandelbrot_parameters(MandelbrotParameters* params);
 void init_julia_parameters(JuliaParameters* params);
 
 // === UI ===
-void handle_movement(float speed, float* offset, Camera2D* cam, bool* update);
+void handle_movement(float speed, Camera2D* cam, bool* update);
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close);
-void gallery_gui(AppState* state, FractalParameters* params, Camera2D* cam, float* offset, ImageNode** head_img, bool* update);
-void tree_gui(FractalParameters* params, Camera2D* cam, float* offset);
-void carpet_gui(FractalParameters* params, Camera2D* cam, float* offset, bool* update);
-void triangle_gui(FractalParameters* params, Camera2D* cam, float* offset);
+void gallery_gui(AppState* state, FractalParameters* params, Camera2D* cam, ImageNode** head_img, bool* update);
+void tree_gui(FractalParameters* params, Camera2D* cam);
+void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update);
+void triangle_gui(FractalParameters* params, Camera2D* cam);
 void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void julia_gui(FractalParameters* params, Camera2D* cam, bool* update);
 
@@ -118,7 +126,7 @@ void draw_square(float x, float y, float length, Color color);
 void draw_carpet(float x_left, float y_left, float length,
                  int depth, CarpetParameters* params);
 void draw_carpet_to_image(Image* img, float x, float y, float length, int depth);
-Texture2D render_carpet_to_texture(int width, int height, int depth, float start_length);
+Texture2D render_carpet_to_texture(int width, int height, int depth, float start_length, Color color);
 
 // === Треугольник ===
 Color get_color_triangle(int depth, TriangleParameters* params);

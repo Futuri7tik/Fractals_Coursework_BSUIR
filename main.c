@@ -31,12 +31,8 @@ int main(void) {
     camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
-    float camera_offset = 20.0f;
 
-    // === Главный цикл ===
     while (!WindowShouldClose()) {
-        // === Обработка клавиш ===
-
         if (IsKeyPressed(KEY_TAB)) {
             GuiLoadStyleDefault();
             if (state == STATE_GALLERY)
@@ -48,11 +44,9 @@ int main(void) {
 
         if (state != STATE_GALLERY && state != STATE_MENU && state != STATE_SLIDESHOW) {
             float current_speed = 20.0f / camera.zoom;
-
-            handle_movement(current_speed, &camera_offset, &camera, &needs_update);
+            handle_movement(current_speed, &camera, &needs_update);
         }
 
-        // === Отрисовка ===
         BeginDrawing();
         ClearBackground(BLACK);
 
@@ -68,7 +62,7 @@ int main(void) {
                 GuiLoadStyleDefault();
                 ImageNode* head = NULL;
 
-                gallery_gui(&state, &fract_params, &camera, &camera_offset, &head, &needs_update);
+                gallery_gui(&state, &fract_params, &camera, &head, &needs_update);
                 GuiLoadStyleDefault();
             }
             else {
@@ -85,8 +79,8 @@ int main(void) {
                             if (fract_params.carpet.texture.id > 0)
                                 UnloadTexture(fract_params.carpet.texture);
                             fract_params.carpet.texture = render_carpet_to_texture(WIDTH, HEIGHT,
-                                                      (int) fract_params.carpet.depth,
-                                                      fract_params.carpet.start_length);
+                            (int) fract_params.carpet.depth, fract_params.carpet.start_length,
+                            (Color){fract_params.carpet.red, fract_params.carpet.green, fract_params.carpet.blue, 255});
                             needs_update = false;
                         }
 
@@ -97,11 +91,10 @@ int main(void) {
                     }
                     case STATE_TRIANGLE: {
                         BeginMode2D(camera);
-                        float start_height = fract_params.triangle.start_length * sqrtf(3.0f) / 2.0f;
-                        float x_start = (WIDTH - fract_params.triangle.start_length) / 2.0f;
-                        float y_start = HEIGHT - (HEIGHT - start_height) / 2.0f;
-                        draw_triangle_base(x_start, y_start, fract_params.triangle.start_length, YELLOW);
-                        draw_sierpinski_triangle(x_start, y_start, fract_params.triangle.start_length,
+                        draw_triangle_base(fract_params.triangle.x_start, fract_params.triangle.y_start,
+                            fract_params.triangle.start_length,
+                            (Color){fract_params.triangle.red, fract_params.triangle.green, fract_params.triangle.blue, 255});
+                        draw_sierpinski_triangle(fract_params.triangle.x_start, fract_params.triangle.y_start, fract_params.triangle.start_length,
                                                (int) fract_params.triangle.depth, &fract_params.triangle);
                         EndMode2D();
                         break;
@@ -156,13 +149,13 @@ int main(void) {
                 GuiPanel((Rectangle){10, 10, 280, 450}, "Controls");
                 switch (state) {
                     case STATE_TREE:
-                        tree_gui(&fract_params, &camera, &camera_offset);
+                        tree_gui(&fract_params, &camera);
                         break;
                     case STATE_CARPET:
-                        carpet_gui(&fract_params, &camera, &camera_offset, &needs_update);
+                        carpet_gui(&fract_params, &camera, &needs_update);
                         break;
                     case STATE_TRIANGLE:
-                        triangle_gui(&fract_params, &camera, &camera_offset);
+                        triangle_gui(&fract_params, &camera);
                         break;
                     case STATE_MANDELBROT:
                         mandelbrot_gui(&fract_params, &camera, &needs_update);

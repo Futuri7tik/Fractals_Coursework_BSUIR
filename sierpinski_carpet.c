@@ -21,13 +21,12 @@ void draw_carpet_to_image(Image* img, float x, float y, float length, int depth)
     }
 }
 
-Texture2D render_carpet_to_texture(int width, int height, int depth, float start_length) {
+Texture2D render_carpet_to_texture(int width, int height, int depth, float start_length, Color color) {
     Image img = GenImageColor(width, height, BLACK);
 
-    // Рисуем основание
     float x_start = ((float) width - start_length) / 2.0f;
     float y_start = ((float) height - start_length) / 2.0f;
-    ImageDrawRectangle(&img, (int) x_start, (int) y_start, (int) start_length, (int) start_length, SKYBLUE);
+    ImageDrawRectangle(&img, (int) x_start, (int) y_start, (int) start_length, (int) start_length, color);
     // Рекурсивно рисуем ковёр
     draw_carpet_to_image(&img, x_start, y_start, start_length, depth);
 

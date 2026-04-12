@@ -1,3 +1,4 @@
+#include <math.h>
 #include <raygui.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -21,9 +22,12 @@ void init_tree_parameters(TreeParameters* params) {
 }
 
 void init_carpet_parameters(CarpetParameters* params) {
-    params->depth = 7;
+    params->depth = 5;
     params->max_depth = 8;
     params->start_length = HEIGHT - 200;
+    params->red = 102.f;
+    params->green = 191.f;
+    params->blue = 255.f;
     params->texture = (Texture2D) {0};
 }
 
@@ -31,6 +35,11 @@ void init_triangle_parameters(TriangleParameters* params) {
     params->depth = 9;
     params->max_depth = 13;
     params->start_length = HEIGHT - 50;
+    params->x_start = (WIDTH - params->start_length) / 2.0f;
+    params->y_start = HEIGHT - (HEIGHT - params->start_length * sqrtf(3.0f) / 2.0f) / 2.0f;
+    params->red = 255.0f;
+    params->green = 255.0f;
+    params->blue = 0.0f;
 }
 
 void init_mandelbrot_parameters(MandelbrotParameters* params) {
@@ -115,7 +124,7 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
     }
 }
 
-void handle_movement(float speed, float* offset, Camera2D* cam, bool* update) {
+void handle_movement(float speed, Camera2D* cam, bool* update) {
     // Вычисляем вектор движения: (Вправо - Влево, Вниз - Вверх)
     int moveX = IsKeyPressedRepeat(KEY_RIGHT) - IsKeyPressedRepeat(KEY_LEFT);
     int moveY = IsKeyPressedRepeat(KEY_DOWN) - IsKeyPressedRepeat(KEY_UP);
@@ -129,22 +138,19 @@ void handle_movement(float speed, float* offset, Camera2D* cam, bool* update) {
     float wheel = GetMouseWheelMove();
     if (wheel > 0) {
         cam->zoom *= 1.05f;
-        *offset *= 0.95f;
         *update = true;
     }
     else
         if (wheel < 0) {
             cam->zoom *= 0.95f;
-            *offset *= 1.05f;
             *update = true;
         }
 }
 
-void gallery_gui(AppState* state, FractalParameters* params, Camera2D* cam, float* offset, ImageNode** head_img, bool* update) {
+void gallery_gui(AppState* state, FractalParameters* params, Camera2D* cam, ImageNode** head_img, bool* update) {
     GuiPanel((Rectangle){0, 10, WIDTH, HEIGHT - 10}, "Fractal Gallery");
     cam->zoom = 1.0f;
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
-    *offset = 20.0f;
 
     char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle", "Julia Set"};
     char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png"};
@@ -187,7 +193,7 @@ void gallery_gui(AppState* state, FractalParameters* params, Camera2D* cam, floa
                 }
 }
 
-void tree_gui(FractalParameters* params, Camera2D* cam, float* offset) {
+void tree_gui(FractalParameters* params, Camera2D* cam) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->tree.depth));
 
     GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -207,11 +213,10 @@ void tree_gui(FractalParameters* params, Camera2D* cam, float* offset) {
         init_tree_parameters(&params->tree);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
-        *offset = 20.0f;
     }
 }
 
-void carpet_gui(FractalParameters* params, Camera2D* cam, float* offset, bool* update) {
+void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->carpet.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
         &params->carpet.depth, 0, (float) params->carpet.max_depth))
@@ -219,26 +224,57 @@ void carpet_gui(FractalParameters* params, Camera2D* cam, float* offset, bool* u
 
     params->carpet.depth = (float) (int) params->carpet.depth;
 
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: "));
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+                  &params->carpet.red, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor:"));
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+                  &params->carpet.green, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor:"));
+    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+        &params->carpet.blue, 0, 255)) {
+        *update = true;
+    }
+
     if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
         init_carpet_parameters(&params->carpet);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
-        *offset = 20.0f;
         *update = true;
     }
 }
 
-void triangle_gui(FractalParameters* params, Camera2D* cam, float* offset) {
+void triangle_gui(FractalParameters* params, Camera2D* cam) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->triangle.depth));
     GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
         &params->triangle.depth, 0, (float) params->triangle.max_depth);
     params->triangle.depth = (float) (int) params->triangle.depth;
 
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
+
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red component: "));
+    GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+        &params->triangle.red, 0, 255);
+
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green component: :"));
+    GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+        &params->triangle.green, 0, 255);
+
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue component: "));
+    GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                  &params->triangle.blue, 0, 255);
+
     if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
         init_triangle_parameters(&params->triangle);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
-        *offset = 20.0f;
     }
 }
 
