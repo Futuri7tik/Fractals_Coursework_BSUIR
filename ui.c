@@ -165,32 +165,32 @@ void gallery_gui(AppState* state, FractalParameters* params, Camera2D* cam, Imag
     if (GuiButton(fields[0], "")) {
         *state = STATE_MANDELBROT;
         *update = true;
-                    params->mandelbrot.zoom = cam->zoom;
-                    cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
-                    params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) / WIDTH;
-                    params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) / HEIGHT;
-                }
+        params->mandelbrot.zoom = cam->zoom;
+        cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
+        params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) / WIDTH;
+        params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) / HEIGHT;
+    }
 
-                if (GuiButton(fields[1], ""))
-                    *state = STATE_TREE;
+    if (GuiButton(fields[1], ""))
+        *state = STATE_TREE;
 
-                if (GuiButton(fields[2], "")) {
-                    *state = STATE_CARPET;
-                    *update = true;
-                }
+    if (GuiButton(fields[2], "")) {
+        *state = STATE_CARPET;
+        *update = true;
+    }
 
-                if (GuiButton(fields[3], "")) {
-                    *state = STATE_TRIANGLE;
-                }
+    if (GuiButton(fields[3], "")) {
+        *state = STATE_TRIANGLE;
+    }
 
-                if (GuiButton(fields[4], "")) {
-                    *state = STATE_JULIA;
-                    *update = true;
-                    params->julia.zoom = cam->zoom;
-                    cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
-                    params->julia.offset_x = (cam->target.x - WIDTH/2.0f) / WIDTH;
-                    params->julia.offset_y = (cam->target.y - HEIGHT/2.0f) / HEIGHT;
-                }
+    if (GuiButton(fields[4], "")) {
+        *state = STATE_JULIA;
+        *update = true;
+        params->julia.zoom = cam->zoom;
+        cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        params->julia.offset_x = (cam->target.x - WIDTH/2.0f) / WIDTH;
+        params->julia.offset_y = (cam->target.y - HEIGHT/2.0f) / HEIGHT;
+    }
 }
 
 void tree_gui(FractalParameters* params, Camera2D* cam) {

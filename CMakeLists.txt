@@ -17,6 +17,7 @@ add_executable(KURSACH
         mandel.c
         ui.c
         julia.c
+        add.c
 )
 
 if(OpenMP_C_FOUND)
