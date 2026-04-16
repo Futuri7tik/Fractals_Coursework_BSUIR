@@ -44,9 +44,8 @@ int main(void) {
         }
 
         if (state == STATE_RANDOM && random_type == STATE_GALLERY) {
-            init_random_config(&random_params, &random_type);
+            init_random_config(&random_params, &camera,&random_type);
             camera.zoom = 1.0f;
-            camera.target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
             needs_update = true;
         }
 
@@ -89,6 +88,7 @@ int main(void) {
                     render_fractal_gui(&camera, &fract_params, &state, &needs_update);
                 }
                 else {
+                    DrawText("Random Fractal", 200, 17, 10, DARKGRAY);
                     render_fractal_gui(&camera, &random_params, &random_type, &needs_update);
                 }
 

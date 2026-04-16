@@ -103,7 +103,7 @@ void init_carpet_parameters(CarpetParameters* params);
 void init_triangle_parameters(TriangleParameters* params);
 void init_mandelbrot_parameters(MandelbrotParameters* params);
 void init_julia_parameters(JuliaParameters* params);
-void init_random_config(FractalParameters* params, AppState* type);
+void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
 
 // === UI ===
 void handle_movement(float speed, Camera2D* cam, bool* update);
