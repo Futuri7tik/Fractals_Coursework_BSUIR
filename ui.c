@@ -165,11 +165,6 @@ void gallery_gui(AppState *state, FractalParameters* params, Camera2D *cam, Imag
     }
     draw_pics(*head_img);
 
-    if (GuiButton((Rectangle){WIDTH - 250, HEIGHT - 100, 230, 40}, "Change Random")) {
-        init_random_config(random_params, random_type);
-        *update = true;
-    }
-
     GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, 0x00000000);
     ImageNode* current = (*head_img)->next;
     int index = 0;
@@ -233,19 +228,19 @@ void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     params->carpet.depth = (float) (int) params->carpet.depth;
 
     GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
-    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: "));
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: %d", (int) params->carpet.red));
     if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
                   &params->carpet.red, 0, 255)) {
         *update = true;
     }
 
-    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor:"));
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor: %d", (int) params->carpet.green));
     if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
                   &params->carpet.green, 0, 255)) {
         *update = true;
     }
 
-    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor:"));
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor: %d", (int) params->carpet.blue));
     if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
         &params->carpet.blue, 0, 255)) {
         *update = true;
@@ -267,15 +262,15 @@ void triangle_gui(FractalParameters* params, Camera2D* cam) {
 
     GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
 
-    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red component: "));
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red component: %d", (int) params->triangle.red));
     GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
         &params->triangle.red, 0, 255);
 
-    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green component: :"));
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green component: %d:", (int) params->triangle.green));
     GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
         &params->triangle.green, 0, 255);
 
-    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue component: "));
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue component: %d", (int) params->triangle.blue));
     GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
                   &params->triangle.blue, 0, 255);
 
@@ -295,19 +290,19 @@ void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
-    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: "));
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: %d", (int) params->mandelbrot.red));
     if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
                   &params->mandelbrot.red, 0, 20)) {
         *update = true;
     }
 
-    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor:"));
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor: %d", (int) params->mandelbrot.green));
     if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
                   &params->mandelbrot.green, 0, 20)) {
         *update = true;
     }
 
-    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor:"));
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor: %d", (int) params->mandelbrot.blue));
     if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
                   &params->mandelbrot.blue, 0, 20)) {
         *update = true;
@@ -331,19 +326,19 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
-    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: "));
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: %d", (int) params->julia.red));
     if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
                   &params->julia.red, 0, 20)) {
         *update = true;
     }
 
-    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor:"));
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor %d:", (int) params->julia.green));
     if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
                   &params->julia.green, 0, 20)) {
         *update = true;
     }
 
-    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor:"));
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor: %d", (int) params->julia.blue));
     if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
                   &params->julia.blue, 0, 20)) {
         *update = true;
@@ -367,18 +362,6 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
         cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;
-        *update = true;
-    }
-}
-
-void random_gui(AppState *state, FractalParameters *params, bool *update) {
-    GuiPanel((Rectangle){10, 10, 280, 450}, "Random Fractal Mode");
-    GuiLabel((Rectangle){20, 50, 200, 20}, "Parameters are randomized!");
-
-    // Кнопка перегенерации прямо из режима просмотра
-    if (GuiButton((Rectangle){20, 80, 150, 30}, "Regenerate")) {
-        AppState type;
-        init_random_config(params, &type);
         *update = true;
     }
 }
@@ -509,5 +492,27 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
                 DrawTexture(params->julia.texture, 0, 0, WHITE);
             break;
         }
+    }
+}
+
+void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update) {
+    switch (*state) {
+        case STATE_TREE:
+            tree_gui(params, cam);
+            break;
+        case STATE_CARPET:
+            carpet_gui(params, cam, update);
+            break;
+        case STATE_TRIANGLE:
+            triangle_gui(params, cam);
+            break;
+        case STATE_MANDELBROT:
+            mandelbrot_gui(params, cam, update);
+            break;
+        case STATE_JULIA:
+            julia_gui(params, cam, update);
+            break;
+        default:
+            break;
     }
 }

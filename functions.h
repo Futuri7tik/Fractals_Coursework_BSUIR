@@ -115,8 +115,7 @@ void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void triangle_gui(FractalParameters* params, Camera2D* cam);
 void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void julia_gui(FractalParameters* params, Camera2D* cam, bool* update);
-void random_gui(AppState *state, FractalParameters *params, bool *update);
-void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
+void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update);
 
 ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state);
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
@@ -153,4 +152,6 @@ int julia_iterations(float re_z, float im_z, float re_c, float im_c, int max_ite
 Color get_color_julia(int iteration, int max_iterations, const JuliaParameters* params);
 Texture2D render_julia(int width, int height, float zoom, float offset_x,
     float offset_y, int max_iterations, const JuliaParameters* params);
+
+void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
 #endif
