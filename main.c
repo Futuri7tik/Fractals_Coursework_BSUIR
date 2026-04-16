@@ -31,7 +31,7 @@ int main(void) {
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
     AppState random_type = STATE_GALLERY;
-    static FractalParameters random_params;
+    FractalParameters random_params;
 
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_TAB)) {

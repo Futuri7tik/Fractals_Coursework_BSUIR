@@ -148,7 +148,7 @@ void handle_movement(float speed, Camera2D* cam, bool* update) {
 }
 
 void gallery_gui(AppState *state, FractalParameters* params, Camera2D *cam, ImageNode **head_img,
-                 bool *update, int *random_type, FractalParameters *random_params) {
+                 bool *update, AppState *random_type, FractalParameters *random_params) {
     GuiPanel((Rectangle){0, 10, WIDTH, HEIGHT - 10}, "Fractal Gallery");
     cam->zoom = 1.0f;
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
@@ -377,7 +377,7 @@ void random_gui(AppState *state, FractalParameters *params, bool *update) {
 
     // Кнопка перегенерации прямо из режима просмотра
     if (GuiButton((Rectangle){20, 80, 150, 30}, "Regenerate")) {
-        int type;
+        AppState type;
         init_random_config(params, &type);
         *update = true;
     }
@@ -432,3 +432,82 @@ void draw_pics(ImageNode* head) {
     }
 }
 
+void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update) {
+    switch (*state) {
+        case STATE_TREE:
+            BeginMode2D(*cam);
+            draw_tree(WIDTH/2.0f, HEIGHT - 220, 200, -PI/2.0f,
+                 (int) params->tree.depth, &params->tree);
+            EndMode2D();
+            break;
+        case STATE_CARPET: {
+            BeginMode2D(*cam);
+            if (*update) {
+                if (params->carpet.texture.id > 0)
+                    UnloadTexture(params->carpet.texture);
+                params->carpet.texture = render_carpet_to_texture(WIDTH, HEIGHT,
+                (int) params->carpet.depth, params->carpet.start_length,
+                (Color){params->carpet.red, params->carpet.green, params->carpet.blue, 255});
+                *update = false;
+            }
+
+            if (params->carpet.texture.id > 0)
+                DrawTexture(params->carpet.texture, 0, 0, WHITE);
+            EndMode2D();
+            break;
+        }
+        case STATE_TRIANGLE: {
+            BeginMode2D(*cam);
+            draw_triangle_base(params->triangle.x_start, params->triangle.y_start,
+                params->triangle.start_length,
+                (Color){params->triangle.red, params->triangle.green, params->triangle.blue, 255});
+            draw_sierpinski_triangle(params->triangle.x_start, params->triangle.y_start, params->triangle.start_length,
+                                   (int) params->triangle.depth, &params->triangle);
+            EndMode2D();
+            break;
+        }
+        case STATE_MANDELBROT: {
+            if (*update == true) {
+                if (params->mandelbrot.texture.id > 0)
+                    UnloadTexture(params->mandelbrot.texture);
+                params->mandelbrot.zoom = cam->zoom;
+                params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
+                params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
+
+                params->mandelbrot.texture = render_mandelbrot(WIDTH, HEIGHT,
+                                      params->mandelbrot.zoom,
+                                      params->mandelbrot.offset_x,
+                                      params->mandelbrot.offset_y,
+                                      (int) params->mandelbrot.iterations,
+                                      &params->mandelbrot);
+                *update = false;
+            }
+
+            if (params->mandelbrot.texture.id > 0)
+                DrawTexture(params->mandelbrot.texture, 0, 0, WHITE);
+            break;
+        }
+        case STATE_JULIA: {
+            if (*update == true) {
+                if (params->julia.texture.id > 0)
+                    UnloadTexture(params->julia.texture);
+
+                params->julia.zoom = cam->zoom;
+                params->julia.offset_x = (cam->target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
+                params->julia.offset_y = (cam->target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
+
+                params->julia.texture = render_julia(WIDTH, HEIGHT,
+                                 params->julia.zoom,
+                                 params->julia.offset_x,
+                                      params->julia.offset_y,
+                                      (int) params->julia.iterations,
+                                      &params->julia);
+                *update = false;
+            }
+
+            if (params->julia.texture.id > 0)
+                DrawTexture(params->julia.texture, 0, 0, WHITE);
+            break;
+        }
+    }
+}
