@@ -14,7 +14,6 @@ static float TextToFloat(const char *text) {
 #include "raygui.h"
 #include "functions.h"
 
-
 int main(void) {
     InitWindow(WIDTH, HEIGHT, "Fractal Gallery");
     bool needs_update = true;
@@ -31,6 +30,8 @@ int main(void) {
     camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
+    AppState random_type = STATE_GALLERY;
+    static FractalParameters random_params;
 
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_TAB)) {
@@ -40,6 +41,17 @@ int main(void) {
             else
                 if (state != STATE_MENU)
                     state = STATE_GALLERY;
+        }
+
+        if (state == STATE_RANDOM && random_type == STATE_GALLERY) {
+            init_random_config(&random_params, &random_type);
+            camera.zoom = 1.0f;
+            camera.target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
+            needs_update = true;
+        }
+
+        if (state != STATE_RANDOM) {
+            random_type = STATE_GALLERY;
         }
 
         if (state != STATE_GALLERY && state != STATE_MENU && state != STATE_SLIDESHOW) {
@@ -62,7 +74,7 @@ int main(void) {
                 GuiLoadStyleDefault();
                 ImageNode* head = NULL;
 
-                gallery_gui(&state, &fract_params, &camera, &head, &needs_update);
+                gallery_gui(&state, &fract_params, &camera, &head, &needs_update, &random_type, &random_params);
                 GuiLoadStyleDefault();
             }
             else {
@@ -142,6 +154,84 @@ int main(void) {
                             DrawTexture(fract_params.julia.texture, 0, 0, WHITE);
                         break;
                     }
+                    case STATE_RANDOM: {
+                        switch (random_type) {
+                            case 0:
+                                BeginMode2D(camera);
+                                draw_tree(WIDTH/2.0f, HEIGHT - 220, 200, -PI/2.0f,
+                                     (int) random_params.tree.depth, &random_params.tree);
+                                EndMode2D();
+                                break;
+                            case 1: {
+                                BeginMode2D(camera);
+                                if (needs_update) {
+                                    if (random_params.carpet.texture.id > 0)
+                                        UnloadTexture(random_params.carpet.texture);
+                                    random_params.carpet.texture = render_carpet_to_texture(WIDTH, HEIGHT,
+                                    (int) random_params.carpet.depth, random_params.carpet.start_length,
+                                    (Color){random_params.carpet.red, random_params.carpet.green,
+                                        random_params.carpet.blue, 255});
+                                    needs_update = false;
+                                }
+
+                                if (random_params.carpet.texture.id > 0)
+                                    DrawTexture(random_params.carpet.texture, 0, 0, WHITE);
+                                EndMode2D();
+                                break;
+                            }
+                            case 2: {
+                                BeginMode2D(camera);
+                                draw_triangle_base(random_params.triangle.x_start, random_params.triangle.y_start,
+                                    random_params.triangle.start_length,
+                                    (Color){random_params.triangle.red, random_params.triangle.green,
+                                        random_params.triangle.blue, 255});
+                                draw_sierpinski_triangle(random_params.triangle.x_start, random_params.triangle.y_start,
+                                    random_params.triangle.start_length, (int) random_params.triangle.depth, &random_params.triangle);
+                                EndMode2D();
+                                break;
+                            }
+                            case 3: {
+                                if (needs_update == true) {
+                                    if (random_params.mandelbrot.texture.id > 0)
+                                        UnloadTexture(random_params.mandelbrot.texture);
+                                    random_params.mandelbrot.zoom = camera.zoom;
+                                    random_params.mandelbrot.offset_x = (camera.target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
+                                    random_params.mandelbrot.offset_y = (camera.target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
+
+                                    random_params.mandelbrot.texture = render_mandelbrot(WIDTH, HEIGHT,
+                                                          random_params.mandelbrot.zoom,
+                                                          random_params.mandelbrot.offset_x,
+                                                          random_params.mandelbrot.offset_y,
+                                                          (int) random_params.mandelbrot.iterations,
+                                                          &random_params.mandelbrot);
+                                    needs_update = false;
+                                }
+
+                                if (random_params.mandelbrot.texture.id > 0)
+                                    DrawTexture(random_params.mandelbrot.texture, 0, 0, WHITE);
+                                break;
+                            }
+                            case 4: {
+                                if (needs_update == true) {
+                                    if (random_params.julia.texture.id > 0)
+                                        UnloadTexture(random_params.julia.texture);
+
+                                    random_params.julia.zoom = camera.zoom;
+                                    random_params.julia.offset_x = (camera.target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
+                                    random_params.julia.offset_y = (camera.target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
+
+                                    random_params.julia.texture = render_julia(WIDTH, HEIGHT,
+                                        random_params.julia.zoom, random_params.julia.offset_x, random_params.julia.offset_y,
+                                        (int) random_params.julia.iterations, &random_params.julia);
+                                    needs_update = false;
+                                }
+
+                                if (random_params.julia.texture.id > 0)
+                                    DrawTexture(random_params.julia.texture, 0, 0, WHITE);
+                                break;
+                            }
+                        }
+                    }
                     default:
                         break;
                 }
@@ -162,6 +252,9 @@ int main(void) {
                         break;
                     case STATE_JULIA:
                         julia_gui(&fract_params, &camera, &needs_update);
+                        break;
+                    case STATE_RANDOM:
+                        random_gui(&state, &random_params, &needs_update);
                         break;
                     default:
                         break;

@@ -18,6 +18,7 @@ add_executable(KURSACH
         ui.c
         julia.c
         add.c
+        circle_fractal.c
 )
 
 if(OpenMP_C_FOUND)

@@ -147,49 +147,57 @@ void handle_movement(float speed, Camera2D* cam, bool* update) {
         }
 }
 
-void gallery_gui(AppState* state, FractalParameters* params, Camera2D* cam, ImageNode** head_img, bool* update) {
+void gallery_gui(AppState *state, FractalParameters* params, Camera2D *cam, ImageNode **head_img,
+                 bool *update, int *random_type, FractalParameters *random_params) {
     GuiPanel((Rectangle){0, 10, WIDTH, HEIGHT - 10}, "Fractal Gallery");
     cam->zoom = 1.0f;
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
 
-    char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle", "Julia Set"};
-    char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png"};
+    char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle",
+        "Julia Set", "Random Fractal"};
+    char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png", "random.png"};
     Rectangle fields[] = {{0, 0,0,0}, {0, 0,0,0},{0, 0,0,0},
-        {0, 0,0,0}, {0, 0,0,0}};
+        {0, 0,0,0}, {0, 0,0,0}, {0, 0,0,0}};
     size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
 
-    load_gallery(head_img, fractal_names, image_names, size, fields);
+    if (*head_img == NULL) {
+        load_gallery(head_img, fractal_names, image_names, size, fields);
+    }
     draw_pics(*head_img);
 
+    if (GuiButton((Rectangle){WIDTH - 250, HEIGHT - 100, 230, 40}, "Change Random")) {
+        init_random_config(random_params, random_type);
+        *update = true;
+    }
+
     GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, 0x00000000);
-    if (GuiButton(fields[0], "")) {
-        *state = STATE_MANDELBROT;
-        *update = true;
-        params->mandelbrot.zoom = cam->zoom;
-        cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
-        params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) / WIDTH;
-        params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) / HEIGHT;
-    }
+    ImageNode* current = (*head_img)->next;
+    int index = 0;
+    while (current != NULL) {
+        if (GuiButton(current->field, "")) {
+            if (index < 5) {
+                switch (index) {
+                    case 0:
+                        *update = true;
+                        params->mandelbrot.zoom = cam->zoom;
+                        cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
+                        params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) / WIDTH;
+                        params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) / HEIGHT;
+                        *state = STATE_MANDELBROT;
+                        break;
+                    case 1: *state = STATE_TREE; break;
+                    case 2: *state = STATE_CARPET; break;
+                    case 3: *state = STATE_TRIANGLE; break;
+                    case 4: *state = STATE_JULIA; break;
+                }
+            }
+            else
+                *state = STATE_RANDOM;
 
-    if (GuiButton(fields[1], ""))
-        *state = STATE_TREE;
-
-    if (GuiButton(fields[2], "")) {
-        *state = STATE_CARPET;
-        *update = true;
-    }
-
-    if (GuiButton(fields[3], "")) {
-        *state = STATE_TRIANGLE;
-    }
-
-    if (GuiButton(fields[4], "")) {
-        *state = STATE_JULIA;
-        *update = true;
-        params->julia.zoom = cam->zoom;
-        cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
-        params->julia.offset_x = (cam->target.x - WIDTH/2.0f) / WIDTH;
-        params->julia.offset_y = (cam->target.y - HEIGHT/2.0f) / HEIGHT;
+            *update = true;
+        }
+        current = current->next;
+        index++;
     }
 }
 
@@ -363,12 +371,24 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture) {
+void random_gui(AppState *state, FractalParameters *params, bool *update) {
+    GuiPanel((Rectangle){10, 10, 280, 450}, "Random Fractal Mode");
+    GuiLabel((Rectangle){20, 50, 200, 20}, "Parameters are randomized!");
+
+    // Кнопка перегенерации прямо из режима просмотра
+    if (GuiButton((Rectangle){20, 80, 150, 30}, "Regenerate")) {
+        int type;
+        init_random_config(params, &type);
+        *update = true;
+    }
+}
+
+ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state) {
     ImageNode* node = malloc(sizeof(ImageNode));
     node->img_name = img_name;
     node->fract_name = fract_name;
     node->field = field;
-    node->texture = texture;
+    node->target_state = state;
     node->texture = texture;
     node->next = NULL;
     return node;
@@ -376,8 +396,9 @@ ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, 
 
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], const size_t size, Rectangle* img_fields)
 {
-    *head = create_image_node("", "", (Rectangle) {0,0,0,0}, (Texture2D) {0});
+    *head = create_image_node("", "", (Rectangle) {0,0,0,0}, (Texture2D) {0}, STATE_MENU);
     ImageNode* last = *head;
+    AppState states[] = {STATE_MANDELBROT, STATE_TREE, STATE_CARPET, STATE_TRIANGLE, STATE_JULIA, STATE_RANDOM};
 
     for (size_t i = 0; i < size; ++i) {
         const int img_height = 230, img_width = 280;
@@ -388,7 +409,7 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
         const Rectangle field = (Rectangle) {x_start + (float) (i % 5) * 350, y_start + (int) (i / 5) * 350, img_width, img_height};
         img_fields[i] = field;
         ImageNode* temp = create_image_node(fract_names[i], img_names[i],
-            field, LoadTextureFromImage(temp_img));
+            field, LoadTextureFromImage(temp_img), states[i]);
         UnloadImage(temp_img);
 
         last->next = temp;
@@ -410,3 +431,4 @@ void draw_pics(ImageNode* head) {
         DrawTexture(temp->texture, (int) temp->field.x, (int) temp->field.y, WHITE);
     }
 }
+
