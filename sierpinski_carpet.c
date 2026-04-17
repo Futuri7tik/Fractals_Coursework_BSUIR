@@ -9,7 +9,7 @@ void draw_carpet_to_image(Image* img, float x, float y, float length, int depth)
     float y_draw = y + new_length;
 
     // Вырезаем центральный квадрат (чёрный)
-    ImageDrawRectangle(img, x_draw, y_draw, new_length, new_length, BLACK);
+    ImageDrawRectangleV(img, (Vector2) {x_draw, y_draw}, (Vector2) {new_length, new_length}, BLACK);
 
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
@@ -26,7 +26,7 @@ Texture2D render_carpet_to_texture(int width, int height, int depth, float start
 
     float x_start = ((float) width - start_length) / 2.0f;
     float y_start = ((float) height - start_length) / 2.0f;
-    ImageDrawRectangle(&img, (int) x_start, (int) y_start, (int) start_length, (int) start_length, color);
+    ImageDrawRectangleV(&img, (Vector2) {x_start, y_start}, (Vector2) {start_length, start_length}, color);
     // Рекурсивно рисуем ковёр
     draw_carpet_to_image(&img, x_start, y_start, start_length, depth);
 

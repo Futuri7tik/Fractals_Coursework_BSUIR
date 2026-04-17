@@ -4,6 +4,7 @@
 #include <stddef.h>
 #define WIDTH 1920
 #define HEIGHT 1080
+#define SQRT3 1.73205080756f
 
 typedef enum {
     STATE_MENU,
@@ -14,6 +15,7 @@ typedef enum {
     STATE_TRIANGLE,
     STATE_MANDELBROT,
     STATE_JULIA,
+    STATE_CIRCLE,
     STATE_RANDOM
 } AppState;
 
@@ -88,12 +90,23 @@ typedef struct {
     Texture2D texture;
 } JuliaParameters;
 
+typedef struct CircleParameters {
+    float depth;
+    int max_depth;
+    Vector2 center;
+    float radius;
+    float red;
+    float green;
+    float blue;
+} CircleParameters;
+
 typedef struct FractalParameters {
     TreeParameters tree;
     CarpetParameters carpet;
     TriangleParameters triangle;
     MandelbrotParameters mandelbrot;
     JuliaParameters julia;
+    CircleParameters circle;
 } FractalParameters;
 
 // === Initialization
@@ -104,6 +117,7 @@ void init_triangle_parameters(TriangleParameters* params);
 void init_mandelbrot_parameters(MandelbrotParameters* params);
 void init_julia_parameters(JuliaParameters* params);
 void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
+void init_circle_parameters(CircleParameters* params);
 
 // === UI ===
 void handle_movement(float speed, Camera2D* cam, bool* update);
@@ -116,6 +130,7 @@ void triangle_gui(FractalParameters* params, Camera2D* cam);
 void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void julia_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update);
+void circle_gui(FractalParameters* params, Camera2D* cam);
 
 ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state);
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
@@ -152,6 +167,9 @@ int julia_iterations(float re_z, float im_z, float re_c, float im_c, int max_ite
 Color get_color_julia(int iteration, int max_iterations, const JuliaParameters* params);
 Texture2D render_julia(int width, int height, float zoom, float offset_x,
     float offset_y, int max_iterations, const JuliaParameters* params);
+
+// === Круговой фрактал
+void draw_circle_fractal(float x, float y, float r, int depth, Color color);
 
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
 #endif

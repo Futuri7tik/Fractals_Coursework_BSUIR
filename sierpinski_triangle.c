@@ -1,10 +1,9 @@
 #include "raylib.h"
 #include "functions.h"
 #include "raymath.h"
-#define SQRT3 0.866025f
 
 void draw_triangle_base(float x, float y, float length, Color color) {
-    float height = length * sqrtf(3.0f) / 2.0f;
+    float height = length * SQRT3 / 2.0f;
     DrawTriangle(
         (Vector2){x, y},                          // Левый нижний
         (Vector2){x + length, y},                 // Правый нижний
@@ -15,7 +14,7 @@ void draw_triangle_base(float x, float y, float length, Color color) {
 
 // Центральный перевёрнутый треугольник (синий)
 void draw_center_triangle(float x, float y, float length, Color color) {
-    float height = length * sqrtf(3.0f) / 2.0f;
+    float height = length * SQRT3 / 2.0f;
     DrawTriangle(
         (Vector2){x + length / 2.0f, y},                     // Середина основания
         (Vector2){x + length / 4.0f, y - height / 2.0f},     // Середина левой стороны
@@ -44,7 +43,7 @@ void draw_sierpinski_triangle(float x, float y, float length,
                               int depth, TriangleParameters* params) {
     if (depth <= 0) return;
 
-    float height = length * sqrtf(3.0f) / 2.0f;
+    float height = length * SQRT3 / 2.0f;
     float h2 = height / 2.0f;
     float l2 = length / 2.0f;
     float l4 = length / 4.0f;

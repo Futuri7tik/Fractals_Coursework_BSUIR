@@ -18,7 +18,7 @@ void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type
     init_random();
     init_fractals_parameters(params);
 
-    *type = STATE_TREE + rand() % 5;
+    *type = STATE_TREE + rand() % 6;
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
 
     switch (*type) {
@@ -54,6 +54,12 @@ void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type
             params->julia.red = 5 + rand() % 15;
             params->julia.green = 5 + rand() % 15;
             params->julia.blue = 5 + rand() % 15;
+            break;
+        case STATE_CIRCLE:
+            params->circle.depth = 1 + rand() % params->circle.max_depth;
+            params->circle.red = rand() % 255;
+            params->circle.green = rand() % 255;
+            params->circle.blue = rand() % 255;
             break;
     }
 }

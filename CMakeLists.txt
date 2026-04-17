@@ -7,7 +7,6 @@ set(RAYGUI_DIR "D:/LIBS/raygui" CACHE PATH "Путь к raygui")
 
 find_package(OpenMP REQUIRED)
 
-# === ИСХОДНЫЕ ФАЙЛЫ ===
 add_executable(KURSACH
         functions.h
         tree.c
@@ -17,7 +16,7 @@ add_executable(KURSACH
         mandel.c
         ui.c
         julia.c
-        add.c
+        random_fractal.c
         circle_fractal.c
 )
 

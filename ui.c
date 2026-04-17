@@ -11,6 +11,7 @@ void init_fractals_parameters(FractalParameters* params) {
     init_triangle_parameters(&params->triangle);
     init_mandelbrot_parameters(&params->mandelbrot);
     init_julia_parameters(&params->julia);
+    init_circle_parameters(&params->circle);
 }
 
 void init_tree_parameters(TreeParameters* params) {
@@ -68,6 +69,16 @@ void init_julia_parameters(JuliaParameters* params) {
     params->texture = (Texture2D) {0};
 }
 
+void init_circle_parameters(CircleParameters* params) {
+    params->depth = 5;
+    params->max_depth = 6;
+    params->center = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+    params->radius = HEIGHT / 2.0f - 100;
+    params->red = 255.0f;
+    params->green = 255.0f;
+    params->blue = 255.0f;
+}
+
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
     DrawRectangleGradientV(0, 0, WIDTH, HEIGHT,
                     (Color){255, 255, 255, 255}, (Color){106, 85, 242, 255});
@@ -108,7 +119,8 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
              "- Sierpinski Carpet\n"
              "- Sierpinski Triangle\n"
              "- Mandelbrot Set\n"
-             "- Julia Set\n\n"
+             "- Julia Set\n"
+             "- Circle Fractal\n\n"
              "Controls:\n"
              "- Mouse Wheel: Zoom\n"
              "- Arrow Keys: Pan\n"
@@ -154,11 +166,11 @@ void gallery_gui(AppState *state, FractalParameters* params, Camera2D *cam, Imag
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
 
     char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle",
-        "Julia Set", "Random Fractal"};
-    char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png", "random.png"};
-    Rectangle fields[] = {{0, 0,0,0}, {0, 0,0,0},{0, 0,0,0},
-        {0, 0,0,0}, {0, 0,0,0}, {0, 0,0,0}};
+        "Julia Set", "Circle Fractal","Random Fractal"};
+    char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png", "circle.png","random.png"};
+
     size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
+    Rectangle fields[7] = {{0}};
 
     if (*head_img == NULL) {
         load_gallery(head_img, fractal_names, image_names, size, fields);
@@ -170,24 +182,22 @@ void gallery_gui(AppState *state, FractalParameters* params, Camera2D *cam, Imag
     int index = 0;
     while (current != NULL) {
         if (GuiButton(current->field, "")) {
-            if (index < 5) {
-                switch (index) {
-                    case 0:
-                        *update = true;
-                        params->mandelbrot.zoom = cam->zoom;
-                        cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
-                        params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) / WIDTH;
-                        params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) / HEIGHT;
-                        *state = STATE_MANDELBROT;
-                        break;
-                    case 1: *state = STATE_TREE; break;
-                    case 2: *state = STATE_CARPET; break;
-                    case 3: *state = STATE_TRIANGLE; break;
-                    case 4: *state = STATE_JULIA; break;
-                }
+            switch (index) {
+                case 0:
+                    *update = true;
+                    params->mandelbrot.zoom = cam->zoom;
+                    cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
+                    params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) / WIDTH;
+                    params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) / HEIGHT;
+                    *state = STATE_MANDELBROT;
+                    break;
+                case 1: *state = STATE_TREE; break;
+                case 2: *state = STATE_CARPET; break;
+                case 3: *state = STATE_TRIANGLE; break;
+                case 4: *state = STATE_JULIA; break;
+                case 5: *state = STATE_CIRCLE; break;
+                case 6: *state = STATE_RANDOM; break;
             }
-            else
-                *state = STATE_RANDOM;
 
             *update = true;
         }
@@ -345,13 +355,13 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     GuiLabel((Rectangle){20, 260, 200, 20}, TextFormat("Constant c: "));
-    GuiLabel((Rectangle){20, 280, 200, 20}, TextFormat("Real part:"));
+    GuiLabel((Rectangle){20, 280, 200, 20}, TextFormat("Real part: %.3f", params->julia.re_c));
     if (GuiSlider((Rectangle){20, 300, 200, 20}, NULL, NULL,
                   &params->julia.re_c, -1, 1)) {
         *update = true;
     }
 
-    GuiLabel((Rectangle){20, 320, 200, 20}, TextFormat("Complex part:"));
+    GuiLabel((Rectangle){20, 320, 200, 20}, TextFormat("Complex part: %.3f", params->julia.im_c));
     if (GuiSlider((Rectangle){20, 340, 200, 20}, NULL, NULL,
                   &params->julia.im_c, -1, 1)) {
         *update = true;
@@ -363,6 +373,33 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;
         *update = true;
+    }
+}
+
+void circle_gui(FractalParameters* params, Camera2D* cam) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->circle.depth));
+    GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+        &params->circle.depth, 0, (float) params->circle.max_depth);
+    params->circle.depth = (float) (int) params->circle.depth;
+
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
+
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red component: %d", (int) params->circle.red));
+    GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+        &params->circle.red, 0, 255);
+
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green component: %d:", (int) params->circle.green));
+    GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+        &params->circle.green, 0, 255);
+
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue component: %d", (int) params->circle.blue));
+    GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                  &params->circle.blue, 0, 255);
+
+    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+        init_circle_parameters(&params->circle);
+        cam->zoom = 1.0f;
+        cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
     }
 }
 
@@ -381,7 +418,7 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
 {
     *head = create_image_node("", "", (Rectangle) {0,0,0,0}, (Texture2D) {0}, STATE_MENU);
     ImageNode* last = *head;
-    AppState states[] = {STATE_MANDELBROT, STATE_TREE, STATE_CARPET, STATE_TRIANGLE, STATE_JULIA, STATE_RANDOM};
+    AppState states[] = {STATE_MANDELBROT, STATE_TREE, STATE_CARPET, STATE_TRIANGLE, STATE_JULIA, STATE_CIRCLE, STATE_RANDOM};
 
     for (size_t i = 0; i < size; ++i) {
         const int img_height = 230, img_width = 280;
@@ -492,6 +529,16 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
                 DrawTexture(params->julia.texture, 0, 0, WHITE);
             break;
         }
+        case STATE_CIRCLE: {
+            BeginMode2D(*cam);
+            DrawCircleLinesV(params->circle.center, params->circle.radius,
+                (Color) {params->circle.red, params->circle.green, params->circle.blue, 255});
+            draw_circle_fractal(params->circle.center.x, params->circle.center.y, params->circle.radius / 3.0f,
+                (int) params->circle.depth, (Color) {params->circle.red, params->circle.green, params->circle.blue, 255});
+            EndMode2D();
+
+            break;
+        }
     }
 }
 
@@ -511,6 +558,9 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
             break;
         case STATE_JULIA:
             julia_gui(params, cam, update);
+            break;
+        case STATE_CIRCLE:
+            circle_gui(params, cam);
             break;
         default:
             break;
