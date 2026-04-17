@@ -18,6 +18,7 @@ add_executable(KURSACH
         julia.c
         random_fractal.c
         circle_fractal.c
+        fern.c
 )
 
 if(OpenMP_C_FOUND)

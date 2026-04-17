@@ -10,12 +10,13 @@ typedef enum {
     STATE_MENU,
     STATE_SLIDESHOW,
     STATE_GALLERY,
+    STATE_MANDELBROT,
     STATE_TREE,
     STATE_CARPET,
     STATE_TRIANGLE,
-    STATE_MANDELBROT,
     STATE_JULIA,
     STATE_CIRCLE,
+    STATE_FERN,
     STATE_RANDOM
 } AppState;
 
@@ -100,6 +101,16 @@ typedef struct CircleParameters {
     float blue;
 } CircleParameters;
 
+typedef struct FernParameters{
+    float iterations;
+    int max_iterations;
+    float prob1;
+    float prob2;
+    float prob3;
+    float prob4;
+    Texture2D texture;
+} FernParameters;
+
 typedef struct FractalParameters {
     TreeParameters tree;
     CarpetParameters carpet;
@@ -107,6 +118,7 @@ typedef struct FractalParameters {
     MandelbrotParameters mandelbrot;
     JuliaParameters julia;
     CircleParameters circle;
+    FernParameters fern;
 } FractalParameters;
 
 // === Initialization
@@ -118,12 +130,13 @@ void init_mandelbrot_parameters(MandelbrotParameters* params);
 void init_julia_parameters(JuliaParameters* params);
 void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
 void init_circle_parameters(CircleParameters* params);
+void init_fern_parameters(FernParameters* params);
 
 // === UI ===
 void handle_movement(float speed, Camera2D* cam, bool* update);
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close);
-void gallery_gui(AppState *state, FractalParameters* params, Camera2D *cam, ImageNode **head_img,
-                 bool *update, AppState *random_type, FractalParameters *random_params);
+void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
+                 bool *update);
 void tree_gui(FractalParameters* params, Camera2D* cam);
 void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void triangle_gui(FractalParameters* params, Camera2D* cam);
@@ -131,6 +144,7 @@ void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void julia_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update);
 void circle_gui(FractalParameters* params, Camera2D* cam);
+void fern_gui(FractalParameters* params, Camera2D* cam, bool* update);
 
 ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state);
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
@@ -170,6 +184,9 @@ Texture2D render_julia(int width, int height, float zoom, float offset_x,
 
 // === Круговой фрактал
 void draw_circle_fractal(float x, float y, float r, int depth, Color color);
+
+// === Папоротник Барнсли
+Texture2D render_barnsley_fern(Vector2 pos, int depth, FernParameters params);
 
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
 #endif

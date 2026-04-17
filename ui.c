@@ -12,6 +12,7 @@ void init_fractals_parameters(FractalParameters* params) {
     init_mandelbrot_parameters(&params->mandelbrot);
     init_julia_parameters(&params->julia);
     init_circle_parameters(&params->circle);
+    init_fern_parameters(&params->fern);
 }
 
 void init_tree_parameters(TreeParameters* params) {
@@ -77,6 +78,16 @@ void init_circle_parameters(CircleParameters* params) {
     params->red = 255.0f;
     params->green = 255.0f;
     params->blue = 255.0f;
+}
+
+void init_fern_parameters(FernParameters* params) {
+    params->iterations = 250000;
+    params->max_iterations = 500000;
+    params->prob1 = 1;
+    params->prob2 = 85;
+    params->prob3 = 7;
+    params->prob4 = 7;
+    params->texture = (Texture2D) {0};
 }
 
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
@@ -159,18 +170,19 @@ void handle_movement(float speed, Camera2D* cam, bool* update) {
         }
 }
 
-void gallery_gui(AppState *state, FractalParameters* params, Camera2D *cam, ImageNode **head_img,
-                 bool *update, AppState *random_type, FractalParameters *random_params) {
+void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
+                 bool *update) {
     GuiPanel((Rectangle){0, 10, WIDTH, HEIGHT - 10}, "Fractal Gallery");
     cam->zoom = 1.0f;
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
 
     char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle",
-        "Julia Set", "Circle Fractal","Random Fractal"};
-    char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png", "circle.png","random.png"};
+        "Julia Set", "Circle Fractal","Barnsley Fern", "Random Fractal"};
+    char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png",
+        "circle.png","fern.png","random.png"};
 
     size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
-    Rectangle fields[7] = {{0}};
+    Rectangle fields[8] = {{0}};
 
     if (*head_img == NULL) {
         load_gallery(head_img, fractal_names, image_names, size, fields);
@@ -179,30 +191,21 @@ void gallery_gui(AppState *state, FractalParameters* params, Camera2D *cam, Imag
 
     GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, 0x00000000);
     ImageNode* current = (*head_img)->next;
-    int index = 0;
+
     while (current != NULL) {
         if (GuiButton(current->field, "")) {
-            switch (index) {
-                case 0:
-                    *update = true;
-                    params->mandelbrot.zoom = cam->zoom;
-                    cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
-                    params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) / WIDTH;
-                    params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) / HEIGHT;
-                    *state = STATE_MANDELBROT;
-                    break;
-                case 1: *state = STATE_TREE; break;
-                case 2: *state = STATE_CARPET; break;
-                case 3: *state = STATE_TRIANGLE; break;
-                case 4: *state = STATE_JULIA; break;
-                case 5: *state = STATE_CIRCLE; break;
-                case 6: *state = STATE_RANDOM; break;
+            if (current->target_state == STATE_MANDELBROT) {
+                *update = true;
+                params->mandelbrot.zoom = cam->zoom;
+                cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
+                params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) / WIDTH;
+                params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) / HEIGHT;
             }
 
+            *state = current->target_state;
             *update = true;
         }
         current = current->next;
-        index++;
     }
 }
 
@@ -403,6 +406,52 @@ void circle_gui(FractalParameters* params, Camera2D* cam) {
     }
 }
 
+void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->fern.iterations));
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+                  &params->fern.iterations, 0, (float) params->fern.max_iterations)) {
+        params->fern.iterations = (float) (int) params->fern.iterations;
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Probabilities:"));
+
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("First probability: %d%%", (int) params->fern.prob1));
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+        &params->fern.prob1, 0, 99)) {
+        params->fern.prob1 = (float) (int) params->fern.prob1;
+        *update = true;
+    };
+
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Second probability: %d%%", (int) params->fern.prob2));
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+        &params->fern.prob2, 0, 99)) {
+        params->fern.prob2 = (float) (int) params->fern.prob2;
+        *update = true;
+    };
+
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Third probability: %d%%", (int) params->fern.prob3));
+    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+        &params->fern.prob3, 0, 99)) {
+        params->fern.prob3 = (float) (int) params->fern.prob3;
+        *update = true;
+    };
+
+    GuiLabel((Rectangle){20, 250, 200, 20}, TextFormat("Fourth probability: %d%%", (int) params->fern.prob4));
+    if (GuiSlider((Rectangle){20, 270, 200, 20}, NULL, NULL,
+        &params->fern.prob4, 0, 99)) {
+        params->fern.prob4 = (float) (int) params->fern.prob4;
+        *update = true;
+    };
+
+    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+        init_fern_parameters(&params->fern);
+        cam->zoom = 1.0f;
+        cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
+        *update = true;
+    }
+}
+
 ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state) {
     ImageNode* node = malloc(sizeof(ImageNode));
     node->img_name = img_name;
@@ -418,7 +467,7 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
 {
     *head = create_image_node("", "", (Rectangle) {0,0,0,0}, (Texture2D) {0}, STATE_MENU);
     ImageNode* last = *head;
-    AppState states[] = {STATE_MANDELBROT, STATE_TREE, STATE_CARPET, STATE_TRIANGLE, STATE_JULIA, STATE_CIRCLE, STATE_RANDOM};
+    AppState state = STATE_MANDELBROT;
 
     for (size_t i = 0; i < size; ++i) {
         const int img_height = 230, img_width = 280;
@@ -426,12 +475,13 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
 
         Image temp_img = LoadImage(img_names[i]);
         ImageResize(&temp_img, img_width, img_height);
-        const Rectangle field = (Rectangle) {x_start + (float) (i % 5) * 350, y_start + (int) (i / 5) * 350, img_width, img_height};
+        const Rectangle field = (Rectangle) {x_start + (float) (i % 5) * 350, y_start + (int) (i / 5) * 300, img_width, img_height};
         img_fields[i] = field;
         ImageNode* temp = create_image_node(fract_names[i], img_names[i],
-            field, LoadTextureFromImage(temp_img), states[i]);
+            field, LoadTextureFromImage(temp_img), state);
         UnloadImage(temp_img);
 
+        state += 1;
         last->next = temp;
         last = temp;
     }
@@ -539,6 +589,22 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
 
             break;
         }
+        case STATE_FERN: {
+            BeginMode2D(*cam);
+            if (*update) {
+                if (params->fern.texture.id > 0)
+                    UnloadTexture(params->fern.texture);
+
+                params->fern.texture = render_barnsley_fern((Vector2) {0, 0},(int) params->fern.iterations, params->fern);
+                *update = false;
+            }
+
+            if (params->fern.texture.id > 0)
+                DrawTexture(params->fern.texture, 0, 0, WHITE);
+
+            EndMode2D();
+            break;
+        }
     }
 }
 
@@ -561,6 +627,9 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
             break;
         case STATE_CIRCLE:
             circle_gui(params, cam);
+            break;
+        case STATE_FERN:
+            fern_gui(params, cam, update);
             break;
         default:
             break;

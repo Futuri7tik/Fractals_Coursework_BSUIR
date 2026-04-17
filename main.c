@@ -73,7 +73,7 @@ int main(void) {
                 GuiLoadStyleDefault();
                 ImageNode* head = NULL;
 
-                gallery_gui(&state, &fract_params, &camera, &head, &needs_update, &random_type, &random_params);
+                gallery_gui(&state, &fract_params, &camera, &head, &needs_update);
                 GuiLoadStyleDefault();
             }
             else {
