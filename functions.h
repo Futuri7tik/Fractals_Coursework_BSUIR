@@ -17,6 +17,7 @@ typedef enum {
     STATE_JULIA,
     STATE_CIRCLE,
     STATE_FERN,
+    STATE_NEWTON,
     STATE_RANDOM
 } AppState;
 
@@ -111,6 +112,18 @@ typedef struct FernParameters{
     Texture2D texture;
 } FernParameters;
 
+typedef struct NewtonParameters {
+    float iterations;
+    int max_iterations;
+    float zoom;
+    float offset_x;
+    float offset_y;
+    float red;
+    float green;
+    float blue;
+    Texture2D texture;
+} NewtonParameters;
+
 typedef struct FractalParameters {
     TreeParameters tree;
     CarpetParameters carpet;
@@ -119,6 +132,7 @@ typedef struct FractalParameters {
     JuliaParameters julia;
     CircleParameters circle;
     FernParameters fern;
+    NewtonParameters newton;
 } FractalParameters;
 
 // === Initialization
@@ -131,6 +145,7 @@ void init_julia_parameters(JuliaParameters* params);
 void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
 void init_circle_parameters(CircleParameters* params);
 void init_fern_parameters(FernParameters* params);
+void init_newton_parameters(NewtonParameters *params);
 
 // === UI ===
 void handle_movement(float speed, Camera2D* cam, bool* update);
@@ -145,6 +160,7 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update);
 void circle_gui(FractalParameters* params, Camera2D* cam);
 void fern_gui(FractalParameters* params, Camera2D* cam, bool* update);
+void newton_gui(FractalParameters* params, Camera2D* cam, bool* update);
 
 ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state);
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
@@ -172,8 +188,7 @@ void draw_sierpinski_triangle(float x, float y, float length,
 // === Множество мандельброта
 int mandelbrot_iterations(float re_c, float im_c, int max_iterations);
 Color get_color_mandelbrot(int iteration, int max_iterations, const MandelbrotParameters* params);
-Texture2D render_mandelbrot(int width, int height, float zoom, float offset_x,
-    float offset_y, int max_iterations, const MandelbrotParameters* params);
+Texture2D render_mandelbrot(float zoom, float offset_x, float offset_y, int max_iterations, const MandelbrotParameters *params);
 int mandelbrot_fourth_iterations(float re_c, float im_c, int max_iterations);
 
 // === Множество Джулии
@@ -187,6 +202,12 @@ void draw_circle_fractal(float x, float y, float r, int depth, Color color);
 
 // === Папоротник Барнсли
 Texture2D render_barnsley_fern(Vector2 pos, int depth, FernParameters params);
+
+// === Бассейны ньютона
+Texture2D render_newton(float zoom, float offset_x, float offset_y, int max_iterations,
+                        NewtonParameters *params);
+int newton_iterations(float re_z, float im_z, int max_iterations, int* root_num);
+Color get_color_newton(int iter, int root, const NewtonParameters *params);
 
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
 #endif

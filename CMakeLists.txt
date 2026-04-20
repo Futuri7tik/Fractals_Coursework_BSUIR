@@ -19,6 +19,7 @@ add_executable(KURSACH
         random_fractal.c
         circle_fractal.c
         fern.c
+        newton.c
 )
 
 if(OpenMP_C_FOUND)

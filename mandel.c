@@ -42,20 +42,20 @@ Color get_color_mandelbrot(const int iteration, const int max_iterations, const 
     return (Color) {r, g, b, 255};
 }
 
-Texture2D render_mandelbrot(const int width, const int height, float zoom, float offset_x,
-    float offset_y, const int max_iterations, const MandelbrotParameters* params) {
-    Image img = GenImageColor(width, height, BLACK);
+Texture2D render_mandelbrot(float zoom, float offset_x,
+                            float offset_y, const int max_iterations, const MandelbrotParameters *params) {
+    Image img = GenImageColor(WIDTH, HEIGHT, BLACK);
     Color* pixels = img.data;
 
     #pragma omp parallel for schedule(dynamic) default(none) \
-    shared(pixels, width, height, zoom, offset_x, offset_y, max_iterations, params)
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            const float re_c = ((float)x - (float)width / 2.0f) * (4.0f / ((float) width * zoom)) + offset_x;
-            const float im_c = ((float)y - (float)height / 2.0f) * (4.0f / ((float) width * zoom)) + offset_y;
+    shared(pixels, zoom, offset_x, offset_y, max_iterations, params)
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            const float re_c = ((float)x - (float)WIDTH / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_x;
+            const float im_c = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
 
             const int iterations = mandelbrot_iterations(re_c, im_c, max_iterations);
-            pixels[y * width + x] = get_color_mandelbrot(iterations, max_iterations, params);
+            pixels[y * WIDTH + x] = get_color_mandelbrot(iterations, max_iterations, params);
         }
     }
 

@@ -13,6 +13,7 @@ void init_fractals_parameters(FractalParameters* params) {
     init_julia_parameters(&params->julia);
     init_circle_parameters(&params->circle);
     init_fern_parameters(&params->fern);
+    init_newton_parameters(&params->newton);
 }
 
 void init_tree_parameters(TreeParameters* params) {
@@ -88,6 +89,18 @@ void init_fern_parameters(FernParameters* params) {
     params->prob3 = 7;
     params->prob4 = 7;
     params->texture = (Texture2D) {0};
+}
+
+void init_newton_parameters(NewtonParameters *params) {
+    params->iterations = 400;
+    params->max_iterations = 800;
+    params->zoom = 1.0f;
+    params->offset_x = 0.0f;
+    params->offset_y = 0.0f;
+    params->red = 20.f;
+    params->green = 40.f;
+    params->blue = 150.f;
+    params->texture = (Texture2D){0};
 }
 
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
@@ -177,12 +190,12 @@ void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, Imag
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
 
     char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle",
-        "Julia Set", "Circle Fractal","Barnsley Fern", "Random Fractal"};
+        "Julia Set", "Circle Fractal","Barnsley Fern", "Newtons Fractal", "Random Fractal"};
     char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png",
-        "circle.png","fern.png","random.png"};
+        "circle.png","fern.png","newton.png", "random.png"};
 
     size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
-    Rectangle fields[8] = {{0}};
+    Rectangle fields[9] = {{0}};
 
     if (*head_img == NULL) {
         load_gallery(head_img, fractal_names, image_names, size, fields);
@@ -452,6 +465,42 @@ void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
+void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->newton.iterations));
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+                  &params->newton.iterations, 0, (float) params->newton.max_iterations)) {
+        params->newton.iterations = (float) (int) params->newton.iterations;
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: %d", (int) params->newton.red));
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+                  &params->newton.red, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor %d:", (int) params->newton.green));
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+                  &params->newton.green, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor: %d", (int) params->newton.blue));
+    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                  &params->newton.blue, 0, 255)) {
+        *update = true;
+    }
+
+    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+        init_newton_parameters(&params->newton);
+        cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        cam->zoom = 1.0f;
+        *update = true;
+    }
+}
+
 ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state) {
     ImageNode* node = malloc(sizeof(ImageNode));
     node->img_name = img_name;
@@ -544,12 +593,8 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
                 params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
                 params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
 
-                params->mandelbrot.texture = render_mandelbrot(WIDTH, HEIGHT,
-                                      params->mandelbrot.zoom,
-                                      params->mandelbrot.offset_x,
-                                      params->mandelbrot.offset_y,
-                                      (int) params->mandelbrot.iterations,
-                                      &params->mandelbrot);
+                params->mandelbrot.texture = render_mandelbrot(params->mandelbrot.zoom, params->mandelbrot.offset_x,
+                    params->mandelbrot.offset_y, (int) params->mandelbrot.iterations, &params->mandelbrot);
                 *update = false;
             }
 
@@ -605,6 +650,26 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
             EndMode2D();
             break;
         }
+        case STATE_NEWTON: {
+            if (*update == true) {
+                if (params->newton.texture.id > 0)
+                    UnloadTexture(params->newton.texture);
+
+                params->newton.zoom = cam->zoom;
+                params->newton.offset_x = (cam->target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
+                params->newton.offset_y = (cam->target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
+                params->newton.texture = render_newton(params->newton.zoom,
+                                 params->newton.offset_x,
+                                      params->newton.offset_y,
+                                      (int) params->newton.iterations,
+                                      &params->newton);
+                *update = false;
+            }
+
+            if (params->newton.texture.id > 0)
+                DrawTexture(params->newton.texture, 0, 0, WHITE);
+            break;
+        }
     }
 }
 
@@ -630,6 +695,9 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
             break;
         case STATE_FERN:
             fern_gui(params, cam, update);
+            break;
+        case STATE_NEWTON:
+            newton_gui(params, cam, update);
             break;
         default:
             break;
