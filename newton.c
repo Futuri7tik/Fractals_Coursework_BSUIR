@@ -3,20 +3,20 @@
 #include "functions.h"
 #include "raylib.h"
 
+
 Color get_color_newton(int iter, int root, const NewtonParameters *params) {
     if (root == -1) return BLACK;
 
-    float t = iter / 20.0f;
+    float t = iter / 30.0f;
     if (t > 1.0f) t = 1.0f;
 
     unsigned char r_base = (unsigned char)(params->red * (root + 1) / 3.0f);
     unsigned char g_base = (unsigned char)(params->green * (root + 1) / 3.0f);
     unsigned char b_base = (unsigned char)params->blue;
 
-    // Интерполяция к белому (255, 255, 255) в зависимости от t
-    unsigned char r = (unsigned char)(r_base + (255 - r_base) * t);
-    unsigned char g = (unsigned char)(g_base + (255 - g_base) * t);
-    unsigned char b = (unsigned char)(b_base + (255 - b_base) * t);
+    unsigned char r = (unsigned char)(r_base + (params->gradient_r - r_base) * t);
+    unsigned char g = (unsigned char)(g_base + (params->gradient_g - g_base) * t);
+    unsigned char b = (unsigned char)(b_base + (params->gradient_b - b_base) * t);
 
     return (Color){ r, g, b, 255 };
 }
@@ -32,7 +32,7 @@ int newton_iterations(float re_z, float im_z, const int max_iterations, int* roo
         float im2 = im_z * im_z;
         float r2 = re2 + im2; // abs(z)^2
 
-        if (r2 < eps * eps)
+        if (r2 == 0)
             break;
 
         // 3 * (a + bi)^2 = 3 * (a2 - b2 + 2ab)
@@ -60,8 +60,7 @@ int newton_iterations(float re_z, float im_z, const int max_iterations, int* roo
     return iterations;
 }
 
-Texture2D render_newton(float zoom, float offset_x, float offset_y, const int max_iterations,
-                        NewtonParameters *params) {
+Texture2D render_newton(float zoom, float offset_x, float offset_y, const int max_iterations, NewtonParameters *params) {
     Image img = GenImageColor(WIDTH, HEIGHT, BLACK);
     Color* pixels = img.data;
 

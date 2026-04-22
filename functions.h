@@ -121,7 +121,9 @@ typedef struct NewtonParameters {
     float red;
     float green;
     float blue;
-    Color gradient;
+    float gradient_r;
+    float gradient_g;
+    float gradient_b;
     Texture2D texture;
 } NewtonParameters;
 

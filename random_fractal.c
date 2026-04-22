@@ -45,7 +45,7 @@ void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type
             params->julia.red = 5 + GetRandomValue(0, 15);
             params->julia.green = 5 + GetRandomValue(0, 15);
             params->julia.blue = 5 + GetRandomValue(0, 15);
-            break;
+             break;
         case STATE_CIRCLE:
             params->circle.depth = 1.0f + GetRandomValue(0, params->circle.max_depth - 1);
             params->circle.red = GetRandomValue(0, 255);
@@ -60,10 +60,13 @@ void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type
             params->fern.prob4 = GetRandomValue(0, 100);
             break;
         case STATE_NEWTON:
-            params->newton.iterations = 100 + GetRandomValue(0, 500);
+            params->newton.iterations = 100 + GetRandomValue(0, 400);
             params->newton.red = GetRandomValue(0, 255);
             params->newton.green = GetRandomValue(0, 255);
             params->newton.blue = GetRandomValue(0, 255);
+            params->newton.gradient_r = GetRandomValue(0, 255);
+            params->newton.gradient_g = GetRandomValue(0, 255);
+            params->newton.gradient_b = GetRandomValue(0, 255);
             break;
     }
 }

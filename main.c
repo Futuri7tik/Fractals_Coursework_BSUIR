@@ -92,7 +92,7 @@ int main(void) {
                     render_fractal_gui(&camera, &random_params, &random_type, &needs_update);
                 }
 
-                if (GuiButton((Rectangle){20, 410, 110, 30}, "<- Gallery")) {
+                if (GuiButton((Rectangle){20, 420, 110, 30}, "<- Gallery")) {
                     state = STATE_GALLERY;
                 }
                 DrawFPS(WIDTH - 90, 15);

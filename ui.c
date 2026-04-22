@@ -47,7 +47,7 @@ void init_triangle_parameters(TriangleParameters* params) {
 
 void init_mandelbrot_parameters(MandelbrotParameters* params) {
     params->iterations = 200;
-    params->max_iterations = 800;
+    params->max_iterations = 500;
     params->zoom = 1.0f;
     params->offset_x = 0.0f;
     params->offset_y = 0.0f;
@@ -59,7 +59,7 @@ void init_mandelbrot_parameters(MandelbrotParameters* params) {
 
 void init_julia_parameters(JuliaParameters* params) {
     params->iterations = 200;
-    params->max_iterations = 800;
+    params->max_iterations = 500;
     params->zoom = 1.0f;
     params->offset_x = 0.0f;
     params->offset_y = 0.0f;
@@ -93,13 +93,16 @@ void init_fern_parameters(FernParameters* params) {
 
 void init_newton_parameters(NewtonParameters *params) {
     params->iterations = 400;
-    params->max_iterations = 800;
+    params->max_iterations = 500;
     params->zoom = 1.0f;
     params->offset_x = 0.0f;
     params->offset_y = 0.0f;
     params->red = 20.f;
     params->green = 40.f;
     params->blue = 150.f;
+    params->gradient_r = 255.0f;
+    params->gradient_g = 255.0f;
+    params->gradient_b = 255.0f;
     params->texture = (Texture2D){0};
 }
 
@@ -144,7 +147,9 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
              "- Sierpinski Triangle\n"
              "- Mandelbrot Set\n"
              "- Julia Set\n"
-             "- Circle Fractal\n\n"
+             "- Circle Fractal\n"
+             "- Barnsley Fern\n"
+             "- Newtons Fractal\n\n"
              "Controls:\n"
              "- Mouse Wheel: Zoom\n"
              "- Arrow Keys: Pan\n"
@@ -238,7 +243,7 @@ void tree_gui(FractalParameters* params, Camera2D* cam) {
     GuiSlider((Rectangle){20, 220, 200, 20}, NULL, NULL,
         &params->tree.length_factor, 0, 0.9f);
 
-    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_tree_parameters(&params->tree);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
@@ -272,7 +277,7 @@ void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
         *update = true;
     }
 
-    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_carpet_parameters(&params->carpet);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
@@ -300,7 +305,7 @@ void triangle_gui(FractalParameters* params, Camera2D* cam) {
     GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
                   &params->triangle.blue, 0, 255);
 
-    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_triangle_parameters(&params->triangle);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
@@ -310,7 +315,7 @@ void triangle_gui(FractalParameters* params, Camera2D* cam) {
 void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->mandelbrot.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
-                  &params->mandelbrot.iterations, 0, 500)) {
+                  &params->mandelbrot.iterations, 0, (float) params->mandelbrot.max_iterations)) {
         params->mandelbrot.iterations = (float) (int) params->mandelbrot.iterations;
         *update = true;
     }
@@ -334,7 +339,7 @@ void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
         *update = true;
     }
 
-    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_mandelbrot_parameters(&params->mandelbrot);
         cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
@@ -346,7 +351,7 @@ void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
 void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->julia.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
-                  &params->julia.iterations, 0, 500)) {
+                  &params->julia.iterations, 0, (float) params->julia.max_iterations)) {
         params->julia.iterations = (float) (int) params->julia.iterations;
         *update = true;
     }
@@ -383,7 +388,7 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
         *update = true;
     }
 
-    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_julia_parameters(&params->julia);
         cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
@@ -412,7 +417,7 @@ void circle_gui(FractalParameters* params, Camera2D* cam) {
     GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
                   &params->circle.blue, 0, 255);
 
-    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_circle_parameters(&params->circle);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
@@ -457,7 +462,7 @@ void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
         *update = true;
     };
 
-    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_fern_parameters(&params->fern);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
@@ -492,7 +497,26 @@ void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
         *update = true;
     }
 
-    if (GuiButton((Rectangle){20, 370, 110, 30}, "Reset")) {
+    GuiLabel((Rectangle){20, 250, 200, 20}, TextFormat("Gradient:"));
+    GuiLabel((Rectangle){20, 265, 200, 20}, TextFormat("Red factor: %d", (int) params->newton.gradient_r));
+    if (GuiSlider((Rectangle){20, 285, 200, 15}, NULL, NULL,
+                  &params->newton.gradient_r, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 300, 200, 20}, TextFormat("Green factor %d:", (int) params->newton.gradient_g));
+    if (GuiSlider((Rectangle){20, 320, 200, 15}, NULL, NULL,
+                  &params->newton.gradient_g, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 335, 200, 20}, TextFormat("Blue factor: %d", (int) params->newton.gradient_b));
+    if (GuiSlider((Rectangle){20, 355, 200, 15}, NULL, NULL,
+                  &params->newton.gradient_b, 0, 255)) {
+        *update = true;
+    }
+
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_newton_parameters(&params->newton);
         cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
