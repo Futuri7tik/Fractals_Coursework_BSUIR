@@ -589,16 +589,15 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
         case STATE_CARPET: {
             BeginMode2D(*cam);
             if (*update) {
-                if (params->carpet.texture.id > 0)
-                    UnloadTexture(params->carpet.texture);
-                params->carpet.texture = render_carpet_to_texture(WIDTH, HEIGHT,
+                render_carpet_to_texture(
                 (int) params->carpet.depth, params->carpet.start_length,
-                (Color){params->carpet.red, params->carpet.green, params->carpet.blue, 255});
+                (Color){params->carpet.red, params->carpet.green, params->carpet.blue, 255},
+                &params->carpet);
+
                 *update = false;
             }
 
-            if (params->carpet.texture.id > 0)
-                DrawTexture(params->carpet.texture, 0, 0, WHITE);
+            DrawTexture(params->carpet.texture, 0, 0, WHITE);
             EndMode2D();
             break;
         }

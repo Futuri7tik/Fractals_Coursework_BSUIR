@@ -180,7 +180,7 @@ void draw_square(float x, float y, float length, Color color);
 void draw_carpet(float x_left, float y_left, float length,
                  int depth, CarpetParameters* params);
 void draw_carpet_to_image(Image* img, float x, float y, float length, int depth);
-Texture2D render_carpet_to_texture(int width, int height, int depth, float start_length, Color color);
+void render_carpet_to_texture(int depth, float start_length, Color color, CarpetParameters* params);
 
 // === Треугольник ===
 Color get_color_triangle(int depth, TriangleParameters* params);

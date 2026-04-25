@@ -20,17 +20,15 @@ void draw_carpet_to_image(Image* img, float x, float y, float length, int depth)
     }
 }
 
-Texture2D render_carpet_to_texture(int width, int height, int depth, float start_length, Color color) {
-    Image img = GenImageColor(width, height, BLACK);
+void render_carpet_to_texture(int depth, float start_length, Color color, CarpetParameters* params) {
 
-    float x_start = ((float) width - start_length) / 2.0f;
-    float y_start = ((float) height - start_length) / 2.0f;
+    Image img = GenImageColor(WIDTH, HEIGHT, BLACK);
+
+    float x_start = ((float) WIDTH - start_length) / 2.0f;
+    float y_start = ((float) HEIGHT - start_length) / 2.0f;
 
     ImageDrawRectangleV(&img, (Vector2) {x_start, y_start}, (Vector2) {start_length, start_length}, color);
-    // Рекурсивно рисуем ковёр
     draw_carpet_to_image(&img, x_start, y_start, start_length, depth);
 
-    Texture2D texture = LoadTextureFromImage(img);
-    UnloadImage(img);
-    return texture;
+    UpdateTexture(params->texture, img.data);
 }
