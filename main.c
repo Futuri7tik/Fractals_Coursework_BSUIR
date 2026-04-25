@@ -83,7 +83,7 @@ int main(void) {
                 else
                     render_fractals(&camera, &random_type, &random_params, &needs_update);
 
-                GuiPanel((Rectangle){10, 10, 280, 450}, "Controls");
+                GuiPanel((Rectangle){10, 10, 250, 450}, "Controls");
                 if (state != STATE_RANDOM) {
                     render_fractal_gui(&camera, &fract_params, &state, &needs_update);
                 }
@@ -95,6 +95,11 @@ int main(void) {
                 if (GuiButton((Rectangle){20, 420, 110, 30}, "<- Gallery")) {
                     state = STATE_GALLERY;
                 }
+
+                if (GuiButton((Rectangle){140, 380, 110, 30}, "Save Image")) {
+
+                }
+
                 DrawFPS(WIDTH - 90, 15);
             }
 

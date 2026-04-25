@@ -50,9 +50,10 @@ Texture2D render_mandelbrot(float zoom, float offset_x,
     #pragma omp parallel for schedule(dynamic) default(none) \
     shared(pixels, zoom, offset_x, offset_y, max_iterations, params)
     for (int y = 0; y < HEIGHT; ++y) {
+        const float im_c = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
+
         for (int x = 0; x < WIDTH; ++x) {
             const float re_c = ((float)x - (float)WIDTH / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_x;
-            const float im_c = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
 
             const int iterations = mandelbrot_iterations(re_c, im_c, max_iterations);
             pixels[y * WIDTH + x] = get_color_mandelbrot(iterations, max_iterations, params);

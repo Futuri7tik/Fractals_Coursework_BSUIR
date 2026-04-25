@@ -50,10 +50,8 @@ void draw_sierpinski_triangle(float x, float y, float length,
 
     Color color = get_color_triangle(depth, params);
 
-    DrawTriangle(
-        (Vector2){ x + l4, y - h2 },
-        (Vector2){ x + l2, y },
-        (Vector2){ x + 3.0f * l4, y - h2 },
+    DrawTriangle((Vector2){ x + l4, y - h2 },(Vector2){ x + l2, y },
+    (Vector2){ x + 3.0f * l4, y - h2 },
         color
     );
 
