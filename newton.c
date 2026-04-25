@@ -60,26 +60,23 @@ int newton_iterations(float re_z, float im_z, const int max_iterations, int* roo
     return iterations;
 }
 
-Texture2D render_newton(float zoom, float offset_x, float offset_y, const int max_iterations, NewtonParameters *params) {
-    Image img = GenImageColor(WIDTH, HEIGHT, BLACK);
-    Color* pixels = img.data;
+void render_newton(float zoom, float offset_x, float offset_y, const int max_iterations, NewtonParameters *params) {
+    static Color pixels[WIDTH * HEIGHT];
 
     #pragma omp parallel for schedule(dynamic) default(none) \
     shared(pixels, max_iterations, params, zoom, offset_x, offset_y)
     for (int y = 0; y < HEIGHT; ++y) {
+        const float im_z = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
+
         for (int x = 0; x < WIDTH; ++x) {
             int root_num;
             const float re_z = ((float)x - (float)WIDTH / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_x;
-            const float im_z = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
 
             const int iterations = newton_iterations(re_z, im_z, max_iterations, &root_num);
             pixels[y * WIDTH + x] = get_color_newton(iterations, root_num, params);
         }
     }
 
-    const Texture2D texture = LoadTextureFromImage(img);
-    UnloadImage(img);
-
-    return texture;
+    UpdateTexture(params->texture, pixels);
 }
 

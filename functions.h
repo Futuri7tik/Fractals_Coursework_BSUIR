@@ -208,7 +208,7 @@ void draw_circle_fractal(float x, float y, float r, int depth, Color color);
 Texture2D render_barnsley_fern(Vector2 pos, int depth, FernParameters params);
 
 // === Бассейны ньютона
-Texture2D render_newton(float zoom, float offset_x, float offset_y, int max_iterations,
+void render_newton(float zoom, float offset_x, float offset_y, int max_iterations,
                         NewtonParameters *params);
 int newton_iterations(float re_z, float im_z, int max_iterations, int* root_num);
 Color get_color_newton(int iter, int root, const NewtonParameters *params);

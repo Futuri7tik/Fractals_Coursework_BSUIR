@@ -669,22 +669,16 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
         }
         case STATE_NEWTON: {
             if (*update == true) {
-                if (params->newton.texture.id > 0)
-                    UnloadTexture(params->newton.texture);
-
                 params->newton.zoom = cam->zoom;
                 params->newton.offset_x = (cam->target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
                 params->newton.offset_y = (cam->target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
-                params->newton.texture = render_newton(params->newton.zoom,
-                                 params->newton.offset_x,
-                                      params->newton.offset_y,
-                                      (int) params->newton.iterations,
-                                      &params->newton);
+
+                render_newton(params->newton.zoom, params->newton.offset_x,
+                params->newton.offset_y, (int) params->newton.iterations, &params->newton);
                 *update = false;
             }
 
-            if (params->newton.texture.id > 0)
-                DrawTexture(params->newton.texture, 0, 0, WHITE);
+            DrawTexture(params->newton.texture, 0, 0, WHITE);
             break;
         }
     }

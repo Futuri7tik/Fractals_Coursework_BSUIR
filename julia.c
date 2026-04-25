@@ -40,9 +40,10 @@ void render_julia(float zoom, float offset_x,
     #pragma omp parallel for schedule(dynamic) default(none) \
     shared(pixels, zoom, offset_x, offset_y, max_iterations, params)
     for (int y = 0; y < HEIGHT; y++) {
+        const float im_z = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
+        
         for (int x = 0; x < WIDTH; x++) {
             const float re_z = ((float)x - (float)WIDTH / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_x;
-            const float im_z = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
 
             const int iterations = julia_iterations(re_z, im_z, params->re_c, params->im_c, max_iterations);
             pixels[y * WIDTH + x] = get_color_julia(iterations, max_iterations, params);
