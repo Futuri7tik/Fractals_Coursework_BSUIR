@@ -153,6 +153,7 @@ void init_newton_parameters(NewtonParameters *params);
 // === UI ===
 void handle_movement(float speed, Camera2D* cam, bool* update);
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close);
+void load_pics(ImageNode** head);
 void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
                  bool *update);
 void tree_gui(FractalParameters* params, Camera2D* cam);

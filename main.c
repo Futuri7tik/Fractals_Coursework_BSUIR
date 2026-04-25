@@ -30,8 +30,12 @@ int main(void) {
     camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
+
     AppState random_type = STATE_GALLERY;
     FractalParameters random_params;
+
+    ImageNode* head = NULL;
+    load_pics(&head);
 
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_TAB)) {
@@ -71,7 +75,6 @@ int main(void) {
         else
             if (state == STATE_GALLERY) {
                 GuiLoadStyleDefault();
-                ImageNode* head = NULL;
 
                 gallery_gui(&state, &fract_params, &camera, &head, &needs_update);
                 GuiLoadStyleDefault();
@@ -97,6 +100,10 @@ int main(void) {
                 }
 
                 if (GuiButton((Rectangle){140, 380, 110, 30}, "Save Image")) {
+
+                }
+
+                if (GuiButton((Rectangle){140, 420, 110, 30}, "Undo")) {
 
                 }
 

@@ -188,12 +188,7 @@ void handle_movement(float speed, Camera2D* cam, bool* update) {
         }
 }
 
-void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
-                 bool *update) {
-    GuiPanel((Rectangle){0, 10, WIDTH, HEIGHT - 10}, "Fractal Gallery");
-    cam->zoom = 1.0f;
-    cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
-
+void load_pics(ImageNode** head) {
     char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle",
         "Julia Set", "Circle Fractal","Barnsley Fern", "Newtons Fractal", "Random Fractal"};
     char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png",
@@ -202,9 +197,17 @@ void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, Imag
     size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
     Rectangle fields[9] = {{0}};
 
-    if (*head_img == NULL) {
-        load_gallery(head_img, fractal_names, image_names, size, fields);
+    if (*head == NULL) {
+        load_gallery(head, fractal_names, image_names, size, fields);
     }
+}
+
+void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
+                 bool *update) {
+    GuiPanel((Rectangle){0, 10, WIDTH, HEIGHT - 10}, "Fractal Gallery");
+    cam->zoom = 1.0f;
+    cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
+
     draw_pics(*head_img);
 
     GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, 0x00000000);
