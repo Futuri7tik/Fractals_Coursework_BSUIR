@@ -198,7 +198,7 @@ int mandelbrot_fourth_iterations(float re_c, float im_c, int max_iterations);
 // === Множество Джулии
 int julia_iterations(float re_z, float im_z, float re_c, float im_c, int max_iterations);
 Color get_color_julia(int iteration, int max_iterations, const JuliaParameters* params);
-Texture2D render_julia(int width, int height, float zoom, float offset_x,
+void render_julia(float zoom, float offset_x,
     float offset_y, int max_iterations, const JuliaParameters* params);
 
 // === Круговой фрактал

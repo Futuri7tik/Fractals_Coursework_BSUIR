@@ -31,7 +31,7 @@ void init_carpet_parameters(CarpetParameters* params) {
     params->red = 102.f;
     params->green = 191.f;
     params->blue = 255.f;
-    params->texture = (Texture2D) {0};
+    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
 void init_triangle_parameters(TriangleParameters* params) {
@@ -68,7 +68,7 @@ void init_julia_parameters(JuliaParameters* params) {
     params->red = 9;
     params->green = 15;
     params->blue = 8.5f;
-    params->texture = (Texture2D) {0};
+    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
 void init_circle_parameters(CircleParameters* params) {
@@ -88,7 +88,7 @@ void init_fern_parameters(FernParameters* params) {
     params->prob2 = 85;
     params->prob3 = 7;
     params->prob4 = 7;
-    params->texture = (Texture2D) {0};
+    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
 void init_newton_parameters(NewtonParameters *params) {
@@ -103,7 +103,7 @@ void init_newton_parameters(NewtonParameters *params) {
     params->gradient_r = 255.0f;
     params->gradient_g = 255.0f;
     params->gradient_b = 255.0f;
-    params->texture = (Texture2D){0};
+    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
@@ -623,29 +623,22 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
 
                 *update = false;
             }
+
             DrawTexture(params->mandelbrot.texture, 0, 0, WHITE);
             break;
         }
         case STATE_JULIA: {
             if (*update == true) {
-                if (params->julia.texture.id > 0)
-                    UnloadTexture(params->julia.texture);
-
                 params->julia.zoom = cam->zoom;
                 params->julia.offset_x = (cam->target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
                 params->julia.offset_y = (cam->target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
 
-                params->julia.texture = render_julia(WIDTH, HEIGHT,
-                                 params->julia.zoom,
-                                 params->julia.offset_x,
-                                      params->julia.offset_y,
-                                      (int) params->julia.iterations,
-                                      &params->julia);
+                render_julia(params->julia.zoom, params->julia.offset_x,
+                params->julia.offset_y, (int) params->julia.iterations, &params->julia);
                 *update = false;
             }
 
-            if (params->julia.texture.id > 0)
-                DrawTexture(params->julia.texture, 0, 0, WHITE);
+            DrawTexture(params->julia.texture, 0, 0, WHITE);
             break;
         }
         case STATE_CIRCLE: {

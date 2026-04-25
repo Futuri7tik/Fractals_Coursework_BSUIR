@@ -33,25 +33,21 @@ Color get_color_julia(const int iteration, const int max_iterations, const Julia
     return (Color) {r, g, b, 255};
 }
 
-Texture2D render_julia(const int width, const int height, float zoom, float offset_x,
+void render_julia(float zoom, float offset_x,
     float offset_y, const int max_iterations, const JuliaParameters* params) {
-    const Image img = GenImageColor(width, height, BLACK);
-    Color* pixels = img.data;
+    static Color pixels[WIDTH * HEIGHT];
 
-#pragma omp parallel for schedule(dynamic) default(none) \
-shared(pixels, width, height, zoom, offset_x, offset_y, max_iterations, params)
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            const float re_z = ((float)x - (float)width / 2.0f) * (4.0f / ((float) width * zoom)) + offset_x;
-            const float im_z = ((float)y - (float)height / 2.0f) * (4.0f / ((float) width * zoom)) + offset_y;
+    #pragma omp parallel for schedule(dynamic) default(none) \
+    shared(pixels, zoom, offset_x, offset_y, max_iterations, params)
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            const float re_z = ((float)x - (float)WIDTH / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_x;
+            const float im_z = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
 
             const int iterations = julia_iterations(re_z, im_z, params->re_c, params->im_c, max_iterations);
-            pixels[y * width + x] = get_color_julia(iterations, max_iterations, params);
+            pixels[y * WIDTH + x] = get_color_julia(iterations, max_iterations, params);
         }
     }
 
-    const Texture2D texture = LoadTextureFromImage(img);
-    UnloadImage(img);
-
-    return texture;
+    UpdateTexture(params->texture, pixels);
 }
