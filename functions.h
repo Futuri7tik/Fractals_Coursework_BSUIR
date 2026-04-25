@@ -192,7 +192,7 @@ void draw_sierpinski_triangle(float x, float y, float length,
 // === Множество мандельброта
 int mandelbrot_iterations(float re_c, float im_c, int max_iterations);
 Color get_color_mandelbrot(int iteration, int max_iterations, const MandelbrotParameters* params);
-Texture2D render_mandelbrot(float zoom, float offset_x, float offset_y, int max_iterations, const MandelbrotParameters *params);
+void render_mandelbrot(float zoom, float offset_x, float offset_y, int max_iterations, const MandelbrotParameters *params);
 int mandelbrot_fourth_iterations(float re_c, float im_c, int max_iterations);
 
 // === Множество Джулии

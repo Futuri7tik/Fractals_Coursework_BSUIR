@@ -54,7 +54,7 @@ void init_mandelbrot_parameters(MandelbrotParameters* params) {
     params->red = 9;
     params->green = 15;
     params->blue = 8.5f;
-    params->texture = (Texture2D) {0};
+    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
 void init_julia_parameters(JuliaParameters* params) {
@@ -614,19 +614,16 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
         }
         case STATE_MANDELBROT: {
             if (*update == true) {
-                if (params->mandelbrot.texture.id > 0)
-                    UnloadTexture(params->mandelbrot.texture);
                 params->mandelbrot.zoom = cam->zoom;
                 params->mandelbrot.offset_x = (cam->target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
                 params->mandelbrot.offset_y = (cam->target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
 
-                params->mandelbrot.texture = render_mandelbrot(params->mandelbrot.zoom, params->mandelbrot.offset_x,
-                    params->mandelbrot.offset_y, (int) params->mandelbrot.iterations, &params->mandelbrot);
+                render_mandelbrot(params->mandelbrot.zoom, params->mandelbrot.offset_x,params->mandelbrot.offset_y,
+                (int)params->mandelbrot.iterations, &params->mandelbrot);
+
                 *update = false;
             }
-
-            if (params->mandelbrot.texture.id > 0)
-                DrawTexture(params->mandelbrot.texture, 0, 0, WHITE);
+            DrawTexture(params->mandelbrot.texture, 0, 0, WHITE);
             break;
         }
         case STATE_JULIA: {

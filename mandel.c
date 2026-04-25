@@ -42,10 +42,9 @@ Color get_color_mandelbrot(const int iteration, const int max_iterations, const 
     return (Color) {r, g, b, 255};
 }
 
-Texture2D render_mandelbrot(float zoom, float offset_x,
+void render_mandelbrot(float zoom, float offset_x,
                             float offset_y, const int max_iterations, const MandelbrotParameters *params) {
-    Image img = GenImageColor(WIDTH, HEIGHT, BLACK);
-    Color* pixels = img.data;
+    static Color pixels[WIDTH * HEIGHT];
 
     #pragma omp parallel for schedule(dynamic) default(none) \
     shared(pixels, zoom, offset_x, offset_y, max_iterations, params)
@@ -60,10 +59,7 @@ Texture2D render_mandelbrot(float zoom, float offset_x,
         }
     }
 
-    const Texture2D texture = LoadTextureFromImage(img);
-    UnloadImage(img);
-
-    return texture;
+    UpdateTexture(params->texture, pixels);
 }
 
 
