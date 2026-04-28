@@ -18,6 +18,7 @@ static float TextToFloat(const char *text) {
 int main(void) {
     InitWindow(WIDTH, HEIGHT, "Fractal Gallery");
     bool needs_update = true;
+    static bool was_updating = false;
     bool show_message_box = false;
 
     SetTargetFPS(144);
@@ -25,6 +26,9 @@ int main(void) {
     AppState state = STATE_MENU;
     FractalParameters fract_params;
     init_fractals_parameters(&fract_params);
+
+    init_undo();
+    push(&fract_params);
 
     Camera2D camera = {0};
     camera.target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
@@ -62,6 +66,14 @@ int main(void) {
             float current_speed = 20.0f / camera.zoom;
             handle_movement(current_speed, &camera, &needs_update);
         }
+
+        if (needs_update && !was_updating) {
+            if (state == STATE_RANDOM)
+                push(&random_params);
+            else
+                push(&fract_params);
+        }
+        was_updating = needs_update;
 
         BeginDrawing();
         ClearBackground(BLACK);
@@ -105,7 +117,17 @@ int main(void) {
                 }
 
                 if (GuiButton((Rectangle){140, 420, 110, 30}, "Undo")) {
-
+                    if (state != STATE_RANDOM) {
+                        if (pop(&fract_params)) {
+                            needs_update = true;
+                            was_updating = true;
+                        }
+                    }
+                    else
+                        if (pop(&random_params)) {
+                            needs_update = true;
+                            was_updating = true;
+                        }
                 }
 
                 DrawFPS(WIDTH - 90, 15);

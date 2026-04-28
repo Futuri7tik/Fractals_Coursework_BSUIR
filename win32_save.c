@@ -27,7 +27,7 @@ char* Win32_ShowSaveDialog(const char* defaultFileName) {
 
     OPENFILENAMEW ofn = {0};
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner   = NULL; // Raylib-окно по умолчанию
+    ofn.hwndOwner   = NULL;
     ofn.lpstrFilter = L"PNG Image\0*.png\0BMP Image\0*.bmp\0JPEG Image\0*.jpg\0All Files\0*.*\0\0";
     ofn.lpstrFile   = buffer;
     ofn.nMaxFile    = MAX_PATH;

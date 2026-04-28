@@ -2,6 +2,7 @@
 #define KURSACH_FUNCTIONS_H
 #include "raylib.h"
 #include <stddef.h>
+#include <stdbool.h>
 
 #define WIDTH 1920
 #define HEIGHT 1080
@@ -237,4 +238,10 @@ int newton_iterations(float re_z, float im_z, int max_iterations, int* root_num)
 Color get_color_newton(int iter, int root, const NewtonParameters *params);
 
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
+
+void clear_undo(void);
+void init_undo(void);
+void push(FractalParameters* params);
+bool pop(FractalParameters* out);
+
 #endif

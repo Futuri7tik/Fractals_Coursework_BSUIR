@@ -24,6 +24,7 @@ add_executable(KURSACH
         initialization.c
         win32_save.c
         win32_save.h
+        undo_stack.c
 )
 
 if(OpenMP_C_FOUND)
