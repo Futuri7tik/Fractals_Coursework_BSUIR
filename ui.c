@@ -147,7 +147,7 @@ void tree_gui(FractalParameters* params, Camera2D* cam) {
         &params->tree.length_factor, 0, 0.9f);
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_tree_parameters(&params->tree);
+        init_default_tree_parameters(&params->tree);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
     }
@@ -181,7 +181,7 @@ void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_carpet_parameters(&params->carpet);
+        init_default_carpet_parameters(&params->carpet);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
         *update = true;
@@ -209,7 +209,7 @@ void triangle_gui(FractalParameters* params, Camera2D* cam) {
                   &params->triangle.blue, 0, 255);
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_triangle_parameters(&params->triangle);
+        init_default_triangle_parameters(&params->triangle);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
     }
@@ -243,7 +243,7 @@ void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_mandelbrot_parameters(&params->mandelbrot);
+        init_default_mandelbrot_parameters(&params->mandelbrot);
         cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;
@@ -292,7 +292,7 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_julia_parameters(&params->julia);
+        init_default_julia_parameters(&params->julia);
         cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;
@@ -321,7 +321,7 @@ void circle_gui(FractalParameters* params, Camera2D* cam) {
                   &params->circle.blue, 0, 255);
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_circle_parameters(&params->circle);
+        init_default_circle_parameters(&params->circle);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
     }
@@ -366,7 +366,7 @@ void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     };
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_fern_parameters(&params->fern);
+        init_default_fern_parameters(&params->fern);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
         *update = true;
@@ -420,7 +420,7 @@ void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_newton_parameters(&params->newton);
+        init_default_newton_parameters(&params->newton);
         cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;

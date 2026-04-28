@@ -113,6 +113,7 @@ int main(void) {
         EndDrawing();
     }
 
+    rewrite_fractal_parameters(&fract_params);
     CloseWindow();
     return 0;
 }
