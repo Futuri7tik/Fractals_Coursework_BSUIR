@@ -185,6 +185,10 @@ void circle_gui(FractalParameters* params, Camera2D* cam);
 void fern_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void newton_gui(FractalParameters* params, Camera2D* cam, bool* update);
 
+// saving image
+void save_image(AppState state, AppState random_type, const FractalParameters* params,
+    const FractalParameters* random_params);
+
 ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state);
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
 void draw_pics(ImageNode* head);

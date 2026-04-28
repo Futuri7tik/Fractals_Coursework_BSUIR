@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "functions.h"
+#include "win32_save.h"
 
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
     DrawRectangleGradientV(0, 0, WIDTH, HEIGHT,
@@ -611,5 +612,47 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
             break;
         default:
             break;
+    }
+}
+
+void save_image(const AppState state, const AppState random_type, const FractalParameters* params,
+    const FractalParameters* random_params) {
+    Image finalImage = {0};
+    const AppState currentState = (state == STATE_RANDOM) ? random_type : state;
+    const FractalParameters* currentParams = (state == STATE_RANDOM) ? random_params : params;
+
+    switch (currentState) {
+        case STATE_MANDELBROT:
+            finalImage = LoadImageFromTexture(currentParams->mandelbrot.texture);
+            break;
+        case STATE_JULIA:
+            finalImage = LoadImageFromTexture(currentParams->julia.texture);
+            break;
+        case STATE_CARPET:
+            finalImage = LoadImageFromTexture(currentParams->carpet.texture);
+            break;
+        case STATE_FERN:
+            finalImage = LoadImageFromTexture(currentParams->fern.texture);
+            break;
+        case STATE_NEWTON:
+            finalImage = LoadImageFromTexture(currentParams->newton.texture);
+            break;
+        default:
+            finalImage = LoadImageFromScreen();
+            ImageCrop(&finalImage, (Rectangle){270.0f, 0.0f, (float)(WIDTH - 270), (float)HEIGHT});
+            break;
+    }
+
+    if (finalImage.data != NULL) {
+        char* savePath = Win32_ShowSaveDialog("fractal.png");
+        if (savePath != NULL) {
+            if (ExportImage(finalImage, savePath)) {
+                TraceLog(LOG_INFO, "Изображение сохранено: %s", savePath);
+            } else {
+                TraceLog(LOG_ERROR, "Ошибка экспорта изображения");
+            }
+            free(savePath);
+        }
+        UnloadImage(finalImage);
     }
 }

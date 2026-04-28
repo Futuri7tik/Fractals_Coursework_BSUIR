@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
+#include "win32_save.h"
 
 #ifndef TEXT_TO_FLOAT_DEFINED
 #define TEXT_TO_FLOAT_DEFINED
@@ -100,7 +101,7 @@ int main(void) {
                 }
 
                 if (GuiButton((Rectangle){140, 380, 110, 30}, "Save Image")) {
-
+                    save_image(state, random_type, &fract_params, &random_params);
                 }
 
                 if (GuiButton((Rectangle){140, 420, 110, 30}, "Undo")) {

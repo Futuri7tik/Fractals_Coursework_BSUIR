@@ -22,6 +22,8 @@ add_executable(KURSACH
         newton.c
         dragon_fractal.c
         initialization.c
+        win32_save.c
+        win32_save.h
 )
 
 if(OpenMP_C_FOUND)
