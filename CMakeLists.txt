@@ -21,6 +21,7 @@ add_executable(KURSACH
         fern.c
         newton.c
         dragon_fractal.c
+        initialization.c
 )
 
 if(OpenMP_C_FOUND)
