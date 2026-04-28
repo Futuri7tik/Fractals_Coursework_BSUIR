@@ -91,7 +91,7 @@ int main(void) {
                     render_fractal_gui(&camera, &fract_params, &state, &needs_update);
                 }
                 else {
-                    DrawText("Random Fractal", 200, 17, 10, DARKGRAY);
+                    DrawText("Random Fractal", 165, 17, 10, DARKGRAY);
                     render_fractal_gui(&camera, &random_params, &random_type, &needs_update);
                 }
 
