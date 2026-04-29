@@ -176,13 +176,13 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close);
 void load_pics(ImageNode** head);
 void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
                  bool *update);
-void tree_gui(FractalParameters* params, Camera2D* cam);
+void tree_gui(FractalParameters* params, Camera2D* cam, bool *update);
 void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update);
-void triangle_gui(FractalParameters* params, Camera2D* cam);
+void triangle_gui(FractalParameters* params, Camera2D* cam, bool *update);
 void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void julia_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update);
-void circle_gui(FractalParameters* params, Camera2D* cam);
+void circle_gui(FractalParameters* params, Camera2D* cam, bool *update);
 void fern_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void newton_gui(FractalParameters* params, Camera2D* cam, bool* update);
 

@@ -131,24 +131,32 @@ void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, Imag
     }
 }
 
-void tree_gui(FractalParameters* params, Camera2D* cam) {
+void tree_gui(FractalParameters* params, Camera2D* cam, bool *update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->tree.depth));
 
-    GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
-        &params->tree.depth, 1,(float)params->tree.max_depth);
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+        &params->tree.depth, 1,(float)params->tree.max_depth)) {
+        *update = true;
+    }
     params->tree.depth = (float) (int)params->tree.depth;
 
     GuiLabel((Rectangle){20, 120, 200, 20}, TextFormat("Angle: %.1f°", params->tree.angle_degrees));
-    GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
-        &params->tree.angle_degrees, 0, 90);
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+        &params->tree.angle_degrees, 0, 90)) {
+        *update = true;
+    }
+
     params->tree.angle = params->tree.angle_degrees * DEG2RAD;
 
     GuiLabel((Rectangle){20, 190, 200, 20}, TextFormat("Length Factor: %.2f", params->tree.length_factor));
-    GuiSlider((Rectangle){20, 220, 200, 20}, NULL, NULL,
-        &params->tree.length_factor, 0, 0.9f);
+    if (GuiSlider((Rectangle){20, 220, 200, 20}, NULL, NULL,
+        &params->tree.length_factor, 0, 0.9f)) {
+        *update = true;
+    }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_default_tree_parameters(&params->tree);
+        *update = true;
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
     }
@@ -157,8 +165,9 @@ void tree_gui(FractalParameters* params, Camera2D* cam) {
 void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->carpet.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
-        &params->carpet.depth, 0, (float) params->carpet.max_depth))
+        &params->carpet.depth, 0, (float) params->carpet.max_depth)) {
         *update = true;
+    }
 
     params->carpet.depth = (float) (int) params->carpet.depth;
 
@@ -189,28 +198,37 @@ void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-void triangle_gui(FractalParameters* params, Camera2D* cam) {
+void triangle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->triangle.depth));
-    GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
-        &params->triangle.depth, 0, (float) params->triangle.max_depth);
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+        &params->triangle.depth, 0, (float) params->triangle.max_depth)) {
+        *update = true;
+    }
     params->triangle.depth = (float) (int) params->triangle.depth;
 
     GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
 
     GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red component: %d", (int) params->triangle.red));
-    GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
-        &params->triangle.red, 0, 255);
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+        &params->triangle.red, 0, 255)) {
+        *update = true;
+    }
 
     GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green component: %d:", (int) params->triangle.green));
-    GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
-        &params->triangle.green, 0, 255);
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+        &params->triangle.green, 0, 255)) {
+        *update = true;
+    }
 
     GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue component: %d", (int) params->triangle.blue));
-    GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
-                  &params->triangle.blue, 0, 255);
+    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                  &params->triangle.blue, 0, 255)) {
+        *update = true;
+    }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_default_triangle_parameters(&params->triangle);
+        *update = true;
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
     }
@@ -301,25 +319,33 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-void circle_gui(FractalParameters* params, Camera2D* cam) {
+void circle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->circle.depth));
-    GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
-        &params->circle.depth, 0, (float) params->circle.max_depth);
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+        &params->circle.depth, 0, (float) params->circle.max_depth)) {
+        *update = true;
+    }
     params->circle.depth = (float) (int) params->circle.depth;
 
     GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
 
     GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red component: %d", (int) params->circle.red));
-    GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
-        &params->circle.red, 0, 255);
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+        &params->circle.red, 0, 255)) {
+        *update = true;
+    }
 
     GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green component: %d:", (int) params->circle.green));
-    GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
-        &params->circle.green, 0, 255);
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+        &params->circle.green, 0, 255)) {
+        *update = true;
+    }
 
     GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue component: %d", (int) params->circle.blue));
-    GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
-                  &params->circle.blue, 0, 255);
+    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                  &params->circle.blue, 0, 255)) {
+        *update = true;
+    }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         init_default_circle_parameters(&params->circle);
@@ -486,6 +512,7 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
             draw_tree(WIDTH/2.0f, HEIGHT - 220, 200, -PI/2.0f,
                  (int) params->tree.depth, &params->tree);
             EndMode2D();
+            *update = false;
             break;
         case STATE_CARPET: {
             BeginMode2D(*cam);
@@ -510,6 +537,7 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
             draw_sierpinski_triangle(params->triangle.x_start, params->triangle.y_start, params->triangle.start_length,
                                    (int) params->triangle.depth, &params->triangle);
             EndMode2D();
+            *update = false;
             break;
         }
         case STATE_MANDELBROT: {
@@ -548,7 +576,7 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
             draw_circle_fractal(params->circle.center.x, params->circle.center.y, params->circle.radius / 3.0f,
                 (int) params->circle.depth, (Color) {params->circle.red, params->circle.green, params->circle.blue, 255});
             EndMode2D();
-
+            *update = false;
             break;
         }
         case STATE_FERN: {
@@ -587,13 +615,13 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
 void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update) {
     switch (*state) {
         case STATE_TREE:
-            tree_gui(params, cam);
+            tree_gui(params, cam, update);
             break;
         case STATE_CARPET:
             carpet_gui(params, cam, update);
             break;
         case STATE_TRIANGLE:
-            triangle_gui(params, cam);
+            triangle_gui(params, cam, update);
             break;
         case STATE_MANDELBROT:
             mandelbrot_gui(params, cam, update);
@@ -602,7 +630,7 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
             julia_gui(params, cam, update);
             break;
         case STATE_CIRCLE:
-            circle_gui(params, cam);
+            circle_gui(params, cam, update);
             break;
         case STATE_FERN:
             fern_gui(params, cam, update);
