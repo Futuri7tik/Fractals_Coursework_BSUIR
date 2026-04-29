@@ -45,6 +45,7 @@ int main(void) {
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_TAB)) {
             GuiLoadStyleDefault();
+            init_undo();
             if (state == STATE_GALLERY)
                 state = STATE_MENU;
             else
