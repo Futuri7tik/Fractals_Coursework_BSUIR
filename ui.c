@@ -96,11 +96,13 @@ void load_pics(ImageNode** head) {
         "circle.png","fern.png","newton.png", "random.png"};
 
     size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
-    Rectangle fields[9] = {{0}};
+    Rectangle *fields = calloc(size, sizeof(Rectangle));
 
     if (*head == NULL) {
         load_gallery(head, fractal_names, image_names, size, fields);
     }
+
+    free(fields);
 }
 
 void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
@@ -517,7 +519,7 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
         case STATE_CARPET: {
             BeginMode2D(*cam);
             if (*update) {
-                render_carpet_to_texture(
+                render_carpet(
                 (int) params->carpet.depth, params->carpet.start_length,
                 (Color){params->carpet.red, params->carpet.green, params->carpet.blue, 255},
                 &params->carpet);

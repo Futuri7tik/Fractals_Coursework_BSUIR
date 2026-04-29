@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include "functions.h"
 
-void draw_carpet_to_image(Image* img, float x, float y, float length, int depth) {
+void draw_carpet(Image* img, float x, float y, float length, int depth) {
     if (depth < 0) return;
 
     float new_length = length / 3.0f;
@@ -13,14 +13,14 @@ void draw_carpet_to_image(Image* img, float x, float y, float length, int depth)
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             if (i != 1 || j != 1) {
-                draw_carpet_to_image(img, x + i * new_length, y + j * new_length,
+                draw_carpet(img, x + i * new_length, y + j * new_length,
                                     new_length, depth - 1);
             }
         }
     }
 }
 
-void render_carpet_to_texture(int depth, float start_length, Color color, CarpetParameters* params) {
+void render_carpet(int depth, float start_length, Color color, const CarpetParameters* params) {
 
     Image img = GenImageColor(WIDTH, HEIGHT, BLACK);
 
@@ -28,7 +28,7 @@ void render_carpet_to_texture(int depth, float start_length, Color color, Carpet
     float y_start = ((float) HEIGHT - start_length) / 2.0f;
 
     ImageDrawRectangleV(&img, (Vector2) {x_start, y_start}, (Vector2) {start_length, start_length}, color);
-    draw_carpet_to_image(&img, x_start, y_start, start_length, depth);
+    draw_carpet(&img, x_start, y_start, start_length, depth);
 
     UpdateTexture(params->texture, img.data);
 }

@@ -19,9 +19,6 @@ void clear_undo(void) {
     depth = 0;
 }
 
-void init_undo(void) {
-    clear_undo();
-}
 
 void push(FractalParameters* params) {
     if (!params)

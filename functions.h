@@ -200,16 +200,11 @@ void draw_tree(float x_start, float y_start, float length, float angle,
                int depth, TreeParameters* params);
 
 // Ковёр
-void draw_square(float x, float y, float length, Color color);
-void draw_carpet(float x_left, float y_left, float length,
-                 int depth, CarpetParameters* params);
-void draw_carpet_to_image(Image* img, float x, float y, float length, int depth);
-void render_carpet_to_texture(int depth, float start_length, Color color, CarpetParameters* params);
+void draw_carpet(Image* img, float x, float y, float length, int depth);
+void render_carpet(int depth, float start_length, Color color, const CarpetParameters* params);
 
 // Треугольник
-Color get_color_triangle(int depth, TriangleParameters* params);
 void draw_triangle_base(float x, float y, float length, Color color);
-void draw_center_triangle(float x, float y, float length, Color color);
 void draw_sierpinski_triangle(float x, float y, float length,
                               int depth, TriangleParameters* params);
 
@@ -240,7 +235,6 @@ Color get_color_newton(int iter, int root, const NewtonParameters *params);
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
 
 void clear_undo(void);
-void init_undo(void);
 void push(FractalParameters* params);
 bool pop(FractalParameters* out);
 

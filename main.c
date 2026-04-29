@@ -27,7 +27,7 @@ int main(void) {
     FractalParameters fract_params;
     init_fractals_parameters(&fract_params);
 
-    init_undo();
+    clear_undo();
     push(&fract_params);
 
     Camera2D camera = {0};
@@ -45,7 +45,7 @@ int main(void) {
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_TAB)) {
             GuiLoadStyleDefault();
-            init_undo();
+            clear_undo();
             if (state == STATE_GALLERY)
                 state = STATE_MENU;
             else
