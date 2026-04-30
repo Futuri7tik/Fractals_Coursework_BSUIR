@@ -123,6 +123,19 @@ typedef struct NewtonParameters {
     Texture2D texture;
 } NewtonParameters;
 
+typedef struct DragonParameters {
+    float depth;
+    int max_depth;
+    float x;
+    float y;
+    float angle;
+    float angle_tilt;
+    float length;
+    float red;
+    float green;
+    float blue;
+} DragonParameters;
+
 typedef struct FractalParameters {
     TreeParameters tree;
     CarpetParameters carpet;

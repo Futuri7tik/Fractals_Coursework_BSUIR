@@ -2,64 +2,94 @@
 #include "raylib.h"
 #include "functions.h"
 
-typedef struct DragonParameters {
-    float depth;
-    float x;
-    float y;
-    float angle;
-    float length;
-    int max_depth;
-    float start_length;
-    float red;
-    float green;
-    float blue;
-} DragonParameters;
 
-void draw_x(DragonParameters* params, int depth);
-void draw_y(DragonParameters* params, int depth);
-void draw_dragon(DragonParameters* params);
-void draw_f(DragonParameters* params);
+static Vector2 draw_f(float x, float y, float angle, float length, Color color);
+static Vector2 draw_x(int depth, float x, float y, float* angle, float length, Color color);
+static Vector2 draw_y(int depth, float x, float y, float* angle, float length, Color color);
+void draw_dragon(float x_start, float y_start, float* start_angle, float length, int depth, Color color);
 
-void draw_f(DragonParameters* params) {
-    float next_x = params->x + cosf(params->angle * DEG2RAD) * params->length;
-    float next_y = params->y + sinf(params->angle * DEG2RAD) * params->length;
-    DrawLineEx((Vector2){params->x, params->y}, (Vector2){next_x, next_y}, 1.0f,
-        (Color){params->red, params->green, params->blue, 255});
-    params->x = next_x;
-    params->y = next_y;
+// drawing line
+static Vector2 draw_f(float x, float y, float angle, float length, Color color) {
+    float next_x = x + cosf(angle * DEG2RAD) * length;
+    float next_y = y + sinf(angle * DEG2RAD) * length;
+    DrawLineEx((Vector2){x, y}, (Vector2){next_x, next_y}, 1.0f, color);
+
+    return (Vector2){next_x, next_y};
 }
 
 // y -> - fx - y
-void draw_y(DragonParameters* params, int depth) {
+Vector2 draw_y(int depth, float x, float y, float* angle, float length, Color color) {
     if (depth <= 0)
-        return;
+        return (Vector2){x, y};
 
-    params->angle -= 90;
-    draw_f(params);
+    *angle -= 90;
 
-    draw_x(params, depth - 1);
+    Vector2 new_pos = draw_f(x, y, *angle, length, color);
+    new_pos = draw_x(depth - 1, new_pos.x, new_pos.y, angle, length, color);
 
-    params->angle -= 90;
-    draw_y(params, depth - 1);
+    *angle -= 90;
+
+    new_pos = draw_y(depth - 1, new_pos.x, new_pos.y, angle, length, color);
+
+    return new_pos;
 }
 
 // x -> x + yf +
-void draw_x(DragonParameters* params, int depth) {
+Vector2 draw_x(int depth, float x, float y, float* angle, float length, Color color) {
     if (depth <= 0)
-        return;
+        return (Vector2) {x, y};
 
-    draw_x(params, depth - 1);
-    params->angle += 90;
+    Vector2 new_pos = draw_x(depth - 1, x, y, angle, length, color);
+    *angle += 90;
 
-    draw_y(params, depth - 1);
-    draw_f(params);
-    params->angle += 90;
+    new_pos = draw_y(depth - 1, new_pos.x, new_pos.y, angle, length, color);
+    new_pos = draw_f(new_pos.x, new_pos.y, *angle, length, color);
+
+    *angle += 90;
+
+    return new_pos;
 }
 
-void draw_dragon(DragonParameters* params) {
-    draw_f(params);
-    draw_x(params, 12);
+void draw_dragon(float x_start, float y_start, float* start_angle, float length, int depth, Color color) {
+    Vector2 pos = draw_f(x_start, y_start, *start_angle, length, color);
+    draw_x(depth - 1, pos.x, pos.y, start_angle, length, color);
 }
 
+int m(void) {
+    InitWindow(WIDTH, HEIGHT, "Fractal Gallery");
+    SetTargetFPS(144);
 
+    Camera2D camera = {0};
+    camera.target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+    camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
+    DragonParameters dragon = {
+        13,
+        14,
+        WIDTH / 2.0f,
+        HEIGHT / 2.0f,
+        0,
+        90,
+        10,
+        255,
+        255,
+        255
+    };
+
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+        BeginMode2D(camera);
+
+        dragon.angle = 0;
+        draw_dragon(dragon.x, dragon.y, &dragon.angle, dragon.length, (int) dragon.depth,
+            (Color){dragon.red, dragon.green, dragon.blue,255});
+
+        EndMode2D();
+        EndDrawing();
+    }
+
+    return 0;
+}
 
