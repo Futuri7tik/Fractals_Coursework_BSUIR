@@ -2,7 +2,8 @@
 #include "functions.h"
 
 void draw_carpet(Image* img, float x, float y, float length, int depth) {
-    if (depth < 0) return;
+    if (depth < 0)
+        return;
 
     float new_length = length / 3.0f;
     float x_draw = x + new_length;

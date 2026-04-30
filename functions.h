@@ -23,12 +23,6 @@ typedef enum {
     STATE_RANDOM
 } AppState;
 
-typedef struct {
-    float min;
-    float max;
-    float value;
-} SliderParameters;
-
 typedef struct ImageNode {
     char* fract_name;
     char* img_name;

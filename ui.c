@@ -142,16 +142,16 @@ void tree_gui(FractalParameters* params, Camera2D* cam, bool *update) {
     }
     params->tree.depth = (float) (int)params->tree.depth;
 
-    GuiLabel((Rectangle){20, 120, 200, 20}, TextFormat("Angle: %.1f°", params->tree.angle_degrees));
-    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Angle: %.1f°", params->tree.angle_degrees));
+    if (GuiSlider((Rectangle){20, 130, 200, 20}, NULL, NULL,
         &params->tree.angle_degrees, 0, 90)) {
         *update = true;
     }
 
     params->tree.angle = params->tree.angle_degrees * DEG2RAD;
 
-    GuiLabel((Rectangle){20, 190, 200, 20}, TextFormat("Length Factor: %.2f", params->tree.length_factor));
-    if (GuiSlider((Rectangle){20, 220, 200, 20}, NULL, NULL,
+    GuiLabel((Rectangle){20, 150, 200, 20}, TextFormat("Length Factor: %.2f", params->tree.length_factor));
+    if (GuiSlider((Rectangle){20, 170, 200, 20}, NULL, NULL,
         &params->tree.length_factor, 0, 0.9f)) {
         *update = true;
     }
@@ -471,24 +471,24 @@ ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, 
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], const size_t size, Rectangle* img_fields)
 {
     *head = create_image_node("", "", (Rectangle) {0,0,0,0}, (Texture2D) {0}, STATE_MENU);
-    ImageNode* last = *head;
+    ImageNode* temp = *head;
     AppState state = STATE_MANDELBROT;
 
     for (size_t i = 0; i < size; ++i) {
         const int img_height = 230, img_width = 280;
-        const float y_start = 100, x_start = 150;
+        const float y_start = 100, x_start = 150, x_indent = 350, y_indent = 300;
 
         Image temp_img = LoadImage(img_names[i]);
         ImageResize(&temp_img, img_width, img_height);
-        const Rectangle field = (Rectangle) {x_start + (float) (i % 5) * 350, y_start + (int) (i / 5) * 300, img_width, img_height};
+        const Rectangle field = (Rectangle) {x_start + (float) (i % 5) * x_indent, y_start + (int) (i / 5) * y_indent, img_width, img_height};
         img_fields[i] = field;
-        ImageNode* temp = create_image_node(fract_names[i], img_names[i],
+        ImageNode* new_node = create_image_node(fract_names[i], img_names[i],
             field, LoadTextureFromImage(temp_img), state);
         UnloadImage(temp_img);
 
         state += 1;
-        last->next = temp;
-        last = temp;
+        temp->next = new_node;
+        temp = temp->next;
     }
 }
 

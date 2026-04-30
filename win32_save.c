@@ -10,9 +10,13 @@ static char* WideToUtf8(const wchar_t* wstr) {
         return NULL;
 
     int len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
-    if (len <= 0) return NULL;
-    char* utf8 = (char*)malloc(len);
-    if (!utf8) return NULL;
+    if (len <= 0)
+        return NULL;
+
+    char* utf8 = malloc(len);
+    if (!utf8)
+        return NULL;
+
     WideCharToMultiByte(CP_UTF8, 0, wstr, -1, utf8, len, NULL, NULL);
     return utf8;
 }

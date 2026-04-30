@@ -12,26 +12,22 @@ void draw_triangle_base(float x, float y, float length, Color color) {
     );
 }
 
-
 void draw_sierpinski_triangle(float x, float y, float length,
                               int depth, TriangleParameters* params) {
-    if (depth <= 0) return;
+    if (depth <= 0)
+        return;
 
     float height = length * SQRT3 / 2.0f;
-    float h2 = height / 2.0f;
-    float l2 = length / 2.0f;
-    float l4 = length / 4.0f;
 
-
-    DrawTriangle((Vector2){ x + l4, y - h2 },(Vector2){ x + l2, y },
-    (Vector2){ x + 3.0f * l4, y - h2 },
+    DrawTriangle((Vector2){x + length / 4.0f, y - height / 2.0f},(Vector2){ x + length / 2.0f, y },
+    (Vector2){ x + 3.0f * length / 4.0f, y - height / 2.0f},
         BLACK
     );
 
     // Левый нижний
-    draw_sierpinski_triangle(x, y, l2, depth - 1, params);
+    draw_sierpinski_triangle(x, y, length / 2.0f, depth - 1, params);
     // Правый нижний
-    draw_sierpinski_triangle(x + l2, y, l2, depth - 1, params);
+    draw_sierpinski_triangle(x + length / 2.0f, y, length / 2.0f, depth - 1, params);
     // Верхний
-    draw_sierpinski_triangle(x + l4, y - h2, l2, depth - 1, params);
+    draw_sierpinski_triangle(x + length / 4.0f, y - height / 2.0f, length / 2.0f, depth - 1, params);
 }
