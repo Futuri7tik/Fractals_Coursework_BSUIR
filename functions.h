@@ -20,6 +20,7 @@ typedef enum {
     STATE_CIRCLE,
     STATE_FERN,
     STATE_NEWTON,
+    STATE_DRAGON,
     STATE_RANDOM
 } AppState;
 
@@ -145,10 +146,12 @@ typedef struct FractalParameters {
     CircleParameters circle;
     FernParameters fern;
     NewtonParameters newton;
+    DragonParameters dragon;
 } FractalParameters;
 
 // Initialization
 void init_fractals_parameters(FractalParameters* params);
+
 void init_tree_parameters(TreeParameters* params);
 void init_default_tree_parameters(TreeParameters* params);
 void init_carpet_parameters(CarpetParameters* params);
@@ -165,6 +168,9 @@ void init_fern_parameters(FernParameters* params);
 void init_default_fern_parameters(FernParameters* params);
 void init_newton_parameters(NewtonParameters *params);
 void init_default_newton_parameters(NewtonParameters* params);
+void init_dragon_parameters(DragonParameters* params);
+void init_default_dragon_parameters(DragonParameters* params);
+
 void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
 
 void rewrite_tree_parameters(const TreeParameters* params);
@@ -176,6 +182,7 @@ void rewrite_julia_parameters(const JuliaParameters* params);
 void rewrite_circle_parameters(const CircleParameters* params);
 void rewrite_fern_parameters(const FernParameters* params);
 void rewrite_newton_parameters(const NewtonParameters* params);
+void rewrite_dragon_parameters(const DragonParameters* params);
 
 // UI
 void handle_movement(float speed, Camera2D* cam, bool* update);
@@ -192,6 +199,7 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
 void circle_gui(FractalParameters* params, Camera2D* cam, bool *update);
 void fern_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void newton_gui(FractalParameters* params, Camera2D* cam, bool* update);
+void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update);
 
 // saving image
 void save_image(AppState state, AppState random_type, const FractalParameters* params,
@@ -238,6 +246,9 @@ void render_newton(float zoom, float offset_x, float offset_y, int max_iteration
                         NewtonParameters *params);
 int newton_iterations(float re_z, float im_z, int max_iterations, int* root_num);
 Color get_color_newton(int iter, int root, const NewtonParameters *params);
+
+// Фрактал дракона
+void draw_dragon(float x_start, float y_start, float* start_angle, float tilt_angle, float length, int depth, Color color);
 
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
 

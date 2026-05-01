@@ -16,6 +16,7 @@ static float TextToFloat(const char *text) {
 #include "functions.h"
 
 int main(void) {
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(WIDTH, HEIGHT, "Fractal Gallery");
     bool needs_update = true;
     static bool was_updating = false;

@@ -39,6 +39,7 @@ void init_fractals_parameters(FractalParameters* params) {
     init_circle_parameters(&params->circle);
     init_fern_parameters(&params->fern);
     init_newton_parameters(&params->newton);
+    init_dragon_parameters(&params->dragon);
 }
 
 void init_tree_parameters(TreeParameters* params) {
@@ -125,7 +126,24 @@ void init_default_newton_parameters(NewtonParameters* params) {
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
-// === Сохранение параметров ===
+void init_dragon_parameters(DragonParameters* params) {
+    load_params("dragon.txt", "%f %d %f %f %f %f %f", &params->depth, &params->max_depth, &params->angle_tilt,
+        &params->length, &params->red, &params->green, &params->blue);
+
+    params->x = WIDTH / 2.0f;
+    params->y = HEIGHT / 2.0f;
+    params->angle = 0.0f;
+}
+
+void init_default_dragon_parameters(DragonParameters* params) {
+    load_params("dragon_default.txt", "%f %d %f %f %f %f %f", &params->depth, &params->max_depth, &params->angle_tilt,
+        &params->length, &params->red, &params->green, &params->blue);
+
+    params->x = WIDTH / 2.0f;
+    params->y = HEIGHT / 2.0f;
+    params->angle = 0.0f;
+}
+
 
 void rewrite_fractal_parameters(const FractalParameters* params) {
     rewrite_tree_parameters(&params->tree);
@@ -136,6 +154,7 @@ void rewrite_fractal_parameters(const FractalParameters* params) {
     rewrite_circle_parameters(&params->circle);
     rewrite_fern_parameters(&params->fern);
     rewrite_newton_parameters(&params->newton);
+    rewrite_dragon_parameters(&params->dragon);
 }
 
 void rewrite_tree_parameters(const TreeParameters* params) {
@@ -168,4 +187,9 @@ void rewrite_fern_parameters(const FernParameters* params) {
 
 void rewrite_newton_parameters(const NewtonParameters* params) {
     save_params("newton.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n", params->iterations, params->max_iterations, params->zoom, params->offset_x, params->offset_y, params->red, params->green, params->blue, params->gradient_r, params->gradient_g, params->gradient_b);
+}
+
+void rewrite_dragon_parameters(const DragonParameters* params) {
+    save_params("dragon.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n", params->depth, params->max_depth, params->angle_tilt,
+        params->length, params->red, params->green, params->blue);
 }

@@ -91,9 +91,9 @@ void handle_movement(float speed, Camera2D* cam, bool* update) {
 
 void load_pics(ImageNode** head) {
     char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle",
-        "Julia Set", "Circle Fractal","Barnsley Fern", "Newtons Fractal", "Random Fractal"};
+        "Julia Set", "Circle Fractal","Barnsley Fern", "Newtons Fractal", "Dragon Fractal","Random Fractal"};
     char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png",
-        "circle.png","fern.png","newton.png", "random.png"};
+        "circle.png","fern.png","newton.png", "dragon.png","random.png"};
 
     size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
     Rectangle *fields = calloc(size, sizeof(Rectangle));
@@ -457,6 +457,48 @@ void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
+void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->dragon.depth));
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+        &params->dragon.depth, 0, (float) params->dragon.max_depth)) {
+        *update = true;
+    }
+    params->dragon.depth = (float) (int) params->dragon.depth;
+
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Tilting angle: %.1f°", params->dragon.angle_tilt));
+    if (GuiSlider((Rectangle){20, 130, 200, 20}, NULL, NULL,
+        &params->dragon.angle_tilt, 0, 90)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 150, 200, 20}, TextFormat("Palette:"));
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Red factor: %d", (int) params->dragon.red));
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+                  &params->dragon.red, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Green factor %d:", (int) params->dragon.green));
+    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                  &params->dragon.green, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 250, 200, 20}, TextFormat("Blue factor: %d", (int) params->dragon.blue));
+    if (GuiSlider((Rectangle){20, 270, 200, 20}, NULL, NULL,
+                  &params->dragon.blue, 0, 255)) {
+        *update = true;
+    }
+
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
+        init_default_dragon_parameters(&params->dragon);
+        cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        cam->zoom = 1.0f;
+        *update = true;
+    }
+}
+
 ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state) {
     ImageNode* node = malloc(sizeof(ImageNode));
     node->img_name = img_name;
@@ -611,6 +653,18 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
             DrawTexture(params->newton.texture, 0, 0, WHITE);
             break;
         }
+        case STATE_DRAGON: {
+            BeginMode2D(*cam);
+            params->dragon.angle = 0;
+            draw_dragon(params->dragon.x, params->dragon.y, &params->dragon.angle, params->dragon.angle_tilt,params->dragon.length, (int) params->dragon.depth,
+                (Color){params->dragon.red, params->dragon.green, params->dragon.blue,255});
+
+            EndMode2D();
+            *update = false;
+            break;
+        }
+        default:
+            break;
     }
 }
 
@@ -639,6 +693,9 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
             break;
         case STATE_NEWTON:
             newton_gui(params, cam, update);
+            break;
+        case STATE_DRAGON:
+            dragon_gui(params, cam, update);
             break;
         default:
             break;
