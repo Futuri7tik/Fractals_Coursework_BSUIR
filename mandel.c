@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include "functions.h"
 
-int mandelbrot_iterations(const float re_c, const float im_c, const int max_iterations) {
+static int mandelbrot_iterations(const float re_c, const float im_c, const int max_iterations) {
     const float q = (re_c - 0.25f) * (re_c - 0.25f) + im_c * im_c;
     if (q * (q + (re_c - 0.25f)) < 0.25f * im_c * im_c) {
         return max_iterations;
@@ -29,7 +29,7 @@ int mandelbrot_iterations(const float re_c, const float im_c, const int max_iter
     return iterations;
 }
 
-Color get_color_mandelbrot(const int iteration, const int max_iterations, const MandelbrotParameters* params) {
+static Color get_color_mandelbrot(const int iteration, const int max_iterations, const MandelbrotParameters* params) {
     if (iteration == max_iterations) {
         return BLACK;
     }

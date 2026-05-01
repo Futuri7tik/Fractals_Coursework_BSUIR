@@ -3,7 +3,7 @@
 #include "stdio.h"
 #include "functions.h"
 
-Color get_color_tree(const int depth, const TreeParameters* params) {
+static Color get_color_tree(const int depth, const TreeParameters* params) {
     const int color_brown[3] = {102, 51, 0};
     const int color_green[3] = {0, 255, 0};
     const float t = 1.0f - (float) depth / (params->depth * 1.0f);

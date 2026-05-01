@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include "functions.h"
 
-int julia_iterations(float re_z, float im_z, const float re_c, const float im_c, const int max_iterations) {
+static int julia_iterations(float re_z, float im_z, const float re_c, const float im_c, const int max_iterations) {
     int iterations = 0;
     float re_z2 = re_z * re_z;
     float im_z2 = im_z * im_z;
@@ -20,7 +20,7 @@ int julia_iterations(float re_z, float im_z, const float re_c, const float im_c,
     return iterations;
 }
 
-Color get_color_julia(const int iteration, const int max_iterations, const JuliaParameters* params) {
+static Color get_color_julia(const int iteration, const int max_iterations, const JuliaParameters* params) {
     if (iteration == max_iterations) {
         return BLACK;
     }

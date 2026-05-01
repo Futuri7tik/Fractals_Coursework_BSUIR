@@ -181,27 +181,16 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close);
 void load_pics(ImageNode** head);
 void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
                  bool *update);
-void tree_gui(FractalParameters* params, Camera2D* cam, bool *update);
-void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update);
-void triangle_gui(FractalParameters* params, Camera2D* cam, bool *update);
-void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update);
-void julia_gui(FractalParameters* params, Camera2D* cam, bool* update);
 void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update);
-void circle_gui(FractalParameters* params, Camera2D* cam, bool *update);
-void fern_gui(FractalParameters* params, Camera2D* cam, bool* update);
-void newton_gui(FractalParameters* params, Camera2D* cam, bool* update);
-void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update);
 
 // saving image
 void save_image(AppState state, AppState random_type, const FractalParameters* params,
     const FractalParameters* random_params);
 
-ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state);
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
 void draw_pics(ImageNode* head);
 
 // Дерево
-Color get_color_tree(int depth, const TreeParameters* params);
 void draw_tree(float x_start, float y_start, float length, float angle,
                int depth, TreeParameters* params);
 
@@ -215,16 +204,11 @@ void draw_sierpinski_triangle(float x, float y, float length,
                               int depth, TriangleParameters* params);
 
 // Множество мандельброта
-int mandelbrot_iterations(float re_c, float im_c, int max_iterations);
-Color get_color_mandelbrot(int iteration, int max_iterations, const MandelbrotParameters* params);
 void render_mandelbrot(float zoom, float offset_x, float offset_y, int max_iterations, const MandelbrotParameters *params);
 int mandelbrot_fourth_iterations(float re_c, float im_c, int max_iterations);
 
 // Множество Жюлиа
-int julia_iterations(float re_z, float im_z, float re_c, float im_c, int max_iterations);
-Color get_color_julia(int iteration, int max_iterations, const JuliaParameters* params);
-void render_julia(float zoom, float offset_x,
-    float offset_y, int max_iterations, const JuliaParameters* params);
+void render_julia(float zoom, float offset_x, float offset_y, int max_iterations, const JuliaParameters* params);
 
 // Круговой фрактал
 void draw_circle_fractal(float x, float y, float r, int depth, Color color);
@@ -233,10 +217,7 @@ void draw_circle_fractal(float x, float y, float r, int depth, Color color);
 Texture2D render_barnsley_fern(Vector2 pos, int depth, FernParameters params);
 
 // Бассейны ньютона
-void render_newton(float zoom, float offset_x, float offset_y, int max_iterations,
-                        NewtonParameters *params);
-int newton_iterations(float re_z, float im_z, int max_iterations, int* root_num);
-Color get_color_newton(int iter, int root, const NewtonParameters *params);
+void render_newton(float zoom, float offset_x, float offset_y, int max_iterations, NewtonParameters *params);
 
 // Фрактал дракона
 void draw_dragon(float x_start, float y_start, float* start_angle, float tilt_angle, float length, int depth, Color color);

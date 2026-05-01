@@ -133,7 +133,7 @@ void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, Imag
     }
 }
 
-void tree_gui(FractalParameters* params, Camera2D* cam, bool *update) {
+static void tree_gui(FractalParameters* params, Camera2D* cam, bool *update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->tree.depth));
 
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -164,7 +164,7 @@ void tree_gui(FractalParameters* params, Camera2D* cam, bool *update) {
     }
 }
 
-void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+static void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->carpet.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
         &params->carpet.depth, 0, (float) params->carpet.max_depth)) {
@@ -200,7 +200,7 @@ void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-void triangle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+static void triangle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->triangle.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
         &params->triangle.depth, 0, (float) params->triangle.max_depth)) {
@@ -236,7 +236,7 @@ void triangle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+static void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->mandelbrot.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
                   &params->mandelbrot.iterations, 0, (float) params->mandelbrot.max_iterations)) {
@@ -272,7 +272,7 @@ void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+static void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->julia.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
                   &params->julia.iterations, 0, (float) params->julia.max_iterations)) {
@@ -321,7 +321,7 @@ void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-void circle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+static void circle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->circle.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
         &params->circle.depth, 0, (float) params->circle.max_depth)) {
@@ -356,7 +356,7 @@ void circle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+static void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->fern.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
                   &params->fern.iterations, 0, (float) params->fern.max_iterations)) {
@@ -402,7 +402,7 @@ void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+static void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->newton.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
                   &params->newton.iterations, 0, (float) params->newton.max_iterations)) {
@@ -457,7 +457,7 @@ void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+static void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->dragon.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
         &params->dragon.depth, 0, (float) params->dragon.max_depth)) {
@@ -499,7 +499,7 @@ void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
-ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state) {
+static ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state) {
     ImageNode* node = malloc(sizeof(ImageNode));
     node->img_name = img_name;
     node->fract_name = fract_name;
@@ -561,8 +561,7 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
         case STATE_CARPET: {
             BeginMode2D(*cam);
             if (*update) {
-                render_carpet(
-                (int) params->carpet.depth, params->carpet.start_length,
+                render_carpet( (int) params->carpet.depth, params->carpet.start_length,
                 (Color){params->carpet.red, params->carpet.green, params->carpet.blue, 255},
                 &params->carpet);
 

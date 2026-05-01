@@ -4,7 +4,7 @@
 #include "raylib.h"
 
 
-Color get_color_newton(int iter, int root, const NewtonParameters *params) {
+static Color get_color_newton(int iter, int root, const NewtonParameters *params) {
     if (root == -1) return BLACK;
 
     float t = iter / 30.0f;
@@ -21,7 +21,7 @@ Color get_color_newton(int iter, int root, const NewtonParameters *params) {
     return (Color){ r, g, b, 255 };
 }
 
-int newton_iterations(float re_z, float im_z, const int max_iterations, int* root_num) {
+static int newton_iterations(float re_z, float im_z, const int max_iterations, int* root_num) {
     int iterations;
     float eps = 1e-4f;
     static float roots[3][2] = {{1, 0}, {-0.5f, -SQRT3 / 2}, {-0.5f, SQRT3 / 2}};
