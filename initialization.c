@@ -144,6 +144,42 @@ void init_default_dragon_parameters(DragonParameters* params) {
     params->angle = 0.0f;
 }
 
+static void rewrite_tree_parameters(const TreeParameters* params) {
+    save_params("tree.txt", "%f\n%d\n%f\n%f\n", params->depth, params->max_depth, params->angle_degrees, params->length_factor);
+}
+
+static void rewrite_carpet_parameters(const CarpetParameters* params) {
+    save_params("carpet.txt", "%f\n%d\n%f\n%f\n%f\n%f\n", params->depth, params->max_depth, params->start_length, params->red, params->green, params->blue);
+}
+
+static void rewrite_triangle_parameters(const TriangleParameters* params) {
+    save_params("triangle.txt", "%f\n%d\n%f\n%f\n%f\n%f\n", params->depth, params->max_depth, params->start_length, params->red, params->green, params->blue);
+}
+
+static void rewrite_mandelbrot_parameters(const MandelbrotParameters* params) {
+    save_params("mandelbrot.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n", params->iterations, params->max_iterations, params->zoom, params->offset_x, params->offset_y, params->red, params->green, params->blue);
+}
+
+static void rewrite_julia_parameters(const JuliaParameters* params) {
+    save_params("julia.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n", params->iterations, params->max_iterations, params->zoom, params->offset_x, params->offset_y, params->re_c, params->im_c, params->red, params->green, params->blue);
+}
+
+static void rewrite_circle_parameters(const CircleParameters* params) {
+    save_params("circle.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n", params->depth, params->max_depth, params->center.x, params->center.y, params->radius, params->red, params->green, params->blue);
+}
+
+static void rewrite_fern_parameters(const FernParameters* params) {
+    save_params("fern.txt", "%f\n%d\n%f\n%f\n%f\n%f\n", params->iterations, params->max_iterations, params->prob1, params->prob2, params->prob3, params->prob4);
+}
+
+static void rewrite_newton_parameters(const NewtonParameters* params) {
+    save_params("newton.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n", params->iterations, params->max_iterations, params->zoom, params->offset_x, params->offset_y, params->red, params->green, params->blue, params->gradient_r, params->gradient_g, params->gradient_b);
+}
+
+static void rewrite_dragon_parameters(const DragonParameters* params) {
+    save_params("dragon.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n", params->depth, params->max_depth, params->angle_tilt,
+        params->length, params->red, params->green, params->blue);
+}
 
 void rewrite_fractal_parameters(const FractalParameters* params) {
     rewrite_tree_parameters(&params->tree);
@@ -155,41 +191,4 @@ void rewrite_fractal_parameters(const FractalParameters* params) {
     rewrite_fern_parameters(&params->fern);
     rewrite_newton_parameters(&params->newton);
     rewrite_dragon_parameters(&params->dragon);
-}
-
-void rewrite_tree_parameters(const TreeParameters* params) {
-    save_params("tree.txt", "%f\n%d\n%f\n%f\n", params->depth, params->max_depth, params->angle_degrees, params->length_factor);
-}
-
-void rewrite_carpet_parameters(const CarpetParameters* params) {
-    save_params("carpet.txt", "%f\n%d\n%f\n%f\n%f\n%f\n", params->depth, params->max_depth, params->start_length, params->red, params->green, params->blue);
-}
-
-void rewrite_triangle_parameters(const TriangleParameters* params) {
-    save_params("triangle.txt", "%f\n%d\n%f\n%f\n%f\n%f\n", params->depth, params->max_depth, params->start_length, params->red, params->green, params->blue);
-}
-
-void rewrite_mandelbrot_parameters(const MandelbrotParameters* params) {
-    save_params("mandelbrot.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n", params->iterations, params->max_iterations, params->zoom, params->offset_x, params->offset_y, params->red, params->green, params->blue);
-}
-
-void rewrite_julia_parameters(const JuliaParameters* params) {
-    save_params("julia.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n", params->iterations, params->max_iterations, params->zoom, params->offset_x, params->offset_y, params->re_c, params->im_c, params->red, params->green, params->blue);
-}
-
-void rewrite_circle_parameters(const CircleParameters* params) {
-    save_params("circle.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n", params->depth, params->max_depth, params->center.x, params->center.y, params->radius, params->red, params->green, params->blue);
-}
-
-void rewrite_fern_parameters(const FernParameters* params) {
-    save_params("fern.txt", "%f\n%d\n%f\n%f\n%f\n%f\n", params->iterations, params->max_iterations, params->prob1, params->prob2, params->prob3, params->prob4);
-}
-
-void rewrite_newton_parameters(const NewtonParameters* params) {
-    save_params("newton.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n", params->iterations, params->max_iterations, params->zoom, params->offset_x, params->offset_y, params->red, params->green, params->blue, params->gradient_r, params->gradient_g, params->gradient_b);
-}
-
-void rewrite_dragon_parameters(const DragonParameters* params) {
-    save_params("dragon.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n", params->depth, params->max_depth, params->angle_tilt,
-        params->length, params->red, params->green, params->blue);
 }

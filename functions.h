@@ -173,16 +173,7 @@ void init_default_dragon_parameters(DragonParameters* params);
 
 void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
 
-void rewrite_tree_parameters(const TreeParameters* params);
-void rewrite_carpet_parameters(const CarpetParameters* params);
 void rewrite_fractal_parameters(const FractalParameters* params);
-void rewrite_triangle_parameters(const TriangleParameters* params);
-void rewrite_mandelbrot_parameters(const MandelbrotParameters* params);
-void rewrite_julia_parameters(const JuliaParameters* params);
-void rewrite_circle_parameters(const CircleParameters* params);
-void rewrite_fern_parameters(const FernParameters* params);
-void rewrite_newton_parameters(const NewtonParameters* params);
-void rewrite_dragon_parameters(const DragonParameters* params);
 
 // UI
 void handle_movement(float speed, Camera2D* cam, bool* update);
