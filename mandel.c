@@ -32,13 +32,16 @@ static int mandelbrot_iterations(const float re_c, const float im_c, const int m
     return iterations;
 }
 
-static int mandelbrot_polynomial_iterations(const float re_c, const float im_c, const int max_iterations) {
+static int mandelbrot_polynomial_iterations(const float re_c, const float im_c, const int max_iterations,
+    const float alph) {
     int iterations = 0;
     float a = 0.0f, b = 0.0f;
     float a2 = 0.0f, b2 = 0.0f, ab;
 
-    const float alph = -0.75f, r = (2.0f > floorf(a) + 1) ? 2.0f : floorf(a) + 1;
-    while (a2 + b2 < r * r && iterations < max_iterations) {
+    const float r = (2.0f > floorf(alph) + 1) ? 2.0f : floorf(a) + 1;
+    const float r2 = r * r;
+
+    while (a2 + b2 < r2 && iterations < max_iterations) {
         a2 = a * a, b2 = b * b;
         ab = a * b;
 
@@ -54,6 +57,19 @@ static int mandelbrot_polynomial_iterations(const float re_c, const float im_c, 
 }
 
 static Color get_color_mandelbrot(const int iteration, const int max_iterations, const MandelbrotParameters* params) {
+    if (iteration == max_iterations) {
+        return BLACK;
+    }
+
+    const float t = (float)iteration / (float)max_iterations;
+    unsigned char r = (unsigned char)(params->red * (1-t) * t * t * t * 255);
+    unsigned char g = (unsigned char)(params->green * (1-t) * (1-t) * t * t * 255);
+    unsigned char b = (unsigned char)(params->blue * (1-t) * (1-t) * (1-t) * t * 255);
+
+    return (Color) {r, g, b, 255};
+}
+
+static Color get_color_polynom_mandelbrot(const int iteration, const int max_iterations, const PolynomMandelParameters* params) {
     if (iteration == max_iterations) {
         return BLACK;
     }
@@ -86,6 +102,25 @@ void render_mandelbrot(float zoom, float offset_x,
     UpdateTexture(params->texture, pixels);
 }
 
+void render_polynom_mandel(float zoom, float offset_x, float offset_y,
+    const int max_iterations, const PolynomMandelParameters *params) {
+    static Color pixels[WIDTH * HEIGHT];
+
+    #pragma omp parallel for schedule(dynamic) default(none) \
+    shared(pixels, zoom, offset_x, offset_y, max_iterations, params)
+    for (int y = 0; y < HEIGHT; ++y) {
+        const float im_c = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
+
+        for (int x = 0; x < WIDTH; ++x) {
+            const float re_c = ((float)x - (float)WIDTH / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_x;
+
+            const int iterations = mandelbrot_polynomial_iterations(re_c, im_c, max_iterations, params->alpha);
+            pixels[y * WIDTH + x] = get_color_polynom_mandelbrot(iterations, max_iterations, params);
+        }
+    }
+
+    UpdateTexture(params->texture, pixels);
+}
 
 int mandelbrot_fourth_iterations(const float re_c, const float im_c, const int max_iterations) {
     // const float q = (re_c - 0.25f) * (re_c - 0.25f) + im_c * im_c;

@@ -39,6 +39,7 @@ void init_fractals_parameters(FractalParameters* params) {
     init_fern_parameters(&params->fern);
     init_newton_parameters(&params->newton);
     init_dragon_parameters(&params->dragon);
+    init_polynom_mandel_parameters(&params->polynom_mandel);
 }
 
 void init_tree_parameters(TreeParameters* params) {
@@ -143,6 +144,20 @@ void init_default_dragon_parameters(DragonParameters* params) {
     params->angle = 0.0f;
 }
 
+void init_polynom_mandel_parameters(PolynomMandelParameters* params) {
+    load_params("polynomial_mandelbrot.txt", "%f %d %f %f %f %f %f %f %f",
+        &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y,
+        &params->red, &params->green, &params->blue, &params->alpha);
+    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
+}
+
+void init_default_polynom_mandel(PolynomMandelParameters* params) {
+    load_params("polynomial_mandelbrot_default.txt", "%f %d %f %f %f %f %f %f %f",
+        &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y,
+        &params->red, &params->green, &params->blue, &params->alpha);
+    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
+}
+
 static void rewrite_tree_parameters(const TreeParameters* params) {
     save_params("tree.txt", "%f\n%d\n%f\n%f\n", params->depth, params->max_depth, params->angle_degrees, params->length_factor);
 }
@@ -180,6 +195,12 @@ static void rewrite_dragon_parameters(const DragonParameters* params) {
         params->length, params->red, params->green, params->blue);
 }
 
+static void rewrite_polynom_mandel_params(const PolynomMandelParameters* params) {
+    save_params("polynomial_mandelbrot.txt", "%f\n%d\n%f\n%f\n%f\n%f\n%f\n%f\n%f",
+        params->iterations, params->max_iterations, params->zoom, params->offset_x, params->offset_y,
+        params->red, params->green, params->blue, params->alpha);
+}
+
 void rewrite_fractal_parameters(const FractalParameters* params) {
     rewrite_tree_parameters(&params->tree);
     rewrite_carpet_parameters(&params->carpet);
@@ -190,4 +211,5 @@ void rewrite_fractal_parameters(const FractalParameters* params) {
     rewrite_fern_parameters(&params->fern);
     rewrite_newton_parameters(&params->newton);
     rewrite_dragon_parameters(&params->dragon);
+    rewrite_polynom_mandel_params(&params->polynom_mandel);
 }

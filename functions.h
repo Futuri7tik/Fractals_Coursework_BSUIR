@@ -21,6 +21,7 @@ typedef enum {
     STATE_FERN,
     STATE_NEWTON,
     STATE_DRAGON,
+    STATE_POLYNOMIAL_MANDELBROT,
     STATE_RANDOM
 } AppState;
 
@@ -137,6 +138,19 @@ typedef struct DragonParameters {
     float blue;
 } DragonParameters;
 
+typedef struct PolynomMandelParameters {
+    float iterations;
+    int max_iterations;
+    float zoom;
+    float offset_x;
+    float offset_y;
+    float red;
+    float green;
+    float blue;
+    float alpha;
+    Texture2D texture;
+} PolynomMandelParameters;
+
 typedef struct FractalParameters {
     TreeParameters tree;
     CarpetParameters carpet;
@@ -147,6 +161,7 @@ typedef struct FractalParameters {
     FernParameters fern;
     NewtonParameters newton;
     DragonParameters dragon;
+    PolynomMandelParameters polynom_mandel;
 } FractalParameters;
 
 // Initialization
@@ -170,6 +185,8 @@ void init_newton_parameters(NewtonParameters *params);
 void init_default_newton_parameters(NewtonParameters* params);
 void init_dragon_parameters(DragonParameters* params);
 void init_default_dragon_parameters(DragonParameters* params);
+void init_polynom_mandel_parameters(PolynomMandelParameters* params);
+void init_default_polynom_mandel(PolynomMandelParameters* params);
 
 void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
 
@@ -223,6 +240,8 @@ void render_newton(float zoom, float offset_x, float offset_y, int max_iteration
 void draw_dragon(float x_start, float y_start, float* start_angle, float tilt_angle, float length, int depth, Color color);
 
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
+
+void render_polynom_mandel(float zoom, float offset_x, float offset_y, int max_iterations, const PolynomMandelParameters *params);
 
 void clear_undo(void);
 void push(FractalParameters* params);

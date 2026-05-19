@@ -91,9 +91,11 @@ void handle_movement(float speed, Camera2D* cam, bool* update) {
 
 void load_pics(ImageNode** head) {
     char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle",
-        "Julia Set", "Circle Fractal","Barnsley Fern", "Newtons Fractal", "Dragon Fractal","Random Fractal"};
-    char* image_names[] = {"mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png",
-        "circle.png","fern.png","newton.png", "dragon.png","random.png"};
+        "Julia Set", "Circle Fractal","Barnsley Fern", "Newtons Fractal", "Dragon Fractal", "Polynomial Mandelbrot",
+        "Random Fractal"};
+    char* image_names[] = {
+        "mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png",
+"circle.png","fern.png","newton.png", "dragon.png","polynom_mandel.png","random.png"};
 
     size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
     Rectangle *fields = calloc(size, sizeof(Rectangle));
@@ -499,6 +501,48 @@ static void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
+static void polynom_mandel_gui(FractalParameters* params, Camera2D* cam, bool* update) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->polynom_mandel.iterations));
+    if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
+                  &params->polynom_mandel.iterations, 0, (float) params->polynom_mandel.max_iterations)) {
+        params->polynom_mandel.iterations = (float) (int) params->polynom_mandel.iterations;
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 110, 200, 20}, TextFormat("Palette:"));
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Red factor: %d", (int) params->polynom_mandel.red));
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+                  &params->polynom_mandel.red, 0, 20)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Green factor: %d", (int) params->polynom_mandel.green));
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+                  &params->polynom_mandel.green, 0, 20)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 210, 200, 20}, TextFormat("Blue factor: %d", (int) params->polynom_mandel.blue));
+    if (GuiSlider((Rectangle){20, 230, 200, 20}, NULL, NULL,
+                  &params->polynom_mandel.blue, 0, 20)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 250, 200, 20}, TextFormat("Constant alpha: %.2f", params->polynom_mandel.alpha));
+    if (GuiSlider((Rectangle){20, 270, 200, 20}, NULL, NULL,
+                  &params->polynom_mandel.alpha, -10.0f, 10.0f)) {
+        *update = true;
+    }
+
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
+        init_default_polynom_mandel(&params->polynom_mandel);
+        cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
+        cam->zoom = 1.0f;
+        *update = true;
+    }
+}
+
 static ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state) {
     ImageNode* node = malloc(sizeof(ImageNode));
     node->img_name = img_name;
@@ -662,6 +706,21 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
             *update = false;
             break;
         }
+        case STATE_POLYNOMIAL_MANDELBROT: {
+            if (*update == true) {
+                params->polynom_mandel.zoom = cam->zoom;
+                params->polynom_mandel.offset_x = (cam->target.x - WIDTH / 2.0f) * (4.0f / WIDTH);
+                params->polynom_mandel.offset_y = (cam->target.y - HEIGHT / 2.0f) * (4.0f / WIDTH);
+
+                render_polynom_mandel(params->polynom_mandel.zoom, params->polynom_mandel.offset_x,
+                    params->polynom_mandel.offset_y,
+                (int)params->polynom_mandel.iterations, &params->polynom_mandel);
+
+                *update = false;
+            }
+
+            DrawTexture(params->polynom_mandel.texture, 0, 0, WHITE);
+        }
         default:
             break;
     }
@@ -696,6 +755,9 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
         case STATE_DRAGON:
             dragon_gui(params, cam, update);
             break;
+        case STATE_POLYNOMIAL_MANDELBROT:
+            polynom_mandel_gui(params, cam, update);
+            break;
         default:
             break;
     }
@@ -722,6 +784,9 @@ void save_image(const AppState state, const AppState random_type, const FractalP
             break;
         case STATE_NEWTON:
             finalImage = LoadImageFromTexture(currentParams->newton.texture);
+            break;
+        case STATE_POLYNOMIAL_MANDELBROT:
+            finalImage = LoadImageFromTexture(currentParams->polynom_mandel.texture);
             break;
         default:
             finalImage = LoadImageFromScreen();

@@ -9,7 +9,7 @@
 void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type) {
     init_fractals_parameters(params);
 
-    *type = STATE_MANDELBROT + GetRandomValue(0, 8);
+    *type = STATE_MANDELBROT + GetRandomValue(0, 9);
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
 
     switch (*type) {
@@ -75,6 +75,14 @@ void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type
             params->dragon.red = GetRandomValue(0, 255);
             params->dragon.green = GetRandomValue(0, 255);
             params->dragon.blue = GetRandomValue(0, 255);
+            break;
+        case STATE_POLYNOMIAL_MANDELBROT:
+            params->polynom_mandel.iterations = 100 + GetRandomValue(0, 400); // 100..500
+            params->polynom_mandel.red = 5 + GetRandomValue(0, 15);
+            params->polynom_mandel.green = 5 + GetRandomValue(0, 15);
+            params->polynom_mandel.blue = 5 + GetRandomValue(0, 15);
+            params->polynom_mandel.alpha= (float) GetRandomValue(-2, 2) / 100.0f;
+        default:
             break;
     }
 }
