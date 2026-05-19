@@ -1,3 +1,6 @@
+#include <bemapiset.h>
+#include <tgmath.h>
+
 #include "raylib.h"
 #include "functions.h"
 
@@ -32,18 +35,18 @@ static int mandelbrot_iterations(const float re_c, const float im_c, const int m
 static int mandelbrot_polynomial_iterations(const float re_c, const float im_c, const int max_iterations) {
     int iterations = 0;
     float a = 0.0f, b = 0.0f;
-    float a2 = 0.0f, b2 = 0.0f;
+    float a2 = 0.0f, b2 = 0.0f, ab;
 
-    const float alph = -0.75f;
+    const float alph = -0.75f, r = (2.0f > floorf(a) + 1) ? 2.0f : floorf(a) + 1;
+    while (a2 + b2 < r * r && iterations < max_iterations) {
+        a2 = a * a, b2 = b * b;
+        ab = a * b;
 
-    while (a2 + b2 < 4.0f && iterations < max_iterations) {
-        float a_next = a*a*a - 3*a*b*b + alph*(a*a - b*b) + re_c;
-        float b_next = 3*a*a*b - b*b*b + 2*alph*a*b + im_c;
+        float a_next = a * (a2 - 3 * b2) + alph * (a2 - b2) + re_c;
+        float b_next = b * (3 * a2 - b2) + 2 * alph * ab + im_c;
 
         a = a_next;
         b = b_next;
-        a2 = a*a;
-        b2 = b*b;
         iterations++;
     }
 
