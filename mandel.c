@@ -29,6 +29,27 @@ static int mandelbrot_iterations(const float re_c, const float im_c, const int m
     return iterations;
 }
 
+static int mandelbrot_polynomial_iterations(const float re_c, const float im_c, const int max_iterations) {
+    int iterations = 0;
+    float a = 0.0f, b = 0.0f;
+    float a2 = 0.0f, b2 = 0.0f;
+
+    const float alph = -0.75f;
+
+    while (a2 + b2 < 4.0f && iterations < max_iterations) {
+        float a_next = a*a*a - 3*a*b*b + alph*(a*a - b*b) + re_c;
+        float b_next = 3*a*a*b - b*b*b + 2*alph*a*b + im_c;
+
+        a = a_next;
+        b = b_next;
+        a2 = a*a;
+        b2 = b*b;
+        iterations++;
+    }
+
+    return iterations;
+}
+
 static Color get_color_mandelbrot(const int iteration, const int max_iterations, const MandelbrotParameters* params) {
     if (iteration == max_iterations) {
         return BLACK;

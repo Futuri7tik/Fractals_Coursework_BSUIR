@@ -2,7 +2,6 @@
 #include <raylib.h>
 #include <stdio.h>
 #include "functions.h"
-#include <stdarg.h>
 
 static void load_params(const char* filename, const char* format, ...) {
     FILE* f = fopen(filename, "r");
