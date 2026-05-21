@@ -35,7 +35,7 @@ char* Win32_ShowSaveDialog(const char* defaultFileName) {
     ofn.lpstrFilter = L"PNG Image\0*.png\0BMP Image\0*.bmp\0JPEG Image\0*.jpg\0All Files\0*.*\0\0";
     ofn.lpstrFile   = buffer;
     ofn.nMaxFile    = MAX_PATH;
-    ofn.Flags       = OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_EXPLORER;
+    ofn.Flags       = OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR;
     ofn.lpstrDefExt = L"png";
     ofn.lpstrInitialDir = L".";
 

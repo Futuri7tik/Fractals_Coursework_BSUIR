@@ -1,6 +1,5 @@
 #include <bemapiset.h>
 #include <tgmath.h>
-
 #include "raylib.h"
 #include "functions.h"
 
@@ -85,14 +84,17 @@ static Color get_color_polynom_mandelbrot(const int iteration, const int max_ite
 void render_mandelbrot(float zoom, float offset_x,
                             float offset_y, const int max_iterations, const MandelbrotParameters *params) {
     static Color pixels[WIDTH * HEIGHT];
+    const float scale_x = 4.0f / (WIDTH * zoom);
+    const float center_x = WIDTH / 2.0f;
+    const float center_y = HEIGHT / 2.0f;
 
     #pragma omp parallel for schedule(dynamic) default(none) \
-    shared(pixels, zoom, offset_x, offset_y, max_iterations, params)
+    shared(pixels, offset_x, offset_y, max_iterations, params, center_y, center_x, scale_x)
     for (int y = 0; y < HEIGHT; ++y) {
-        const float im_c = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
+        const float im_c = ((float)y - center_y) * scale_x + offset_y;
 
         for (int x = 0; x < WIDTH; ++x) {
-            const float re_c = ((float)x - (float)WIDTH / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_x;
+            const float re_c = ((float)x - center_x) * scale_x + offset_x;
 
             const int iterations = mandelbrot_iterations(re_c, im_c, max_iterations);
             pixels[y * WIDTH + x] = get_color_mandelbrot(iterations, max_iterations, params);
@@ -105,14 +107,17 @@ void render_mandelbrot(float zoom, float offset_x,
 void render_polynom_mandel(float zoom, float offset_x, float offset_y,
     const int max_iterations, const PolynomMandelParameters *params) {
     static Color pixels[WIDTH * HEIGHT];
+    const float scale_x = 4.0f / (WIDTH * zoom);
+    const float center_x = WIDTH / 2.0f;
+    const float center_y = HEIGHT / 2.0f;
 
     #pragma omp parallel for schedule(dynamic) default(none) \
-    shared(pixels, zoom, offset_x, offset_y, max_iterations, params)
+    shared(pixels, offset_x, offset_y, max_iterations, params, center_y, center_x, scale_x)
     for (int y = 0; y < HEIGHT; ++y) {
-        const float im_c = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
+        const float im_c = ((float)y - center_y) * scale_x + offset_y;
 
         for (int x = 0; x < WIDTH; ++x) {
-            const float re_c = ((float)x - (float)WIDTH / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_x;
+            const float re_c = ((float)x - center_x) * scale_x + offset_x;
 
             const int iterations = mandelbrot_polynomial_iterations(re_c, im_c, max_iterations, params->alpha);
             pixels[y * WIDTH + x] = get_color_polynom_mandelbrot(iterations, max_iterations, params);
@@ -123,15 +128,6 @@ void render_polynom_mandel(float zoom, float offset_x, float offset_y,
 }
 
 int mandelbrot_fourth_iterations(const float re_c, const float im_c, const int max_iterations) {
-    // const float q = (re_c - 0.25f) * (re_c - 0.25f) + im_c * im_c;
-    // if (q * (q + (re_c - 0.25f)) < 0.25f * im_c * im_c) {
-    //     return max_iterations;
-    // }
-    //
-    // if ((re_c + 1.0f) * (re_c + 1.0f) + im_c * im_c < 0.0625f) {
-    //     return max_iterations;
-    // }
-
     int iterations = 0;
     float a = 0.0f, b = 0.0f;
     float a2 = 0.0f, b2 = 0.0f, ab = 0.0f;
