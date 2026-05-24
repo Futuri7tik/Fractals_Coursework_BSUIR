@@ -1,6 +1,8 @@
 #include <math.h>
 #include <raylib.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "functions.h"
 
 static void load_params(const char* filename, const char* format, ...) {
@@ -40,6 +42,7 @@ void init_fractals_parameters(FractalParameters* params) {
     init_newton_parameters(&params->newton);
     init_dragon_parameters(&params->dragon);
     init_polynom_mandel_parameters(&params->polynom_mandel);
+    init_lyapunov_parameters(&params->lyapunov);
 }
 
 void init_tree_parameters(TreeParameters* params) {
@@ -158,6 +161,22 @@ void init_default_polynom_mandel(PolynomMandelParameters* params) {
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
+void init_lyapunov_parameters(LyapunovParameters* params) {
+    const int SIZE = 10;
+    params->sequence = (char*)malloc((SIZE + 1) * sizeof(char));
+
+    load_params("lyapunov.txt", "%d %f %9s", &params->max_iterations, &params->iterations, params->sequence);
+    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
+}
+
+void init_default_lyapunov_parameters(LyapunovParameters* params) {
+    const int SIZE = 10;
+    params->sequence = (char*)malloc((SIZE + 1) * sizeof(char));
+
+    load_params("lyapunov_default.txt", "%d %f %9s", &params->max_iterations, &params->iterations, params->sequence);
+    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
+}
+
 static void rewrite_tree_parameters(const TreeParameters* params) {
     save_params("tree.txt", "%f\n%d\n%f\n%f\n", params->depth, params->max_depth, params->angle_degrees, params->length_factor);
 }
@@ -201,6 +220,10 @@ static void rewrite_polynom_mandel_params(const PolynomMandelParameters* params)
         params->red, params->green, params->blue, params->alpha);
 }
 
+static void rewrite_lyapunov_parameters(const LyapunovParameters* params) {
+    save_params("lyapunov.txt", "%d\n%f\n%9s", params->max_iterations, params->iterations, params->sequence);
+}
+
 void rewrite_fractal_parameters(const FractalParameters* params) {
     rewrite_tree_parameters(&params->tree);
     rewrite_carpet_parameters(&params->carpet);
@@ -212,4 +235,5 @@ void rewrite_fractal_parameters(const FractalParameters* params) {
     rewrite_newton_parameters(&params->newton);
     rewrite_dragon_parameters(&params->dragon);
     rewrite_polynom_mandel_params(&params->polynom_mandel);
+    rewrite_lyapunov_parameters(&params->lyapunov);
 }

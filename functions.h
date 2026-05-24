@@ -22,6 +22,7 @@ typedef enum {
     STATE_NEWTON,
     STATE_DRAGON,
     STATE_POLYNOMIAL_MANDELBROT,
+    STATE_LYAPUNOV,
     STATE_RANDOM
 } AppState;
 
@@ -90,7 +91,7 @@ typedef struct {
     Texture2D texture;
 } JuliaParameters;
 
-typedef struct CircleParameters {
+typedef struct {
     float depth;
     int max_depth;
     Vector2 center;
@@ -100,7 +101,7 @@ typedef struct CircleParameters {
     float blue;
 } CircleParameters;
 
-typedef struct FernParameters{
+typedef struct {
     float iterations;
     int max_iterations;
     float prob1;
@@ -110,7 +111,7 @@ typedef struct FernParameters{
     Texture2D texture;
 } FernParameters;
 
-typedef struct NewtonParameters {
+typedef struct {
     float iterations;
     int max_iterations;
     float zoom;
@@ -125,7 +126,7 @@ typedef struct NewtonParameters {
     Texture2D texture;
 } NewtonParameters;
 
-typedef struct DragonParameters {
+typedef struct {
     float depth;
     int max_depth;
     float x;
@@ -138,7 +139,7 @@ typedef struct DragonParameters {
     float blue;
 } DragonParameters;
 
-typedef struct PolynomMandelParameters {
+typedef struct {
     float iterations;
     int max_iterations;
     float zoom;
@@ -151,6 +152,13 @@ typedef struct PolynomMandelParameters {
     Texture2D texture;
 } PolynomMandelParameters;
 
+typedef struct {
+    int max_iterations;
+    float iterations;
+    char* sequence;
+    Texture2D texture;
+} LyapunovParameters;
+
 typedef struct FractalParameters {
     TreeParameters tree;
     CarpetParameters carpet;
@@ -162,6 +170,7 @@ typedef struct FractalParameters {
     NewtonParameters newton;
     DragonParameters dragon;
     PolynomMandelParameters polynom_mandel;
+    LyapunovParameters lyapunov;
 } FractalParameters;
 
 // Initialization
@@ -187,6 +196,8 @@ void init_dragon_parameters(DragonParameters* params);
 void init_default_dragon_parameters(DragonParameters* params);
 void init_polynom_mandel_parameters(PolynomMandelParameters* params);
 void init_default_polynom_mandel(PolynomMandelParameters* params);
+void init_lyapunov_parameters(LyapunovParameters* params);
+void init_default_lyapunov_parameters(LyapunovParameters* params);
 
 void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
 
@@ -242,6 +253,10 @@ void draw_dragon(float x_start, float y_start, float* start_angle, float tilt_an
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
 
 void render_polynom_mandel(float zoom, float offset_x, float offset_y, int max_iterations, const PolynomMandelParameters *params);
+
+float lyapunov_exponent(float rx, float ry, const char* sequence,
+                        int iterations, float x0);
+Texture2D render_lyapunov(const char* sequence, int iterations);
 
 void clear_undo(void);
 void push(FractalParameters* params);

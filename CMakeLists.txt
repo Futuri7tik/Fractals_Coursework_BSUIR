@@ -4,6 +4,7 @@ project(KURSACH C)
 set(CMAKE_C_STANDARD 11)
 set(RAYLIB_DIR "D:/LIBS/raylib" CACHE PATH "Путь к raylib")
 set(RAYGUI_DIR "D:/LIBS/raygui" CACHE PATH "Путь к raygui")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -ffast-math -march=native")
 
 find_package(OpenMP REQUIRED)
 
@@ -25,6 +26,7 @@ add_executable(KURSACH
         win32_save.c
         win32_save.h
         undo_stack.c
+        lyapunov.c
 )
 
 if(OpenMP_C_FOUND)

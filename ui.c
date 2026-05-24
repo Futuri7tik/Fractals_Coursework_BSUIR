@@ -92,12 +92,13 @@ void handle_movement(float speed, Camera2D* cam, bool* update) {
 void load_pics(ImageNode** head) {
     char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle",
         "Julia Set", "Circle Fractal","Barnsley Fern", "Newtons Fractal", "Dragon Fractal", "Polynomial Mandelbrot",
-        "Random Fractal"};
+        "Lyapunov Fractal","Random Fractal"};
     char* image_names[] = {
         "mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png",
-"circle.png","fern.png","newton.png", "dragon.png","polynom_mandel.png","random.png"};
+        "circle.png","fern.png","newton.png", "dragon.png","polynom_mandel.png",
+        "lyapunov.png","random.png"};
 
-    size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
+    const size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
     Rectangle *fields = calloc(size, sizeof(Rectangle));
 
     if (*head == NULL) {
@@ -720,6 +721,16 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
             }
 
             DrawTexture(params->polynom_mandel.texture, 0, 0, WHITE);
+            break;
+        }
+        case STATE_LYAPUNOV: {
+            if (*update == true) {
+                params->lyapunov.texture = render_lyapunov(params->lyapunov.sequence, params->lyapunov.iterations);
+
+                *update = false;
+            }
+
+            DrawTexture(params->lyapunov.texture, 0, 0, WHITE);
         }
         default:
             break;
@@ -787,6 +798,9 @@ void save_image(const AppState state, const AppState random_type, const FractalP
             break;
         case STATE_POLYNOMIAL_MANDELBROT:
             finalImage = LoadImageFromTexture(currentParams->polynom_mandel.texture);
+            break;
+        case STATE_LYAPUNOV:
+            finalImage = LoadImageFromTexture(currentParams->lyapunov.texture);
             break;
         default:
             finalImage = LoadImageFromScreen();
