@@ -165,7 +165,8 @@ void init_lyapunov_parameters(LyapunovParameters* params) {
     const int SIZE = 15;
     params->sequence = (char*)malloc((SIZE + 1) * sizeof(char));
 
-    load_params("lyapunov.txt", "%d %f %15s", &params->max_iterations, &params->iterations, params->sequence);
+    load_params("lyapunov.txt", "%d %f %15s %f %f %f", &params->max_iterations, &params->iterations,
+        params->sequence, &params->red, &params->green, &params->blue);
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
@@ -173,7 +174,8 @@ void init_default_lyapunov_parameters(LyapunovParameters* params) {
     const int SIZE = 10;
     params->sequence = (char*)malloc((SIZE + 1) * sizeof(char));
 
-    load_params("lyapunov_default.txt", "%d %f %9s", &params->max_iterations, &params->iterations, params->sequence);
+    load_params("lyapunov_default.txt", "%d %f %15s %f %f %f", &params->max_iterations, &params->iterations,
+        params->sequence, &params->red, &params->green, &params->blue);
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
@@ -221,7 +223,8 @@ static void rewrite_polynom_mandel_params(const PolynomMandelParameters* params)
 }
 
 static void rewrite_lyapunov_parameters(const LyapunovParameters* params) {
-    save_params("lyapunov.txt", "%d\n%f\n%15s", params->max_iterations, params->iterations, params->sequence);
+    save_params("lyapunov.txt", "%d\n%f\n%15s\n%f\n%f\n%f", params->max_iterations,
+        params->iterations, params->sequence, params->red, params->green, params->blue);
 }
 
 void rewrite_fractal_parameters(const FractalParameters* params) {

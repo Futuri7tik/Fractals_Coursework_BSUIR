@@ -156,6 +156,9 @@ typedef struct {
     int max_iterations;
     float iterations;
     char* sequence;
+    float red;
+    float green;
+    float blue;
     Texture2D texture;
 } LyapunovParameters;
 
@@ -256,7 +259,7 @@ void render_polynom_mandel(float zoom, float offset_x, float offset_y, int max_i
 
 float lyapunov_exponent(float rx, float ry, const char* sequence, int seq_len,
                         int iterations, float x0);
-Texture2D render_lyapunov(const char* sequence, int iterations);
+Texture2D render_lyapunov(LyapunovParameters* params);
 
 void clear_undo(void);
 void push(FractalParameters* params);

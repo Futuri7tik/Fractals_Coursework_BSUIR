@@ -49,34 +49,35 @@ float lyapunov_exponent(float rx, float ry, const char* sequence, int seq_len,
     return sum / iterations;
 }
 
-Texture2D render_lyapunov(const char* sequence, int iterations) {
+Texture2D render_lyapunov(LyapunovParameters* params) {
     Image img = GenImageColor(WIDTH, HEIGHT, BLACK);
     Color* pixels = img.data;
     float scale_x = WIDTH / 2.0f, scale_y = HEIGHT / 2.0f;
-    int seq_len = strlen(sequence);
+    int seq_len = strlen(params->sequence);
+    char* sequence = params->sequence;
+    float iterations = params->iterations, red = params->red, green = params->green, blue = params->blue;
 
     #pragma omp parallel for schedule(dynamic) default(none) \
-    shared(sequence, iterations, pixels, scale_x, scale_y, seq_len)
+    shared(sequence, iterations, pixels, scale_x, scale_y, seq_len, red, green, blue)
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
             // Отображение координат в диапазон [2.0, 4.0]
             float rx = 2.0f + (float)x / scale_x;
             float ry = 2.0f + (float)y / scale_y;
 
-            float lambda = lyapunov_exponent(rx, ry, sequence, seq_len,iterations, 0.5f);
+            float lambda = lyapunov_exponent(rx, ry, sequence, seq_len,(int) iterations, 0.5f);
 
             // Раскраска
             if (lambda < 0) {
-                // Зелёный (стабильно)
                 float intensity = 1.0f - fabsf(lambda) * 2.0f;
                 pixels[y * WIDTH + x] = (Color){
-                    (unsigned char)(255 * intensity),(unsigned char)(255 * intensity),0,255
+                    (unsigned char)(255 * intensity),(unsigned char)(255 * intensity),(unsigned char)blue,255
                 };
-            } else {
-                // Синий (хаос)
+            }
+            else {
                 float intensity = lambda * 2.0f;
                 pixels[y * WIDTH + x] = (Color){
-                    0,0,(unsigned char)(255 * fminf(1.0f, intensity)),255
+                    (unsigned char)red,(unsigned char)blue,(unsigned char)(255 * fminf(1.0f, intensity)),255
                 };
             }
         }

@@ -544,6 +544,60 @@ static void polynom_mandel_gui(FractalParameters* params, Camera2D* cam, bool* u
     }
 }
 
+static bool dropdown_edit = false;
+
+static void lyapunov_gui(FractalParameters *params, bool *update) {
+    GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Palette:"));
+    GuiLabel((Rectangle){20, 80, 200, 20}, TextFormat("Red factor: %d", (int) params->lyapunov.red));
+    if (GuiSlider((Rectangle){20, 110, 200, 20}, NULL, NULL,
+                  &params->lyapunov.red, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 130, 200, 20}, TextFormat("Green factor: %d", (int) params->lyapunov.green));
+    if (GuiSlider((Rectangle){20, 150, 200, 20}, NULL, NULL,
+                  &params->lyapunov.green, 0, 255)) {
+        *update = true;
+    }
+
+    GuiLabel((Rectangle){20, 170, 200, 20}, TextFormat("Blue factor: %d", (int) params->lyapunov.blue));
+    if (GuiSlider((Rectangle){20, 190, 200, 20}, NULL, NULL,
+                  &params->lyapunov.blue, 0, 255)) {
+        *update = true;
+    }
+
+    const char* sequence_options = "AB;BBBBBBAAAAAA;AABAB;BAB";
+    GuiLabel((Rectangle){20, 230, 200, 20}, TextFormat("Sequence: %s", params->lyapunov.sequence));
+    Rectangle bounds = {20, 250,200, 20};
+    static int dropdown_index = 0;
+
+    if (GuiDropdownBox(bounds, sequence_options, &dropdown_index, dropdown_edit)) {
+        dropdown_edit = true;
+        *update = true;
+
+        switch (dropdown_index) {
+            case 0:
+                params->lyapunov.sequence = "AB";
+                break;
+            case 1:
+                params->lyapunov.sequence = "BBBBBBAAAAAA";
+                break;
+            case 2:
+                params->lyapunov.sequence = "AABAB";
+                break;
+            case 3:
+                params->lyapunov.sequence = "BAB";
+                break;
+        }
+    }
+
+    if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
+        dropdown_index = 0;
+        init_default_lyapunov_parameters(&params->lyapunov);
+        *update = true;
+    }
+}
+
 static ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state) {
     ImageNode* node = malloc(sizeof(ImageNode));
     node->img_name = img_name;
@@ -725,7 +779,7 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
         }
         case STATE_LYAPUNOV: {
             if (*update == true) {
-                params->lyapunov.texture = render_lyapunov(params->lyapunov.sequence, params->lyapunov.iterations);
+                params->lyapunov.texture = render_lyapunov(&params->lyapunov);
 
                 *update = false;
             }
@@ -768,6 +822,9 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
             break;
         case STATE_POLYNOMIAL_MANDELBROT:
             polynom_mandel_gui(params, cam, update);
+            break;
+        case STATE_LYAPUNOV:
+            lyapunov_gui(params, update);
             break;
         default:
             break;
