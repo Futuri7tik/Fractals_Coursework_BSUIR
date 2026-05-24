@@ -254,7 +254,7 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
 
 void render_polynom_mandel(float zoom, float offset_x, float offset_y, int max_iterations, const PolynomMandelParameters *params);
 
-float lyapunov_exponent(float rx, float ry, const char* sequence,
+float lyapunov_exponent(float rx, float ry, const char* sequence, int seq_len,
                         int iterations, float x0);
 Texture2D render_lyapunov(const char* sequence, int iterations);
 
