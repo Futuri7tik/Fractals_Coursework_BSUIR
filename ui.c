@@ -616,12 +616,12 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
     AppState state = STATE_MANDELBROT;
 
     for (size_t i = 0; i < size; ++i) {
-        const int img_height = 230, img_width = 280;
-        const float y_start = 100, x_start = 150, x_indent = 350, y_indent = 300;
+        const int img_height = 280, img_width = 330;
+        const float y_start = 90, x_start = 115, x_indent = img_width + 70, y_indent = img_height + 35;
 
         Image temp_img = LoadImage(img_names[i]);
         ImageResize(&temp_img, img_width, img_height);
-        const Rectangle field = (Rectangle) {x_start + (float) (i % 5) * x_indent, y_start + (int) (i / 5) * y_indent, img_width, img_height};
+        const Rectangle field = (Rectangle) {x_start + (float) (i % 4) * x_indent, y_start + (int) (i / 4) * y_indent, img_width, img_height};
         img_fields[i] = field;
         ImageNode* new_node = create_image_node(fract_names[i], img_names[i],
             field, LoadTextureFromImage(temp_img), state);
