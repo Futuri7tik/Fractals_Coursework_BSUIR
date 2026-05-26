@@ -604,7 +604,7 @@ static ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle 
     node->fract_name = fract_name;
     node->field = field;
     node->target_state = state;
-    node->texture = texture;
+    node->texture_preview = texture;
     node->next = NULL;
     return node;
 }
@@ -619,13 +619,18 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
         const int img_height = 280, img_width = 330;
         const float y_start = 90, x_start = 115, x_indent = img_width + 70, y_indent = img_height + 35;
 
-        Image temp_img = LoadImage(img_names[i]);
+        Image img = LoadImage(img_names[i]);
+        Image temp_img = ImageCopy(img);
+
         ImageResize(&temp_img, img_width, img_height);
         const Rectangle field = (Rectangle) {x_start + (float) (i % 4) * x_indent, y_start + (int) (i / 4) * y_indent, img_width, img_height};
         img_fields[i] = field;
         ImageNode* new_node = create_image_node(fract_names[i], img_names[i],
             field, LoadTextureFromImage(temp_img), state);
+        new_node->texture_slideshow = LoadTextureFromImage(img);
+
         UnloadImage(temp_img);
+        UnloadImage(img);
 
         state += 1;
         temp->next = new_node;
@@ -644,7 +649,7 @@ void draw_pics(ImageNode* head) {
         const int textWidth = MeasureText(text, font_size);
 
         DrawText(text, (temp->field.width - textWidth) / 2 + temp->field.x, (int) temp->field.y - 25, font_size, GRAY);
-        DrawTexture(temp->texture, (int) temp->field.x, (int) temp->field.y, WHITE);
+        DrawTexture(temp->texture_preview, (int) temp->field.x, (int) temp->field.y, WHITE);
     }
 }
 
@@ -908,16 +913,16 @@ void show_slideshow(ImageNode* head, AppState* state) {
             elapsed = 0.0;
         }
 
-        float scale_curr = fminf((float)WIDTH / current_slide->texture.width,
-                                 (float)HEIGHT / current_slide->texture.height);
-        Rectangle source_curr = { 0.0f, 0.0f, (float)current_slide->texture.width, (float)current_slide->texture.height };
+        float scale_curr = fminf((float)WIDTH / current_slide->texture_slideshow.width,
+                                 (float)HEIGHT / current_slide->texture_slideshow.height);
+        Rectangle source_curr = { 0.0f, 0.0f, (float)current_slide->texture_slideshow.width, (float)current_slide->texture_slideshow.height };
         Rectangle dest_curr = {
-            (WIDTH - current_slide->texture.width * scale_curr) / 2.0f,
-            (HEIGHT - current_slide->texture.height * scale_curr) / 2.0f,
-            current_slide->texture.width * scale_curr,
-            current_slide->texture.height * scale_curr
+            (WIDTH - current_slide->texture_slideshow.width * scale_curr) / 2.0f,
+            (HEIGHT - current_slide->texture_slideshow.height * scale_curr) / 2.0f,
+            current_slide->texture_slideshow.width * scale_curr,
+            current_slide->texture_slideshow.height * scale_curr
         };
-        DrawTexturePro(current_slide->texture, source_curr, dest_curr, (Vector2){0, 0}, 0.0f, WHITE);
+        DrawTexturePro(current_slide->texture_slideshow, source_curr, dest_curr, (Vector2){0, 0}, 0.0f, WHITE);
 
         // --- 2. Эффект ПЕРЕХОДА (Crossfade) ---
         float alpha = 0.0f;
@@ -926,18 +931,18 @@ void show_slideshow(ImageNode* head, AppState* state) {
             alpha = (elapsed - (SLIDE_DURATION - TRANSITION_DURATION)) / TRANSITION_DURATION;
             if (alpha > 1.0f) alpha = 1.0f; // Защита от выхода за пределы
 
-            float scale_next = fminf((float)WIDTH / next_slide->texture.width,
-                                     (float)HEIGHT / next_slide->texture.height);
-            Rectangle source_next = { 0.0f, 0.0f, (float)next_slide->texture.width, (float)next_slide->texture.height };
+            float scale_next = fminf((float)WIDTH / next_slide->texture_slideshow.width,
+                                     (float)HEIGHT / next_slide->texture_slideshow.height);
+            Rectangle source_next = { 0.0f, 0.0f, (float)next_slide->texture_slideshow.width, (float)next_slide->texture_slideshow.height };
             Rectangle dest_next = {
-                (WIDTH - next_slide->texture.width * scale_next) / 2.0f,
-                (HEIGHT - next_slide->texture.height * scale_next) / 2.0f,
-                next_slide->texture.width * scale_next,
-                next_slide->texture.height * scale_next
+                (WIDTH - next_slide->texture_slideshow.width * scale_next) / 2.0f,
+                (HEIGHT - next_slide->texture_slideshow.height * scale_next) / 2.0f,
+                next_slide->texture_slideshow.width * scale_next,
+                next_slide->texture_slideshow.height * scale_next
             };
 
             // Рисуем следующий слайд поверх текущего, постепенно увеличивая его непрозрачность
-            DrawTexturePro(next_slide->texture, source_next, dest_next, (Vector2){0, 0}, 0.0f, Fade(WHITE, alpha));
+            DrawTexturePro(next_slide->texture_slideshow, source_next, dest_next, (Vector2){0, 0}, 0.0f, Fade(WHITE, alpha));
         }
 
         Color text_color_fg = Fade(RAYWHITE, 1.0f - alpha);
@@ -952,7 +957,6 @@ void show_slideshow(ImageNode* head, AppState* state) {
             DrawText(next_slide->fract_name, 32, 32, 40, next_text_bg);
             DrawText(next_slide->fract_name, 30, 30, 40, next_text_fg);
         }
-
     }
     else {
         DrawText("No images to show", WIDTH/2 - 150, HEIGHT/2, 30, LIGHTGRAY);

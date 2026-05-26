@@ -30,7 +30,8 @@ typedef struct ImageNode {
     char* fract_name;
     char* img_name;
     Rectangle field;
-    Texture2D texture;
+    Texture2D texture_preview;
+    Texture2D texture_slideshow;
     AppState target_state;
     struct ImageNode* next;
 } ImageNode;

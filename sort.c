@@ -80,7 +80,8 @@ static void copy_node(ImageNode* dest, ImageNode* src) {
     dest->fract_name = src->fract_name;
     dest->img_name = src->img_name;
     dest->field = src->field;
-    dest->texture = src->texture;
+    dest->texture_preview = src->texture_preview;
+    dest->texture_slideshow = src->texture_slideshow;
     dest->target_state = src->target_state;
     dest->next = src->next;
 }
