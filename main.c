@@ -44,6 +44,9 @@ int main(void) {
     load_pics(&head);
 
     while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
         if (IsKeyPressed(KEY_TAB)) {
             GuiLoadStyleDefault();
             clear_undo();
@@ -54,61 +57,40 @@ int main(void) {
                     state = STATE_GALLERY;
         }
 
-        if (state == STATE_RANDOM && random_type == STATE_GALLERY) {
-            init_random_config(&random_params, &camera,&random_type);
-            camera.zoom = 1.0f;
-            needs_update = true;
-        }
+        switch (state) {
+            case STATE_MENU: {
+                bool should_close = false;
 
-        if (state != STATE_RANDOM) {
-            random_type = STATE_GALLERY;
-        }
+                menu_gui(&state, &show_message_box, &should_close);
+                if (should_close)
+                    exit(0);
 
-        if (state != STATE_GALLERY && state != STATE_MENU && state != STATE_SLIDESHOW) {
-            float current_speed = 20.0f / camera.zoom;
-            handle_movement(current_speed, &camera, &needs_update);
-        }
-
-        if (needs_update && !was_updating) {
-            if (state == STATE_RANDOM)
-                push(&random_params);
-            else
-                push(&fract_params);
-        }
-        was_updating = needs_update;
-
-        BeginDrawing();
-        ClearBackground(BLACK);
-
-        if (state == STATE_MENU) {
-            bool should_close = false;
-
-            menu_gui(&state, &show_message_box, &should_close);
-            if (should_close)
+                random_type = STATE_GALLERY;
                 break;
-        }
-        else
-            if (state == STATE_GALLERY) {
+            }
+            case STATE_GALLERY: {
                 GuiLoadStyleDefault();
 
                 gallery_gui(&state, &fract_params, &camera, &head, &needs_update);
                 GuiLoadStyleDefault();
+
+                random_type = STATE_GALLERY;
+                break;
             }
-            else {
-                if (state != STATE_RANDOM) {
-                    render_fractals(&camera, &state, &fract_params, &needs_update);
+            case STATE_RANDOM: {
+                GuiLoadStyleDefault();
+                if (random_type == STATE_GALLERY) {
+                    init_random_config(&random_params, &camera,&random_type);
+                    camera.zoom = 1.0f;
+                    needs_update = true;
                 }
-                else
-                    render_fractals(&camera, &random_type, &random_params, &needs_update);
+                float current_speed = 20.0f / camera.zoom;
+                handle_movement(current_speed, &camera, &needs_update);
+                render_fractals(&camera, &random_type, &random_params, &needs_update);
 
                 GuiPanel((Rectangle){10, 10, 250, 450}, "Controls");
-                if (state != STATE_RANDOM) {
-                    render_fractal_gui(&camera, &fract_params, &state, &needs_update);
-                }
-                else {
-                    DrawText("Random Fractal", 165, 17, 10, DARKGRAY);
-                    render_fractal_gui(&camera, &random_params, &random_type, &needs_update);
-                }
+                DrawText("Random Fractal", 165, 17, 10, DARKGRAY);
+                render_fractal_gui(&camera, &random_params, &random_type, &needs_update);
 
                 if (GuiButton((Rectangle){20, 420, 110, 30}, "<- Gallery")) {
                     state = STATE_GALLERY;
@@ -119,22 +101,56 @@ int main(void) {
                 }
 
                 if (GuiButton((Rectangle){140, 420, 110, 30}, "Undo")) {
-                    if (state != STATE_RANDOM) {
-                        if (pop(&fract_params)) {
-                            needs_update = true;
-                            was_updating = true;
-                        }
+                    if (pop(&random_params)) {
+                        needs_update = true;
+                        was_updating = true;
                     }
-                    else
-                        if (pop(&random_params)) {
-                            needs_update = true;
-                            was_updating = true;
-                        }
                 }
 
                 DrawFPS(WIDTH - 90, 15);
-            }
 
+                break;
+            }
+            default: {
+                GuiLoadStyleDefault();
+                float current_speed = 20.0f / camera.zoom;
+                handle_movement(current_speed, &camera, &needs_update);
+
+                render_fractals(&camera, &state, &fract_params, &needs_update);
+
+
+                GuiPanel((Rectangle){10, 10, 250, 450}, "Controls");
+                render_fractal_gui(&camera, &fract_params, &state, &needs_update);
+
+                if (GuiButton((Rectangle){20, 420, 110, 30}, "<- Gallery")) {
+                    state = STATE_GALLERY;
+                }
+
+                if (GuiButton((Rectangle){140, 380, 110, 30}, "Save Image")) {
+                    save_image(state, random_type, &fract_params, &random_params);
+                }
+
+                if (GuiButton((Rectangle){140, 420, 110, 30}, "Undo")) {
+                    if (pop(&fract_params)) {
+                        needs_update = true;
+                        was_updating = true;
+                    }
+                }
+
+                DrawFPS(WIDTH - 90, 15);
+
+                random_type = STATE_GALLERY;
+                break;
+            }
+        }
+
+        if (needs_update && !was_updating) {
+            if (state == STATE_RANDOM)
+                push(&random_params);
+            else
+                push(&fract_params);
+        }
+        was_updating = needs_update;
         EndDrawing();
     }
 
