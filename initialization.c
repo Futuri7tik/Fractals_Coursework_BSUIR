@@ -32,105 +32,81 @@ static void save_params(const char* filename, const char* format, ...) {
 }
 
 void init_fractals_parameters(FractalParameters* params) {
-    init_tree_parameters(&params->tree);
-    init_carpet_parameters(&params->carpet);
-    init_triangle_parameters(&params->triangle);
-    init_mandelbrot_parameters(&params->mandelbrot);
-    init_julia_parameters(&params->julia);
-    init_circle_parameters(&params->circle);
-    init_fern_parameters(&params->fern);
-    init_newton_parameters(&params->newton);
-    init_dragon_parameters(&params->dragon);
-    init_polynom_mandel_parameters(&params->polynom_mandel);
-    init_lyapunov_parameters(&params->lyapunov);
+    init_tree_parameters(&params->tree, false);
+    init_carpet_parameters(&params->carpet, false);
+    init_triangle_parameters(&params->triangle, false);
+    init_mandelbrot_parameters(&params->mandelbrot, false);
+    init_julia_parameters(&params->julia, false);
+    init_circle_parameters(&params->circle, false);
+    init_fern_parameters(&params->fern, false);
+    init_newton_parameters(&params->newton, false);
+    init_dragon_parameters(&params->dragon, false);
+    init_polynom_mandel_parameters(&params->polynom_mandel, false);
+    init_lyapunov_parameters(&params->lyapunov, false);
 }
 
-void init_tree_parameters(TreeParameters* params) {
-    load_params("tree.txt", "%f %d %f %f", &params->depth, &params->max_depth, &params->angle_degrees, &params->length_factor);
+void init_tree_parameters(TreeParameters* params, const bool is_default) {
+    const char *filename = is_default ? "tree_default.txt" : "tree.txt";
+
+    load_params(filename, "%f %d %f %f", &params->depth, &params->max_depth, &params->angle_degrees, &params->length_factor);
     params->angle = params->angle_degrees * DEG2RAD;
 }
 
-void init_default_tree_parameters(TreeParameters* params) {
-    load_params("tree_default.txt", "%f %d %f %f", &params->depth, &params->max_depth, &params->angle_degrees, &params->length_factor);
-    params->angle = params->angle_degrees * DEG2RAD;
-}
+void init_carpet_parameters(CarpetParameters* params, const bool is_default) {
+    const char *filename = is_default ? "carpet_default.txt" : "carpet.txt";
 
-void init_carpet_parameters(CarpetParameters* params) {
-    load_params("carpet.txt", "%f %d %f %f %f %f", &params->depth, &params->max_depth, &params->start_length, &params->red, &params->green, &params->blue);
+    load_params(filename, "%f %d %f %f %f %f", &params->depth, &params->max_depth, &params->start_length, &params->red, &params->green, &params->blue);
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
-void init_default_carpet_parameters(CarpetParameters* params) {
-    load_params("carpet_default.txt", "%f %d %f %f %f %f", &params->depth, &params->max_depth, &params->start_length, &params->red, &params->green, &params->blue);
-    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
-}
+void init_triangle_parameters(TriangleParameters* params, const bool is_default) {
+    const char *filename = is_default ? "triangle_default.txt" : "triangle.txt";
 
-void init_triangle_parameters(TriangleParameters* params) {
-    load_params("triangle.txt", "%f %d %f %f %f %f", &params->depth, &params->max_depth, &params->start_length, &params->red, &params->green, &params->blue);
+    load_params(filename, "%f %d %f %f %f %f", &params->depth, &params->max_depth, &params->start_length, &params->red, &params->green, &params->blue);
     params->x_start = (WIDTH - params->start_length) / 2.0f;
     params->y_start = HEIGHT - (HEIGHT - params->start_length * sqrtf(3.0f) / 2.0f) / 2.0f;
 }
 
-void init_default_triangle_parameters(TriangleParameters* params) {
-    load_params("triangle_default.txt", "%f %d %f %f %f %f", &params->depth, &params->max_depth, &params->start_length, &params->red, &params->green, &params->blue);
-    params->x_start = (WIDTH - params->start_length) / 2.0f;
-    params->y_start = HEIGHT - (HEIGHT - params->start_length * sqrtf(3.0f) / 2.0f) / 2.0f;
-}
+void init_mandelbrot_parameters(MandelbrotParameters* params, const bool is_default) {
+    const char *filename = is_default ? "mandelbrot_default.txt" : "mandelbrot.txt";
 
-void init_mandelbrot_parameters(MandelbrotParameters* params) {
-    load_params("mandelbrot.txt", "%f %d %f %f %f %f %f %f", &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y, &params->red, &params->green, &params->blue);
+    load_params(filename, "%f %d %f %f %f %f %f %f", &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y, &params->red, &params->green, &params->blue);
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
-void init_default_mandelbrot_parameters(MandelbrotParameters* params) {
-    load_params("mandelbrot_default.txt", "%f %d %f %f %f %f %f %f", &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y, &params->red, &params->green, &params->blue);
+void init_julia_parameters(JuliaParameters* params, const bool is_default) {
+    const char *filename = is_default ? "julia_default.txt" : "julia.txt";
+
+    load_params(filename, "%f %d %f %f %f %f %f %f %f %f", &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y, &params->re_c, &params->im_c, &params->red, &params->green, &params->blue);
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
-void init_julia_parameters(JuliaParameters* params) {
-    load_params("julia.txt", "%f %d %f %f %f %f %f %f %f %f", &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y, &params->re_c, &params->im_c, &params->red, &params->green, &params->blue);
-    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
-}
-
-void init_default_julia_parameters(JuliaParameters* params) {
-    load_params("julia_default.txt", "%f %d %f %f %f %f %f %f %f %f", &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y, &params->re_c, &params->im_c, &params->red, &params->green, &params->blue);
-    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
-}
-
-void init_circle_parameters(CircleParameters* params) {
+void init_circle_parameters(CircleParameters* params, const bool is_default) {
+    const char *filename = is_default ? "circle_default.txt" : "circle.txt";
     float x_center, y_center;
-    load_params("circle.txt", "%f %d %f %f %f %f %f %f", &params->depth, &params->max_depth, &x_center, &y_center, &params->radius, &params->red, &params->green, &params->blue);
+
+    load_params(filename, "%f %d %f %f %f %f %f %f", &params->depth, &params->max_depth, &x_center, &y_center, &params->radius, &params->red, &params->green, &params->blue);
     params->center = (Vector2){x_center, y_center};
 }
 
-void init_default_circle_parameters(CircleParameters* params) {
-    float x_center, y_center;
-    load_params("circle_default.txt", "%f %d %f %f %f %f %f %f", &params->depth, &params->max_depth, &x_center, &y_center, &params->radius, &params->red, &params->green, &params->blue);
-    params->center = (Vector2){x_center, y_center};
-}
+void init_fern_parameters(FernParameters* params, const bool is_default) {
+    const char *filename = is_default ? "fern_default.txt" : "fern.txt";
 
-void init_fern_parameters(FernParameters* params) {
-    load_params("fern.txt", "%f %d %f %f %f %f", &params->iterations, &params->max_iterations, &params->prob1, &params->prob2, &params->prob3, &params->prob4);
+    load_params(filename, "%f %d %f %f %f %f", &params->iterations, &params->max_iterations, &params->prob1, &params->prob2, &params->prob3, &params->prob4);
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
-void init_default_fern_parameters(FernParameters* params) {
-    load_params("fern_default.txt", "%f %d %f %f %f %f", &params->iterations, &params->max_iterations, &params->prob1, &params->prob2, &params->prob3, &params->prob4);
+void init_newton_parameters(NewtonParameters *params, const bool is_default) {
+    const char *filename = is_default ? "newton_default.txt" : "newton.txt";
+
+    load_params(filename, "%f %d %f %f %f %f %f %f %f %f %f", &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y, &params->red, &params->green, &params->blue, &params->gradient_r, &params->gradient_g, &params->gradient_b);
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
-void init_newton_parameters(NewtonParameters *params) {
-    load_params("newton.txt", "%f %d %f %f %f %f %f %f %f %f %f", &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y, &params->red, &params->green, &params->blue, &params->gradient_r, &params->gradient_g, &params->gradient_b);
-    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
-}
+void init_dragon_parameters(DragonParameters* params, const bool is_default) {
+    const char *filename = is_default ? "dragon_default.txt" : "dragon.txt";
 
-void init_default_newton_parameters(NewtonParameters* params) {
-    load_params("newton_default.txt", "%f %d %f %f %f %f %f %f %f %f %f", &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y, &params->red, &params->green, &params->blue, &params->gradient_r, &params->gradient_g, &params->gradient_b);
-    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
-}
-
-void init_dragon_parameters(DragonParameters* params) {
-    load_params("dragon.txt", "%f %d %f %f %f %f %f", &params->depth, &params->max_depth, &params->angle_tilt,
+    load_params(filename, "%f %d %f %f %f %f %f", &params->depth, &params->max_depth, &params->angle_tilt,
         &params->length, &params->red, &params->green, &params->blue);
 
     params->x = WIDTH / 2.0f;
@@ -138,43 +114,21 @@ void init_dragon_parameters(DragonParameters* params) {
     params->angle = 0.0f;
 }
 
-void init_default_dragon_parameters(DragonParameters* params) {
-    load_params("dragon_default.txt", "%f %d %f %f %f %f %f", &params->depth, &params->max_depth, &params->angle_tilt,
-        &params->length, &params->red, &params->green, &params->blue);
+void init_polynom_mandel_parameters(PolynomMandelParameters* params, const bool is_default) {
+    const char *filename = is_default ? "polynomial_mandelbrot_default.txt" : "polynomial_mandelbrot.txt";
 
-    params->x = WIDTH / 2.0f;
-    params->y = HEIGHT / 2.0f;
-    params->angle = 0.0f;
-}
-
-void init_polynom_mandel_parameters(PolynomMandelParameters* params) {
-    load_params("polynomial_mandelbrot.txt", "%f %d %f %f %f %f %f %f %f",
+    load_params(filename, "%f %d %f %f %f %f %f %f %f",
         &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y,
         &params->red, &params->green, &params->blue, &params->alpha);
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }
 
-void init_default_polynom_mandel(PolynomMandelParameters* params) {
-    load_params("polynomial_mandelbrot_default.txt", "%f %d %f %f %f %f %f %f %f",
-        &params->iterations, &params->max_iterations, &params->zoom, &params->offset_x, &params->offset_y,
-        &params->red, &params->green, &params->blue, &params->alpha);
-    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
-}
-
-void init_lyapunov_parameters(LyapunovParameters* params) {
+void init_lyapunov_parameters(LyapunovParameters* params, const bool is_default)  {
+    const char *filename = is_default ? "lyapunov_default.txt" : "lyapunov.txt";
     const int SIZE = 15;
     params->sequence = (char*)malloc((SIZE + 1) * sizeof(char));
 
-    load_params("lyapunov.txt", "%d %f %15s %f %f %f", &params->max_iterations, &params->iterations,
-        params->sequence, &params->red, &params->green, &params->blue);
-    params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
-}
-
-void init_default_lyapunov_parameters(LyapunovParameters* params) {
-    const int SIZE = 10;
-    params->sequence = (char*)malloc((SIZE + 1) * sizeof(char));
-
-    load_params("lyapunov_default.txt", "%d %f %15s %f %f %f", &params->max_iterations, &params->iterations,
+    load_params(filename, "%d %f %15s %f %f %f", &params->max_iterations, &params->iterations,
         params->sequence, &params->red, &params->green, &params->blue);
     params->texture = LoadTextureFromImage(GenImageColor(WIDTH, HEIGHT, BLACK));
 }

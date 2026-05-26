@@ -179,28 +179,17 @@ typedef struct FractalParameters {
 // Initialization
 void init_fractals_parameters(FractalParameters* params);
 
-void init_tree_parameters(TreeParameters* params);
-void init_default_tree_parameters(TreeParameters* params);
-void init_carpet_parameters(CarpetParameters* params);
-void init_default_carpet_parameters(CarpetParameters* params);
-void init_triangle_parameters(TriangleParameters* params);
-void init_default_triangle_parameters(TriangleParameters* params);
-void init_mandelbrot_parameters(MandelbrotParameters* params);
-void init_default_mandelbrot_parameters(MandelbrotParameters* params);
-void init_julia_parameters(JuliaParameters* params);
-void init_default_julia_parameters(JuliaParameters* params);
-void init_circle_parameters(CircleParameters* params);
-void init_default_circle_parameters(CircleParameters* params);
-void init_fern_parameters(FernParameters* params);
-void init_default_fern_parameters(FernParameters* params);
-void init_newton_parameters(NewtonParameters *params);
-void init_default_newton_parameters(NewtonParameters* params);
-void init_dragon_parameters(DragonParameters* params);
-void init_default_dragon_parameters(DragonParameters* params);
-void init_polynom_mandel_parameters(PolynomMandelParameters* params);
-void init_default_polynom_mandel(PolynomMandelParameters* params);
-void init_lyapunov_parameters(LyapunovParameters* params);
-void init_default_lyapunov_parameters(LyapunovParameters* params);
+void init_tree_parameters(TreeParameters* params, bool is_default);
+void init_carpet_parameters(CarpetParameters* params, bool is_default);
+void init_triangle_parameters(TriangleParameters* params, bool is_default);
+void init_mandelbrot_parameters(MandelbrotParameters* params, bool is_default);
+void init_julia_parameters(JuliaParameters* params, bool is_default);
+void init_circle_parameters(CircleParameters* params, bool is_default);
+void init_fern_parameters(FernParameters* params, bool is_default);
+void init_newton_parameters(NewtonParameters *params, bool is_default);
+void init_dragon_parameters(DragonParameters* params, bool is_default);
+void init_polynom_mandel_parameters(PolynomMandelParameters* params, bool is_default);
+void init_lyapunov_parameters(LyapunovParameters* params, bool is_default);
 
 void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
 

@@ -160,7 +160,7 @@ static void tree_gui(FractalParameters* params, Camera2D* cam, bool *update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_tree_parameters(&params->tree);
+        init_tree_parameters(&params->tree, true);
         *update = true;
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
@@ -196,7 +196,7 @@ static void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_carpet_parameters(&params->carpet);
+        init_carpet_parameters(&params->carpet, true);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
         *update = true;
@@ -232,7 +232,7 @@ static void triangle_gui(FractalParameters* params, Camera2D* cam, bool* update)
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_triangle_parameters(&params->triangle);
+        init_triangle_parameters(&params->triangle, true);
         *update = true;
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
@@ -267,7 +267,7 @@ static void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* updat
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_mandelbrot_parameters(&params->mandelbrot);
+        init_mandelbrot_parameters(&params->mandelbrot, true);
         cam->target = (Vector2){WIDTH / 2.0f - 300.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;
@@ -316,7 +316,7 @@ static void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_julia_parameters(&params->julia);
+        init_julia_parameters(&params->julia, true);
         cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;
@@ -353,7 +353,7 @@ static void circle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_circle_parameters(&params->circle);
+        init_circle_parameters(&params->circle, true);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
     }
@@ -398,7 +398,7 @@ static void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     };
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_fern_parameters(&params->fern);
+        init_fern_parameters(&params->fern, true);
         cam->zoom = 1.0f;
         cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
         *update = true;
@@ -452,7 +452,7 @@ static void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_newton_parameters(&params->newton);
+        init_newton_parameters(&params->newton, true);
         cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;
@@ -494,7 +494,7 @@ static void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_dragon_parameters(&params->dragon);
+        init_dragon_parameters(&params->dragon, true);
         cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;
@@ -536,7 +536,7 @@ static void polynom_mandel_gui(FractalParameters* params, Camera2D* cam, bool* u
     }
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
-        init_default_polynom_mandel(&params->polynom_mandel);
+        init_polynom_mandel_parameters(&params->polynom_mandel, true);
         cam->target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
         cam->zoom = 1.0f;
@@ -593,7 +593,7 @@ static void lyapunov_gui(FractalParameters *params, bool *update) {
 
     if (GuiButton((Rectangle){20, 380, 110, 30}, "Reset")) {
         dropdown_index = 0;
-        init_default_lyapunov_parameters(&params->lyapunov);
+        init_lyapunov_parameters(&params->lyapunov, true);
         *update = true;
     }
 }
