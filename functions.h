@@ -264,4 +264,8 @@ void clear_undo(void);
 void push(FractalParameters* params);
 bool pop(FractalParameters* out);
 
+// Сортировка списка
+ImageNode* merge_sort(ImageNode* head);
+void update_gallery_positions(ImageNode* head);
+
 #endif

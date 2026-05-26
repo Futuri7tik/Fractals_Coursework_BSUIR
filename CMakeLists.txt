@@ -27,6 +27,7 @@ add_executable(KURSACH
         win32_save.h
         undo_stack.c
         lyapunov.c
+        sort.c
 )
 
 if(OpenMP_C_FOUND)

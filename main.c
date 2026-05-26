@@ -18,9 +18,7 @@ static float TextToFloat(const char *text) {
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(WIDTH, HEIGHT, "Fractal Gallery");
-    bool needs_update = true;
-    bool was_updating = false;
-    bool show_message_box = false;
+    bool needs_update = true, was_updating = false, show_message_box = false;
 
     SetTargetFPS(144);
 
@@ -69,11 +67,20 @@ int main(void) {
                 break;
             }
             case STATE_GALLERY: {
-                GuiLoadStyleDefault();
-
                 gallery_gui(&state, &fract_params, &camera, &head, &needs_update);
                 GuiLoadStyleDefault();
 
+                GuiSetStyle(DEFAULT, TEXT_SIZE, 24);
+                if (GuiButton((Rectangle) {1690, 90, 200, 50}, "Sort by name")) {
+                    head->next = merge_sort(head->next);
+                    update_gallery_positions(head);
+                }
+
+                if (GuiButton((Rectangle) {1690, 150, 200, 50}, "Exit")) {
+                    exit(0);
+                }
+
+                GuiLoadStyleDefault();
                 random_type = STATE_GALLERY;
                 break;
             }
