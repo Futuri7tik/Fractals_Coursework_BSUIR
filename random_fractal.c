@@ -9,7 +9,7 @@
 void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type) {
     init_fractals_parameters(params);
 
-    *type = STATE_MANDELBROT + GetRandomValue(0, 9);
+    *type = STATE_MANDELBROT + GetRandomValue(0, 10);
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
 
     switch (*type) {
@@ -45,7 +45,7 @@ void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type
             params->julia.red = 5 + GetRandomValue(0, 15);
             params->julia.green = 5 + GetRandomValue(0, 15);
             params->julia.blue = 5 + GetRandomValue(0, 15);
-             break;
+            break;
         case STATE_CIRCLE:
             params->circle.depth = 1.0f + GetRandomValue(0, params->circle.max_depth - 1);
             params->circle.red = GetRandomValue(0, 255);
@@ -82,6 +82,18 @@ void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type
             params->polynom_mandel.green = 5 + GetRandomValue(0, 15);
             params->polynom_mandel.blue = 5 + GetRandomValue(0, 15);
             params->polynom_mandel.alpha= (float) GetRandomValue(-2, 2) / 100.0f;
+        case STATE_LYAPUNOV:
+            params->lyapunov.iterations = 10 + GetRandomValue(0, 200);
+            params->lyapunov.red = GetRandomValue(0, 255);
+            params->lyapunov.green = GetRandomValue(0, 255);
+            params->lyapunov.blue = GetRandomValue(0, 255);
+
+            for (int i = 0; i < strlen(params->lyapunov.sequence); i++) {
+                if (GetRandomValue(0, 1) == 1)
+                    params->lyapunov.sequence[i] = 'A';
+                else
+                    params->lyapunov.sequence[i] = 'B';
+            }
         default:
             break;
     }

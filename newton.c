@@ -10,13 +10,13 @@ static Color get_color_newton(int iter, int root, const NewtonParameters *params
     float t = iter / 30.0f;
     if (t > 1.0f) t = 1.0f;
 
-    unsigned char r_base = (unsigned char)(params->red * (root + 1) / 3.0f);
-    unsigned char g_base = (unsigned char)(params->green * (root + 1) / 3.0f);
-    unsigned char b_base = (unsigned char)params->blue;
+    unsigned char r_base = (unsigned char)(params->red * (root + 1) / 3.0f),
+    g_base = (unsigned char)(params->green * (root + 1) / 3.0f),
+    b_base = (unsigned char)params->blue;
 
-    unsigned char r = (unsigned char)(r_base + (params->gradient_r - r_base) * t);
-    unsigned char g = (unsigned char)(g_base + (params->gradient_g - g_base) * t);
-    unsigned char b = (unsigned char)(b_base + (params->gradient_b - b_base) * t);
+    unsigned char r = (unsigned char)(r_base + (params->gradient_r - r_base) * t),
+    g = (unsigned char)(g_base + (params->gradient_g - g_base) * t),
+    b = (unsigned char)(b_base + (params->gradient_b - b_base) * t);
 
     return (Color){ r, g, b, 255 };
 }
@@ -28,26 +28,23 @@ static int newton_iterations(float re_z, float im_z, const int max_iterations, i
     *root_num = -1;
 
     for (iterations = 0; iterations < max_iterations; ++iterations) {
-        float re2 = re_z * re_z;
-        float im2 = im_z * im_z;
-        float r2 = re2 + im2; // abs(z)^2
+        float re2 = re_z * re_z, im2 = im_z * im_z, r2 = re2 + im2;
 
         if (r2 == 0)
             break;
 
         // 3 * (a + bi)^2 = 3 * (a2 - b2 + 2ab)
         // 1 / (a + bi) = (a - bi) / (a2 + b2)
-        float denom_re = 3.0f * (re2 - im2);
-        float denom_im = 6.0f * re_z * im_z;
-        float denom = denom_re * denom_re + denom_im * denom_im;
+        float denom_re = 3.0f * (re2 - im2), denom_im = 6.0f * re_z * im_z,
+        denom = denom_re * denom_re + denom_im * denom_im;
 
         // z - (z3 - 1) / (3 * z2) = 2z/3 + 1/(3 * z2)
-        float next_re_z = (2.0f / 3.0f) * re_z + denom_re / denom;
-        float next_im_z = (2.0f / 3.0f) * im_z - denom_im / denom;
+        float next_re_z = (2.0f / 3.0f) * re_z + denom_re / denom,
+        next_im_z = (2.0f / 3.0f) * im_z - denom_im / denom;
 
         for (int r = 0; r < 3; ++r) {
-            float re_check = next_re_z - roots[r][0];
-            float im_check = next_im_z - roots[r][1];
+            float re_check = next_re_z - roots[r][0], im_check = next_im_z - roots[r][1];
+
             if (re_check * re_check + im_check * im_check < eps * eps) {
                 *root_num = r;
                 return iterations;

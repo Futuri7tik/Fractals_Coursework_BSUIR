@@ -236,7 +236,6 @@ void draw_sierpinski_triangle(float x, float y, float length,
 
 // Множество мандельброта
 void render_mandelbrot(float zoom, float offset_x, float offset_y, int max_iterations, const MandelbrotParameters *params);
-int mandelbrot_fourth_iterations(float re_c, float im_c, int max_iterations);
 
 // Множество Жюлиа
 void render_julia(float zoom, float offset_x, float offset_y, int max_iterations, const JuliaParameters* params);

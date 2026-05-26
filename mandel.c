@@ -14,9 +14,7 @@ static int mandelbrot_iterations(const float re_c, const float im_c, const int m
     }
 
     int iterations = 0;
-    float a = 0.0f, b = 0.0f;
-    float a2 = 0.0f, b2 = 0.0f;
-    float ab = a * b;
+    float a = 0.0f, b = 0.0f, a2 = 0.0f, b2 = 0.0f, ab = a * b;
 
     while (a2 + b2 < 4.0f && iterations < max_iterations) {
         b = 2 * ab + im_c;
@@ -34,11 +32,9 @@ static int mandelbrot_iterations(const float re_c, const float im_c, const int m
 static int mandelbrot_polynomial_iterations(const float re_c, const float im_c, const int max_iterations,
     const float alph) {
     int iterations = 0;
-    float a = 0.0f, b = 0.0f;
-    float a2 = 0.0f, b2 = 0.0f, ab;
+    float a = 0.0f, b = 0.0f, a2 = 0.0f, b2 = 0.0f, ab;
 
-    const float r = (2.0f > floorf(alph) + 1) ? 2.0f : floorf(a) + 1;
-    const float r2 = r * r;
+    const float r = (2.0f > floorf(alph) + 1) ? 2.0f : floorf(a) + 1, r2 = r * r;
 
     while (a2 + b2 < r2 && iterations < max_iterations) {
         a2 = a * a, b2 = b * b;
@@ -61,9 +57,9 @@ static Color get_color_mandelbrot(const int iteration, const int max_iterations,
     }
 
     const float t = (float)iteration / (float)max_iterations;
-    unsigned char r = (unsigned char)(params->red * (1-t) * t * t * t * 255);
-    unsigned char g = (unsigned char)(params->green * (1-t) * (1-t) * t * t * 255);
-    unsigned char b = (unsigned char)(params->blue * (1-t) * (1-t) * (1-t) * t * 255);
+    const unsigned char r = (unsigned char)(params->red * (1-t) * t * t * t * 255),
+    g = (unsigned char)(params->green * (1-t) * (1-t) * t * t * 255),
+    b = (unsigned char)(params->blue * (1-t) * (1-t) * (1-t) * t * 255);
 
     return (Color) {r, g, b, 255};
 }
@@ -74,9 +70,9 @@ static Color get_color_polynom_mandelbrot(const int iteration, const int max_ite
     }
 
     const float t = (float)iteration / (float)max_iterations;
-    unsigned char r = (unsigned char)(params->red * (1-t) * t * t * t * 255);
-    unsigned char g = (unsigned char)(params->green * (1-t) * (1-t) * t * t * 255);
-    unsigned char b = (unsigned char)(params->blue * (1-t) * (1-t) * (1-t) * t * 255);
+    const unsigned char r = (unsigned char)(params->red * (1-t) * t * t * t * 255),
+    g = (unsigned char)(params->green * (1-t) * (1-t) * t * t * 255),
+    b = (unsigned char)(params->blue * (1-t) * (1-t) * (1-t) * t * 255);
 
     return (Color) {r, g, b, 255};
 }
@@ -84,9 +80,7 @@ static Color get_color_polynom_mandelbrot(const int iteration, const int max_ite
 void render_mandelbrot(float zoom, float offset_x,
                             float offset_y, const int max_iterations, const MandelbrotParameters *params) {
     static Color pixels[WIDTH * HEIGHT];
-    const float scale_x = 4.0f / (WIDTH * zoom);
-    const float center_x = WIDTH / 2.0f;
-    const float center_y = HEIGHT / 2.0f;
+    const float scale_x = 4.0f / (WIDTH * zoom), center_x = WIDTH / 2.0f, center_y = HEIGHT / 2.0f;
 
     #pragma omp parallel for schedule(dynamic) default(none) \
     shared(pixels, offset_x, offset_y, max_iterations, params, center_y, center_x, scale_x)
@@ -107,9 +101,7 @@ void render_mandelbrot(float zoom, float offset_x,
 void render_polynom_mandel(float zoom, float offset_x, float offset_y,
     const int max_iterations, const PolynomMandelParameters *params) {
     static Color pixels[WIDTH * HEIGHT];
-    const float scale_x = 4.0f / (WIDTH * zoom);
-    const float center_x = WIDTH / 2.0f;
-    const float center_y = HEIGHT / 2.0f;
+    const float scale_x = 4.0f / (WIDTH * zoom), center_x = WIDTH / 2.0f, center_y = HEIGHT / 2.0f;
 
     #pragma omp parallel for schedule(dynamic) default(none) \
     shared(pixels, offset_x, offset_y, max_iterations, params, center_y, center_x, scale_x)
@@ -125,22 +117,4 @@ void render_polynom_mandel(float zoom, float offset_x, float offset_y,
     }
 
     UpdateTexture(params->texture, pixels);
-}
-
-int mandelbrot_fourth_iterations(const float re_c, const float im_c, const int max_iterations) {
-    int iterations = 0;
-    float a = 0.0f, b = 0.0f;
-    float a2 = 0.0f, b2 = 0.0f, ab = 0.0f;
-
-    while (a2 + b2 < 4.0f && iterations < max_iterations) {
-        b = 4 * (a2 * ab - b2 * ab) + im_c;
-        a = a2 * a2 - 6 * ab * ab + b2 * b2 + re_c;
-
-        a2 = a * a;
-        b2 = b * b;
-        ab = a * b;
-        iterations++;
-    }
-
-    return iterations;
 }

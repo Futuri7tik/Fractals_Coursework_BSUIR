@@ -8,8 +8,7 @@ static Vector2 draw_y(int depth, float x, float y, float* angle, float tilt_angl
 
 // drawing line
 static Vector2 draw_f(float x, float y, float angle, float length, Color color) {
-    float next_x = x + cosf(angle * DEG2RAD) * length;
-    float next_y = y + sinf(angle * DEG2RAD) * length;
+    float next_x = x + cosf(angle * DEG2RAD) * length, next_y = y + sinf(angle * DEG2RAD) * length;
     DrawLineEx((Vector2){x, y}, (Vector2){next_x, next_y}, 1.0f, color);
 
     return (Vector2){next_x, next_y};
@@ -52,42 +51,3 @@ void draw_dragon(float x_start, float y_start, float* start_angle, float tilt_an
     Vector2 pos = draw_f(x_start, y_start, *start_angle, length, color);
     draw_x(depth - 1, pos.x, pos.y, start_angle, tilt_angle, length, color);
 }
-
-// int m(void) {
-//     InitWindow(WIDTH, HEIGHT, "Fractal Gallery");
-//     SetTargetFPS(144);
-//
-//     Camera2D camera = {0};
-//     camera.target = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
-//     camera.offset = (Vector2){WIDTH / 2.0f, HEIGHT / 2.0f};
-//     camera.rotation = 0.0f;
-//     camera.zoom = 1.0f;
-//     DragonParameters dragon = {
-//         13,
-//         14,
-//         WIDTH / 2.0f,
-//         HEIGHT / 2.0f,
-//         0,
-//         90,
-//         10,
-//         255,
-//         255,
-//         255
-//     };
-//
-//     while (!WindowShouldClose()) {
-//         BeginDrawing();
-//         ClearBackground(BLACK);
-//         BeginMode2D(camera);
-//
-//         dragon.angle = 0;
-//         draw_dragon(dragon.x, dragon.y, &dragon.angle, dragon.length, (int) dragon.depth,
-//             (Color){dragon.red, dragon.green, dragon.blue,255});
-//
-//         EndMode2D();
-//         EndDrawing();
-//     }
-//
-//     return 0;
-// }
-

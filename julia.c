@@ -3,9 +3,7 @@
 
 static int julia_iterations(float re_z, float im_z, const float re_c, const float im_c, const int max_iterations) {
     int iterations = 0;
-    float re_z2 = re_z * re_z;
-    float im_z2 = im_z * im_z;
-    float prod = re_z * im_z;
+    float re_z2 = re_z * re_z, im_z2 = im_z * im_z, prod = re_z * im_z;
 
     while (re_z2 + im_z2 < 4.0f && iterations < max_iterations) {
         im_z = prod + prod + im_c;
@@ -26,9 +24,9 @@ static Color get_color_julia(const int iteration, const int max_iterations, cons
     }
 
     const float t = (float)iteration / (float)max_iterations;
-    unsigned char r = (unsigned char)(params->red * (1-t) * t * t * t * 255);
-    unsigned char g = (unsigned char)(params->green * (1-t) * (1-t) * t * t * 255);
-    unsigned char b = (unsigned char)(params->blue * (1-t) * (1-t) * (1-t) * t * 255);
+    unsigned char r = (unsigned char)(params->red * (1-t) * t * t * t * 255),
+    g = (unsigned char)(params->green * (1-t) * (1-t) * t * t * 255),
+    b = (unsigned char)(params->blue * (1-t) * (1-t) * (1-t) * t * 255);
 
     return (Color) {r, g, b, 255};
 }
@@ -37,9 +35,9 @@ void render_julia(float zoom, float offset_x,
     float offset_y, const int max_iterations, const JuliaParameters* params) {
     static Color pixels[WIDTH * HEIGHT];
 
-    const float scale_x = 4.0f / (WIDTH * zoom);
-    const float center_x = WIDTH / 2.0f;
-    const float center_y = HEIGHT / 2.0f;
+    const float scale_x = 4.0f / (WIDTH * zoom),
+    center_x = WIDTH / 2.0f,
+    center_y = HEIGHT / 2.0f;
 
     #pragma omp parallel for schedule(dynamic) default(none) \
     shared(pixels, offset_x, offset_y, max_iterations, params, center_y, center_x, scale_x)

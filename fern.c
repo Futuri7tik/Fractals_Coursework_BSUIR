@@ -9,8 +9,7 @@ Texture2D render_barnsley_fern(Vector2 pos, const int depth, const FernParameter
     for (int i = 0; i < depth; ++i) {
         int possib = GetRandomValue(0, 99);
         const int scale = 100;
-        const float offset_x = WIDTH / 2.0f;
-        const float offset_y = HEIGHT - 50.0f;
+        const float offset_x = WIDTH / 2.0f, offset_y = HEIGHT - 50.0f;
 
         const float aff_trans[4][6] = {
             {0, 0, 0, 0.16f, 0, 0}, {0.85f, 0.04f, -0.04f, 0.85f, 0, 1.6f},
@@ -36,8 +35,7 @@ Texture2D render_barnsley_fern(Vector2 pos, const int depth, const FernParameter
                     e = aff_trans[3][4], f = aff_trans[3][5];
                 }
 
-        const float new_x = a * pos.x + b * pos.y + e;
-        const float new_y = c * pos.x + d * pos.y + f;
+        const float new_x = a * pos.x + b * pos.y + e, new_y = c * pos.x + d * pos.y + f;
 
         pos.x = new_x;
         pos.y = new_y;

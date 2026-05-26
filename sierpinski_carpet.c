@@ -5,9 +5,7 @@ void draw_carpet(Image* img, float x, float y, float length, int depth) {
     if (depth < 0)
         return;
 
-    float new_length = length / 3.0f;
-    float x_draw = x + new_length;
-    float y_draw = y + new_length;
+    float new_length = length / 3.0f, x_draw = x + new_length, y_draw = y + new_length;
 
     ImageDrawRectangleV(img, (Vector2) {x_draw, y_draw}, (Vector2) {new_length, new_length}, BLACK);
 
@@ -25,8 +23,7 @@ void render_carpet(int depth, float start_length, Color color, const CarpetParam
 
     Image img = GenImageColor(WIDTH, HEIGHT, BLACK);
 
-    float x_start = ((float) WIDTH - start_length) / 2.0f;
-    float y_start = ((float) HEIGHT - start_length) / 2.0f;
+    float x_start = ((float) WIDTH - start_length) / 2.0f, y_start = ((float) HEIGHT - start_length) / 2.0f;
 
     ImageDrawRectangleV(&img, (Vector2) {x_start, y_start}, (Vector2) {start_length, start_length}, color);
     draw_carpet(&img, x_start, y_start, start_length, depth);

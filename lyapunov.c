@@ -4,15 +4,11 @@
 
 #include "functions.h"
 
-// === Вычисление показателя Ляпунова ===
-// === Оптимизированное вычисление показателя Ляпунова ===
 float lyapunov_exponent(float rx, float ry, const char* sequence, int seq_len,
                         int iterations, float x0) {
     float x = x0;
     float sum = 0.0f;
 
-    // Предвычисляем множители для текущего пикселя, чтобы не парсить строку в цикле
-    // Массив на 64 элемента обычно покрывает любые разумные длины паттернов (AB, AABAB и т.д.)
     float r_seq[64];
     for (int i = 0; i < seq_len; i++) {
         r_seq[i] = (sequence[i] == 'A') ? rx : ry;
@@ -23,12 +19,16 @@ float lyapunov_exponent(float rx, float ry, const char* sequence, int seq_len,
     // Пропускаем первые итерации (транзиент)
     for (int i = 0; i < 50; i++) {
         float r = r_seq[seq_idx++];
-        if (seq_idx == seq_len) seq_idx = 0; // Замена медленного %
+        if (seq_idx == seq_len)
+            seq_idx = 0;
 
         x = r * x * (1.0f - x);
 
-        if (x < 0.0f) x = 0.0f;
-        else if (x > 1.0f) x = 1.0f;
+        if (x < 0.0f)
+            x = 0.0f;
+        else
+            if (x > 1.0f)
+                x = 1.0f;
     }
 
     // Считаем показатель Ляпунова
@@ -62,8 +62,7 @@ Texture2D render_lyapunov(LyapunovParameters* params) {
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
             // Отображение координат в диапазон [2.0, 4.0]
-            float rx = 2.0f + (float)x / scale_x;
-            float ry = 2.0f + (float)y / scale_y;
+            float rx = 2.0f + (float)x / scale_x, ry = 2.0f + (float)y / scale_y;
 
             float lambda = lyapunov_exponent(rx, ry, sequence, seq_len,(int) iterations, 0.5f);
 
