@@ -119,7 +119,7 @@ int main(void) {
                 }
 
                 if (GuiButton((Rectangle){140, 380, 110, 30}, "Save Image")) {
-                    save_image(state, random_type, &fract_params, &random_params);
+                    save_image(state, random_type, &fract_params, &random_params, &needs_update);
                 }
 
                 if (GuiButton((Rectangle){140, 420, 110, 30}, "Undo")) {
@@ -149,7 +149,7 @@ int main(void) {
                 }
 
                 if (GuiButton((Rectangle){140, 380, 110, 30}, "Save Image")) {
-                    save_image(state, random_type, &fract_params, &random_params);
+                    save_image(state, random_type, &fract_params, &random_params, &needs_update);
                 }
 
                 if (GuiButton((Rectangle){140, 420, 110, 30}, "Undo")) {

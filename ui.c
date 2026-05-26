@@ -836,11 +836,11 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
     }
 }
 
-void save_image(const AppState state, const AppState random_type, const FractalParameters* params,
-    const FractalParameters* random_params) {
+void save_image(const AppState state, const AppState random_type, FractalParameters* params,
+    const FractalParameters* random_params, bool* needs_update) {
     Image finalImage = {0};
     const AppState currentState = (state == STATE_RANDOM) ? random_type : state;
-    const FractalParameters* currentParams = (state == STATE_RANDOM) ? random_params : params;
+    FractalParameters* currentParams = (state == STATE_RANDOM) ? random_params : params;
 
     switch (currentState) {
         case STATE_MANDELBROT:
@@ -864,10 +864,36 @@ void save_image(const AppState state, const AppState random_type, const FractalP
         case STATE_LYAPUNOV:
             finalImage = LoadImageFromTexture(currentParams->lyapunov.texture);
             break;
-        default:
-            finalImage = LoadImageFromScreen();
-            ImageCrop(&finalImage, (Rectangle){270.0f, 0.0f, (float)(WIDTH - 270), (float)HEIGHT});
+        default: {
+            // создаем временную камеру для сохранения
+            Camera2D saveCamera = {0};
+            saveCamera.target = (Vector2){ (WIDTH / 2.0f), HEIGHT / 2.0f };
+            saveCamera.offset = (Vector2){ WIDTH / 2.0f, HEIGHT / 2.0f };
+            saveCamera.rotation = 0.0f;
+            saveCamera.zoom = 1.0f;
+
+            // создаем холст (RenderTexture) размером 1920x1080
+            RenderTexture2D target = LoadRenderTexture(WIDTH, HEIGHT);
+
+            // 3. Рендерим дерево на этот холст с использованием новой камеры
+            BeginTextureMode(target);
+            ClearBackground(BLACK); // Очищаем фон (черный, как в приложении)
+            BeginMode2D(saveCamera);
+
+            render_fractals(&saveCamera, &state, currentParams, needs_update);
+            EndMode2D();
+            EndTextureMode();
+
+            // 4. Переводим полученную текстуру в изображение для сохранения
+            finalImage = LoadImageFromTexture(target.texture);
+
+            // в OpenGL текстуры рендерятся перевернутыми по вертикали, зеркалим обратно
+            ImageFlipVertical(&finalImage);
+
+            // Освобождаем память холста
+            UnloadRenderTexture(target);
             break;
+        }
     }
 
     if (finalImage.data != NULL) {
@@ -909,6 +935,11 @@ void show_slideshow(ImageNode* head, AppState* state) {
         if (elapsed > SLIDE_DURATION) {
             current_slide = next_slide;
             next_slide = current_slide->next ? current_slide->next : head->next;
+            if (next_slide->target_state == STATE_RANDOM) {
+                next_slide = next_slide->next;
+                if (!next_slide)
+                    next_slide = head->next;
+            }
             last_slide_time = current_time;
             elapsed = 0.0;
         }
