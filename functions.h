@@ -259,4 +259,6 @@ void update_gallery_positions(ImageNode* head);
 void copy_list(ImageNode* dest_head, const ImageNode* src_head);
 void free_list(ImageNode* head);
 
+void show_slideshow(ImageNode* head, AppState* state);
+
 #endif

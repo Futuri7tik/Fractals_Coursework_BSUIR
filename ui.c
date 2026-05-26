@@ -878,3 +878,92 @@ void save_image(const AppState state, const AppState random_type, const FractalP
         UnloadImage(finalImage);
     }
 }
+
+void show_slideshow(ImageNode* head, AppState* state) {
+    // Добавили next_slide для эффекта перехода
+    static double last_slide_time = 0.0;
+    static ImageNode* current_slide = NULL;
+    static ImageNode* next_slide = NULL;
+
+    // Настройки таймингов (в секундах)
+    const double SLIDE_DURATION = 4.0;
+    const double TRANSITION_DURATION = 1.0;
+
+    // Инициализация при первом входе
+    if (current_slide == NULL && head != NULL && head->next != NULL) {
+        current_slide = head->next;
+        next_slide = current_slide->next ? current_slide->next : head->next;
+        last_slide_time = GetTime();
+    }
+
+    if (current_slide != NULL) {
+        double current_time = GetTime();
+        double elapsed = current_time - last_slide_time;
+
+        // Логика переключения на следующий кадр
+        if (elapsed > SLIDE_DURATION) {
+            current_slide = next_slide;
+            next_slide = current_slide->next ? current_slide->next : head->next;
+            last_slide_time = current_time;
+            elapsed = 0.0;
+        }
+
+        float scale_curr = fminf((float)WIDTH / current_slide->texture.width,
+                                 (float)HEIGHT / current_slide->texture.height);
+        Rectangle source_curr = { 0.0f, 0.0f, (float)current_slide->texture.width, (float)current_slide->texture.height };
+        Rectangle dest_curr = {
+            (WIDTH - current_slide->texture.width * scale_curr) / 2.0f,
+            (HEIGHT - current_slide->texture.height * scale_curr) / 2.0f,
+            current_slide->texture.width * scale_curr,
+            current_slide->texture.height * scale_curr
+        };
+        DrawTexturePro(current_slide->texture, source_curr, dest_curr, (Vector2){0, 0}, 0.0f, WHITE);
+
+        // --- 2. Эффект ПЕРЕХОДА (Crossfade) ---
+        float alpha = 0.0f;
+        if (elapsed > SLIDE_DURATION - TRANSITION_DURATION) {
+            // Вычисляем прозрачность от 0.0 до 1.0
+            alpha = (elapsed - (SLIDE_DURATION - TRANSITION_DURATION)) / TRANSITION_DURATION;
+            if (alpha > 1.0f) alpha = 1.0f; // Защита от выхода за пределы
+
+            float scale_next = fminf((float)WIDTH / next_slide->texture.width,
+                                     (float)HEIGHT / next_slide->texture.height);
+            Rectangle source_next = { 0.0f, 0.0f, (float)next_slide->texture.width, (float)next_slide->texture.height };
+            Rectangle dest_next = {
+                (WIDTH - next_slide->texture.width * scale_next) / 2.0f,
+                (HEIGHT - next_slide->texture.height * scale_next) / 2.0f,
+                next_slide->texture.width * scale_next,
+                next_slide->texture.height * scale_next
+            };
+
+            // Рисуем следующий слайд поверх текущего, постепенно увеличивая его непрозрачность
+            DrawTexturePro(next_slide->texture, source_next, dest_next, (Vector2){0, 0}, 0.0f, Fade(WHITE, alpha));
+        }
+
+        Color text_color_fg = Fade(RAYWHITE, 1.0f - alpha);
+        Color text_color_bg = Fade(BLACK, 1.0f - alpha);
+        DrawText(current_slide->fract_name, 32, 32, 40, text_color_bg);
+        DrawText(current_slide->fract_name, 30, 30, 40, text_color_fg);
+
+        // Текст следующего слайда плавно появляется
+        if (alpha > 0.0f) {
+            Color next_text_fg = Fade(RAYWHITE, alpha);
+            Color next_text_bg = Fade(BLACK, alpha);
+            DrawText(next_slide->fract_name, 32, 32, 40, next_text_bg);
+            DrawText(next_slide->fract_name, 30, 30, 40, next_text_fg);
+        }
+
+    }
+    else {
+        DrawText("No images to show", WIDTH/2 - 150, HEIGHT/2, 30, LIGHTGRAY);
+    }
+
+    // Кнопка прерывания слайд-шоу
+    GuiLoadStyleDefault();
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 24);
+    if (GuiButton((Rectangle){WIDTH - 150, 20, 120, 40}, "Exit")) {
+        *state = STATE_MENU;
+        current_slide = NULL;
+        next_slide = NULL;
+    }
+}

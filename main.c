@@ -51,8 +51,10 @@ int main(void) {
             if (state == STATE_GALLERY)
                 state = STATE_MENU;
             else
-                if (state != STATE_MENU)
+                if (state != STATE_MENU && state != STATE_SLIDESHOW)
                     state = STATE_GALLERY;
+                else
+                    state = STATE_MENU;
         }
 
         switch (state) {
@@ -91,6 +93,10 @@ int main(void) {
 
                 GuiLoadStyleDefault();
                 random_type = STATE_GALLERY;
+                break;
+            }
+            case STATE_SLIDESHOW: {
+                show_slideshow(head, &state);
                 break;
             }
             case STATE_RANDOM: {
