@@ -267,5 +267,7 @@ bool pop(FractalParameters* out);
 // Сортировка списка
 ImageNode* merge_sort(ImageNode* head);
 void update_gallery_positions(ImageNode* head);
+void copy_list(ImageNode* dest_head, const ImageNode* src_head);
+void free_list(ImageNode* head);
 
 #endif

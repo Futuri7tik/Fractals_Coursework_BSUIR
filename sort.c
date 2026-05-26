@@ -1,8 +1,9 @@
+#include <stdlib.h>
 #include <string.h>
 
 #include "functions.h"
 
-void split_list(ImageNode* source, ImageNode** frontRef, ImageNode** backRef) {
+static void split_list(ImageNode* source, ImageNode** frontRef, ImageNode** backRef) {
     // создаем два указателя. slow двигается на 1 узел вперед, fast на 2
     ImageNode* slow = source;
     ImageNode* fast = source->next;
@@ -26,7 +27,7 @@ void split_list(ImageNode* source, ImageNode** frontRef, ImageNode** backRef) {
     slow->next = NULL;
 }
 
-ImageNode* merge(ImageNode* node_a, ImageNode* node_b) {
+static ImageNode* merge(ImageNode* node_a, ImageNode* node_b) {
     // создаем головной элемент для создания списка
     ImageNode dummy;
     ImageNode* tail = &dummy;
@@ -73,6 +74,38 @@ ImageNode* merge_sort(ImageNode* head) {
 
     // получим отсортированный подсписок слиянием
     return merge(front, back);
+}
+
+static void copy_node(ImageNode* dest, ImageNode* src) {
+    dest->fract_name = src->fract_name;
+    dest->img_name = src->img_name;
+    dest->field = src->field;
+    dest->texture = src->texture;
+    dest->target_state = src->target_state;
+    dest->next = src->next;
+}
+
+void copy_list(ImageNode* dest_head, const ImageNode* src_head) {
+    ImageNode* temp_src = src_head->next;
+    ImageNode* temp_dest = dest_head;
+
+    while (temp_src) {
+        ImageNode* new_node = malloc(sizeof(ImageNode));
+        copy_node(new_node, temp_src);
+
+        temp_dest->next = new_node;
+
+        temp_src = temp_src->next;
+        temp_dest = temp_dest->next;
+    }
+}
+
+void free_list(ImageNode* head) {
+    while (head) {
+        ImageNode* temp = head;
+        head = head->next;
+        free(temp);
+    }
 }
 
 void update_gallery_positions(ImageNode* head) {

@@ -1,8 +1,6 @@
 #include "raylib.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "math.h"
-#include "win32_save.h"
 
 #ifndef TEXT_TO_FLOAT_DEFINED
 #define TEXT_TO_FLOAT_DEFINED
@@ -19,6 +17,8 @@ int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(WIDTH, HEIGHT, "Fractal Gallery");
     bool needs_update = true, was_updating = false, show_message_box = false;
+    bool is_sorted = false;
+    ImageNode* unsorted_head = malloc(sizeof(ImageNode));
 
     SetTargetFPS(144);
 
@@ -71,9 +71,18 @@ int main(void) {
                 GuiLoadStyleDefault();
 
                 GuiSetStyle(DEFAULT, TEXT_SIZE, 24);
-                if (GuiButton((Rectangle) {1690, 90, 200, 50}, "Sort by name")) {
-                    head->next = merge_sort(head->next);
-                    update_gallery_positions(head);
+                if (GuiButton((Rectangle) {1690, 90, 200, 50},
+                    (is_sorted == false) ? "Sort by name" : "Undo")) {
+                    if (is_sorted == false) {
+                        copy_list(unsorted_head, head);
+
+                        head->next = merge_sort(head->next);
+                        update_gallery_positions(head);
+                    }
+                    else
+                        copy_list(head, unsorted_head);
+
+                    is_sorted = !is_sorted;
                 }
 
                 if (GuiButton((Rectangle) {1690, 150, 200, 50}, "Exit")) {
@@ -161,6 +170,8 @@ int main(void) {
         EndDrawing();
     }
 
+    free_list(unsorted_head);
+    free_list(head);
     rewrite_fractal_parameters(&fract_params);
     CloseWindow();
     return 0;
