@@ -114,9 +114,8 @@ void update_gallery_positions(ImageNode* head) {
     int i = 0;
 
     while (current != NULL) {
-        // Используем точно такие же формулы и константы, как при первой загрузке
-        const int img_height = 280, img_width = 330;
-        const float y_start = 90, x_start = 115, x_indent = img_width + 70, y_indent = img_height + 35;
+        const int img_height = 215, img_width = 350;
+        const float y_start = 130, x_start = 85, x_indent = img_width + 50, y_indent = img_height + 65;
 
         current->field = (Rectangle) {
             x_start + (float) (i % 4) * x_indent,

@@ -616,8 +616,8 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
     AppState state = STATE_MANDELBROT;
 
     for (size_t i = 0; i < size; ++i) {
-        const int img_height = 280, img_width = 330;
-        const float y_start = 90, x_start = 115, x_indent = img_width + 70, y_indent = img_height + 35;
+        const int img_height = 215, img_width = 350;
+        const float y_start = 130, x_start = 85, x_indent = img_width + 50, y_indent = img_height + 65;
 
         Image img = LoadImage(img_names[i]);
         Image temp_img = ImageCopy(img);

@@ -73,7 +73,7 @@ int main(void) {
                 GuiLoadStyleDefault();
 
                 GuiSetStyle(DEFAULT, TEXT_SIZE, 24);
-                if (GuiButton((Rectangle) {1690, 90, 200, 50},
+                if (GuiButton((Rectangle) {1690, 130, 200, 50},
                     (is_sorted == false) ? "Sort by name" : "Undo")) {
                     if (is_sorted == false) {
                         copy_list(unsorted_head, head);
@@ -87,7 +87,7 @@ int main(void) {
                     is_sorted = !is_sorted;
                 }
 
-                if (GuiButton((Rectangle) {1690, 150, 200, 50}, "Exit")) {
+                if (GuiButton((Rectangle) {1690, 190, 200, 50}, "Exit")) {
                     exit(0);
                 }
 
