@@ -8,17 +8,17 @@
 #include "win32_save.h"
 
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
-    DrawRectangleGradientV(0, 0, WIDTH, HEIGHT,
-                    (Color){255, 255, 255, 255}, (Color){106, 85, 242, 255});
+    Texture2D font_texture = LoadTexture("font2.png");
+    DrawTexture(font_texture, 0, 0, WHITE);
 
     int fontSize = 80, button_text = 30;
     char* text= "FRACTAL GALLERY";
     int textWidth = MeasureText(text, fontSize);
     int x_coord = (WIDTH - textWidth) / 2, y_coord = HEIGHT/2 - 350;
-    DrawText(text, x_coord, y_coord, fontSize, BLACK);
+    DrawText(text, x_coord, y_coord, fontSize, WHITE);
 
     int gallery_button = GuiButton((Rectangle){WIDTH / 2.0f - 200, HEIGHT / 2.0f - 200, 400, 60}, "GALLERY");
-    GuiSetStyle(gallery_button, TEXT_SIZE, button_text);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, button_text);
 
     if (gallery_button)
         *state = STATE_GALLERY;
@@ -36,21 +36,13 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
     }
 
     if (*show_msg_box) {
-        GuiLoadStyleDefault();
+        GuiSetStyle(DEFAULT, TEXT_SIZE, 19);
         int result = GuiMessageBox(
-        (Rectangle){WIDTH/2.0f - 300, HEIGHT/2.0f - 200, 600, 400},
+        (Rectangle){WIDTH/2.0f - 400, HEIGHT/2.0f - 300, 800, 600},
             "About",
         "Fractal Gallery v1.0\n\n"
-             "Interactive Fractal Explorer\n\n"
-             "Features:\n"
-             "- Pythagoras Tree\n"
-             "- Sierpinski Carpet\n"
-             "- Sierpinski Triangle\n"
-             "- Mandelbrot Set\n"
-             "- Julia Set\n"
-             "- Circle Fractal\n"
-             "- Barnsley Fern\n"
-             "- Newtons Fractal\n\n"
+             "This app was provided by student of BSUIR Viachesslav Brutski\n"
+             "\n\n\n\n\n\n\n\n\n\n\n\n"
              "Controls:\n"
              "- Mouse Wheel: Zoom\n"
              "- Arrow Keys: Pan\n"
@@ -59,9 +51,13 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
              "- ESC: Exit",
         "OK");
 
+        Texture2D dev = LoadTexture("dev.png");
+
+        DrawTexture(dev, WIDTH / 2.0f - 150, HEIGHT / 2.0f - 150, WHITE);
+
         if (result >= 0) {
             *show_msg_box = false;
-            GuiSetStyle(gallery_button, TEXT_SIZE, button_text);
+            UnloadTexture(dev);
         }
     }
 }
@@ -837,7 +833,7 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
 }
 
 void save_image(const AppState state, const AppState random_type, FractalParameters* params,
-    const FractalParameters* random_params, bool* needs_update) {
+    FractalParameters* random_params, bool* needs_update) {
     Image finalImage = {0};
     const AppState currentState = (state == STATE_RANDOM) ? random_type : state;
     FractalParameters* currentParams = (state == STATE_RANDOM) ? random_params : params;

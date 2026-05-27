@@ -102,7 +102,10 @@ void copy_list(ImageNode* dest_head, const ImageNode* src_head) {
 }
 
 void free_list(ImageNode* head) {
-    while (head) {
+    if (!head || !head->next)
+        return;
+
+    while (head && head->next) {
         ImageNode* temp = head;
         head = head->next;
         free(temp);

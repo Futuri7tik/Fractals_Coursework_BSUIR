@@ -206,7 +206,7 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
 
 // saving image
 void save_image(AppState state, AppState random_type, FractalParameters* params,
-    const FractalParameters* random_params, bool* needs_update);
+    FractalParameters* random_params, bool* needs_update);
 
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
 void draw_pics(ImageNode* head);

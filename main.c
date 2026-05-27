@@ -176,7 +176,7 @@ int main(void) {
         EndDrawing();
     }
 
-    free_list(unsorted_head);
+    free(unsorted_head);
     free_list(head);
     rewrite_fractal_parameters(&fract_params);
     CloseWindow();
