@@ -198,7 +198,7 @@ void rewrite_fractal_parameters(const FractalParameters* params);
 
 // UI
 void handle_movement(float speed, Camera2D* cam, bool* update);
-void menu_gui(AppState* state, bool* show_msg_box, bool* should_close);
+void menu_gui(AppState* state, bool* show_msg_box, bool* should_close, Texture2D font_texture, Texture2D dev);
 void load_pics(ImageNode** head);
 void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
                  bool *update);

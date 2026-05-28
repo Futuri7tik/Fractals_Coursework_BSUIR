@@ -7,8 +7,7 @@
 #include "functions.h"
 #include "win32_save.h"
 
-void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
-    Texture2D font_texture = LoadTexture("resources/font2.png");
+void menu_gui(AppState* state, bool* show_msg_box, bool* should_close, Texture2D font_texture, Texture2D dev) {
     DrawTexture(font_texture, 0, 0, WHITE);
 
     int fontSize = 80, button_text = 30;
@@ -51,13 +50,10 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
              "- ESC: Exit",
         "OK");
 
-        Texture2D dev = LoadTexture("resources/dev.png");
-
         DrawTexture(dev, WIDTH / 2.0f - 150, HEIGHT / 2.0f - 150, WHITE);
 
         if (result >= 0) {
             *show_msg_box = false;
-            UnloadTexture(dev);
         }
     }
 }

@@ -19,6 +19,7 @@ int main(void) {
     bool needs_update = true, was_updating = false, show_message_box = false;
     bool is_sorted = false;
     ImageNode* unsorted_head = malloc(sizeof(ImageNode));
+    Texture2D font = LoadTexture("resources/font2.png"), dev = LoadTexture("resources/dev.png");
 
     SetTargetFPS(144);
 
@@ -61,7 +62,7 @@ int main(void) {
             case STATE_MENU: {
                 bool should_close = false;
 
-                menu_gui(&state, &show_message_box, &should_close);
+                menu_gui(&state, &show_message_box, &should_close, font, dev);
                 if (should_close)
                     exit(0);
 
@@ -176,6 +177,8 @@ int main(void) {
         EndDrawing();
     }
 
+    UnloadTexture(font);
+    UnloadTexture(dev);
     free(unsorted_head);
     free_list(head);
     rewrite_fractal_parameters(&fract_params);
