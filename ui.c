@@ -8,7 +8,7 @@
 #include "win32_save.h"
 
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
-    Texture2D font_texture = LoadTexture("font2.png");
+    Texture2D font_texture = LoadTexture("resources/font2.png");
     DrawTexture(font_texture, 0, 0, WHITE);
 
     int fontSize = 80, button_text = 30;
@@ -51,7 +51,7 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close) {
              "- ESC: Exit",
         "OK");
 
-        Texture2D dev = LoadTexture("dev.png");
+        Texture2D dev = LoadTexture("resources/dev.png");
 
         DrawTexture(dev, WIDTH / 2.0f - 150, HEIGHT / 2.0f - 150, WHITE);
 
@@ -90,9 +90,9 @@ void load_pics(ImageNode** head) {
         "Julia Set", "Circle Fractal","Barnsley Fern", "Newtons Fractal", "Dragon Fractal", "Polynomial Mandelbrot",
         "Lyapunov Fractal","Random Fractal"};
     char* image_names[] = {
-        "mandelbrot.png", "tree.png", "carpet.png", "triangle.png", "julia.png",
-        "circle.png","fern.png","newton.png", "dragon.png","polynom_mandel.png",
-        "lyapunov.png","random.png"};
+        "resources/mandelbrot.png", "resources/tree.png", "resources/carpet.png", "resources/triangle.png",
+        "resources/julia.png", "resources/circle.png","resources/fern.png","resources/newton.png",
+        "resources/dragon.png","resources/polynom_mandel.png", "resources/lyapunov.png","resources/random.png"};
 
     const size_t size = sizeof(fractal_names) / sizeof(fractal_names[0]);
     Rectangle *fields = calloc(size, sizeof(Rectangle));
