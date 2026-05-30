@@ -144,7 +144,7 @@ int main(void) {
 
                 // сохранение изображения
                 if (GuiButton((Rectangle){140, 380, 110, 30}, "Save Image"))
-                    save_image(state, random_type, &fract_params, &random_params, &needs_update);
+                    save_image(state, random_type, &fract_params, &random_params, camera ,&needs_update);
 
                 // откат через стек по нажатию на кнопку
                 if (GuiButton((Rectangle){140, 420, 110, 30}, "Undo")) {
@@ -177,7 +177,7 @@ int main(void) {
 
                 // сохранение изображения
                 if (GuiButton((Rectangle){140, 380, 110, 30}, "Save Image"))
-                    save_image(state, random_type, &fract_params, &random_params, &needs_update);
+                    save_image(state, random_type, &fract_params, &random_params, camera, &needs_update);
 
                 // откат через стек по нажатию на кнопку
                 if (GuiButton((Rectangle){140, 420, 110, 30}, "Undo")) {

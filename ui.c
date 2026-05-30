@@ -850,7 +850,7 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
 
 // сохранение изображения фрактала
 void save_image(const AppState state, const AppState random_type, FractalParameters* params,
-    FractalParameters* random_params, bool* needs_update) {
+    FractalParameters* random_params, Camera2D cam, bool* needs_update) {
     Image finalImage = {0};
     const AppState currentState = (state == STATE_RANDOM) ? random_type : state;
     FractalParameters* currentParams = (state == STATE_RANDOM) ? random_params : params;
@@ -878,22 +878,15 @@ void save_image(const AppState state, const AppState random_type, FractalParamet
             finalImage = LoadImageFromTexture(currentParams->lyapunov.texture);
             break;
         default: {
-            // создаем временную камеру для сохранения
-            Camera2D saveCamera = {0};
-            saveCamera.target = (Vector2){ (WIDTH / 2.0f), HEIGHT / 2.0f };
-            saveCamera.offset = (Vector2){ WIDTH / 2.0f, HEIGHT / 2.0f };
-            saveCamera.rotation = 0.0f;
-            saveCamera.zoom = 1.0f;
-
             // создаем холст (RenderTexture) размером 1920x1080
             RenderTexture2D target = LoadRenderTexture(WIDTH, HEIGHT);
 
             // рендерим дерево на этот холст с использованием новой камеры
             BeginTextureMode(target);
             ClearBackground(BLACK);
-            BeginMode2D(saveCamera);
+            BeginMode2D(cam);
 
-            render_fractals(&saveCamera, &state, currentParams, needs_update);
+            render_fractals(&cam, &state, currentParams, needs_update);
             EndMode2D();
             EndTextureMode();
 
