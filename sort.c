@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
-
 #include "functions.h"
 
+// разделение списка на два
 static void split_list(ImageNode* source, ImageNode** frontRef, ImageNode** backRef) {
     // создаем два указателя. slow двигается на 1 узел вперед, fast на 2
     ImageNode* slow = source;
@@ -27,6 +27,7 @@ static void split_list(ImageNode* source, ImageNode** frontRef, ImageNode** back
     slow->next = NULL;
 }
 
+// слияние двух отсортированных список в один
 static ImageNode* merge(ImageNode* node_a, ImageNode* node_b) {
     // создаем головной элемент для создания списка
     ImageNode dummy;
@@ -59,6 +60,7 @@ static ImageNode* merge(ImageNode* node_a, ImageNode* node_b) {
     return dummy.next;
 }
 
+// сортировка слиянием связного списка
 ImageNode* merge_sort(ImageNode* head) {
     if (!head || !head->next)
         return head;
@@ -76,6 +78,7 @@ ImageNode* merge_sort(ImageNode* head) {
     return merge(front, back);
 }
 
+// копирование узла
 static void copy_node(ImageNode* dest, ImageNode* src) {
     dest->fract_name = src->fract_name;
     dest->img_name = src->img_name;
@@ -86,6 +89,7 @@ static void copy_node(ImageNode* dest, ImageNode* src) {
     dest->next = src->next;
 }
 
+// копирование списка
 void copy_list(ImageNode* dest_head, const ImageNode* src_head) {
     ImageNode* temp_src = src_head->next;
     ImageNode* temp_dest = dest_head;
@@ -101,6 +105,7 @@ void copy_list(ImageNode* dest_head, const ImageNode* src_head) {
     }
 }
 
+// очистка памяти списка
 void free_list(ImageNode* head) {
     if (!head || !head->next)
         return;
@@ -112,6 +117,7 @@ void free_list(ImageNode* head) {
     }
 }
 
+// обновление изображение после сортировки
 void update_gallery_positions(ImageNode* head) {
     ImageNode* current = head->next;
     int i = 0;

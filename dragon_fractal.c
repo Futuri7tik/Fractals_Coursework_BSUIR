@@ -2,51 +2,72 @@
 #include "raylib.h"
 #include "functions.h"
 
+// отрисовка линии
 static Vector2 draw_f(float x, float y, float angle, float length, Color color);
+
+// изменение системы при x
 static Vector2 draw_x(int depth, float x, float y, float* angle, float tilt_angle, float length, Color color);
+
+// изменение системы при y
 static Vector2 draw_y(int depth, float x, float y, float* angle, float tilt_angle, float length, Color color);
 
-// drawing line
 static Vector2 draw_f(float x, float y, float angle, float length, Color color) {
+    // отрисовка линии
     float next_x = x + cosf(angle * DEG2RAD) * length, next_y = y + sinf(angle * DEG2RAD) * length;
     DrawLineEx((Vector2){x, y}, (Vector2){next_x, next_y}, 1.0f, color);
 
     return (Vector2){next_x, next_y};
 }
 
-// y -> - fx - y
 Vector2 draw_y(int depth, float x, float y, float* angle, float tilt_angle, float length, Color color) {
+    // базовый случай для рекурсии по y
     if (depth <= 0)
         return (Vector2){x, y};
 
+    // получаем дальнейшие вызовы по формуле y -> - fx - y
+    // изменение угла отрисовки линии
     *angle -= tilt_angle;
 
+    // отрисовка линии
     Vector2 new_pos = draw_f(x, y, *angle, length, color);
+
+    // вызов при x
     new_pos = draw_x(depth - 1, new_pos.x, new_pos.y, angle, tilt_angle, length, color);
 
+    // изменение угла отрисовки линии
     *angle -= 90;
 
+    // вызов при y
     new_pos = draw_y(depth - 1, new_pos.x, new_pos.y, angle, tilt_angle, length, color);
 
     return new_pos;
 }
 
-// x -> x + yf +
 Vector2 draw_x(int depth, float x, float y, float* angle, float tilt_angle,float length, Color color) {
+    // базовый случай для рекурсии по x
     if (depth <= 0)
         return (Vector2) {x, y};
 
+    // получаем дальнейшие вызовы по x -> x + yf +
+    // вызов при x
     Vector2 new_pos = draw_x(depth - 1, x, y, angle, tilt_angle, length, color);
+
+    // изменяем угол
     *angle += 90;
 
+    // вызов при y
     new_pos = draw_y(depth - 1, new_pos.x, new_pos.y, angle, tilt_angle, length, color);
+
+    // отрисовка линии
     new_pos = draw_f(new_pos.x, new_pos.y, *angle, length, color);
 
+    // изменяем угол
     *angle += 90;
 
     return new_pos;
 }
 
+// отрисовка фрактала дракона. запуск рекурсии
 void draw_dragon(float x_start, float y_start, float* start_angle, float tilt_angle,float length, int depth, Color color) {
     Vector2 pos = draw_f(x_start, y_start, *start_angle, length, color);
     draw_x(depth - 1, pos.x, pos.y, start_angle, tilt_angle, length, color);

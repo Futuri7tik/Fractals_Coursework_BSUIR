@@ -3,10 +3,12 @@
 #include "functions.h"
 #include "raylib.h"
 
-
+// получение цвета точки бассейна ньютона
 static Color get_color_newton(int iter, int root, const NewtonParameters *params) {
-    if (root == -1) return BLACK;
+    if (root == -1)
+        return BLACK;
 
+    // получаем коэффициент
     float t = iter / 30.0f;
     if (t > 1.0f) t = 1.0f;
 
@@ -21,15 +23,19 @@ static Color get_color_newton(int iter, int root, const NewtonParameters *params
     return (Color){ r, g, b, 255 };
 }
 
+// получение цвета точки бассейна ньютона
 static int newton_iterations(float re_z, float im_z, const int max_iterations, int* root_num) {
+    // параметры фрактала
     int iterations;
     float eps = 1e-4f;
     static float roots[3][2] = {{1, 0}, {-0.5f, -SQRT3 / 2}, {-0.5f, SQRT3 / 2}};
     *root_num = -1;
 
+    // запуск итераций для точки
     for (iterations = 0; iterations < max_iterations; ++iterations) {
         float re2 = re_z * re_z, im2 = im_z * im_z, r2 = re2 + im2;
 
+        // проверяем не пришли ли в ноль
         if (r2 == 0)
             break;
 
@@ -57,17 +63,20 @@ static int newton_iterations(float re_z, float im_z, const int max_iterations, i
     return iterations;
 }
 
+// рендер фрактала ньютона в текстуру
 void render_newton(float zoom, float offset_x, float offset_y, const int max_iterations, NewtonParameters *params) {
+    // переменные для отрисовки фрактала. преобразования координат в комплексные
     static Color pixels[WIDTH * HEIGHT];
+    const float scale_x = 4.0f / (WIDTH * zoom), center_x = WIDTH / 2.0f, center_y = HEIGHT / 2.0f;
 
     #pragma omp parallel for schedule(dynamic) default(none) \
-    shared(pixels, max_iterations, params, zoom, offset_x, offset_y)
+    shared(pixels, max_iterations, params, zoom, offset_x, offset_y, center_y, center_x, scale_x)
     for (int y = 0; y < HEIGHT; ++y) {
-        const float im_z = ((float)y - (float)HEIGHT / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_y;
+        const float im_z = ((float)y - center_y) * scale_x + offset_y;
 
         for (int x = 0; x < WIDTH; ++x) {
             int root_num;
-            const float re_z = ((float)x - (float)WIDTH / 2.0f) * (4.0f / ((float) WIDTH * zoom)) + offset_x;
+            const float re_z = ((float)x - center_x) * scale_x + offset_x;
 
             const int iterations = newton_iterations(re_z, im_z, max_iterations, &root_num);
             pixels[y * WIDTH + x] = get_color_newton(iterations, root_num, params);

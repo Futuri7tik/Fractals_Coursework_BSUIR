@@ -7,6 +7,7 @@
 #include "functions.h"
 #include "win32_save.h"
 
+// отрисовка главного меню
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close, Texture2D font_texture, Texture2D dev) {
     DrawTexture(font_texture, 0, 0, WHITE);
 
@@ -59,9 +60,9 @@ void menu_gui(AppState* state, bool* show_msg_box, bool* should_close, Texture2D
 }
 
 void handle_movement(float speed, Camera2D* cam, bool* update) {
-    // Вычисляем вектор движения: (Вправо - Влево, Вниз - Вверх)
-    int moveX = IsKeyPressedRepeat(KEY_RIGHT) - IsKeyPressedRepeat(KEY_LEFT);
-    int moveY = IsKeyPressedRepeat(KEY_DOWN) - IsKeyPressedRepeat(KEY_UP);
+    // вычисляем вектор движения: (Вправо - Влево, Вниз - Вверх)
+    int moveX = (IsKeyPressed(KEY_RIGHT) || IsKeyPressedRepeat(KEY_RIGHT)) - (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT));
+    int moveY = (IsKeyPressed(KEY_DOWN) || IsKeyPressedRepeat(KEY_DOWN)) - (IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP));
 
     if (moveX != 0 || moveY != 0) {
         cam->target.x += (float) moveX * speed;
@@ -81,6 +82,7 @@ void handle_movement(float speed, Camera2D* cam, bool* update) {
         }
 }
 
+// загрузка изображений в список
 void load_pics(ImageNode** head) {
     char* fractal_names[] = {"Mandelbrot Set", "Pythagorean Tree","Sierpinski Carpet", "Sierpinski Triangle",
         "Julia Set", "Circle Fractal","Barnsley Fern", "Newtons Fractal", "Dragon Fractal", "Polynomial Mandelbrot",
@@ -100,6 +102,7 @@ void load_pics(ImageNode** head) {
     free(fields);
 }
 
+// отрисовка интерфейса галереи
 void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
                  bool *update) {
     GuiPanel((Rectangle){0, 10, WIDTH, HEIGHT - 10}, "Fractal Gallery");
@@ -128,6 +131,7 @@ void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, Imag
     }
 }
 
+// интерфейс дерева пифагора
 static void tree_gui(FractalParameters* params, Camera2D* cam, bool *update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->tree.depth));
 
@@ -159,6 +163,7 @@ static void tree_gui(FractalParameters* params, Camera2D* cam, bool *update) {
     }
 }
 
+// интерфейс ковра Серпинского
 static void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->carpet.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -195,6 +200,7 @@ static void carpet_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
+// интерфейс треугольника Серпинского
 static void triangle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->triangle.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -231,6 +237,7 @@ static void triangle_gui(FractalParameters* params, Camera2D* cam, bool* update)
     }
 }
 
+// отрисовка интерфейса Множества мандельброта
 static void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->mandelbrot.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -267,6 +274,7 @@ static void mandelbrot_gui(FractalParameters* params, Camera2D* cam, bool* updat
     }
 }
 
+// отрисовка интерфейса множества жюлиа
 static void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->julia.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -316,6 +324,7 @@ static void julia_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
+// отрисовка интерфейса кругового фрактала
 static void circle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->circle.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -351,6 +360,7 @@ static void circle_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
+// отрисовка интерфейса папоротника Барнсли
 static void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->fern.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -397,6 +407,7 @@ static void fern_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
+// отрисовка интерфейса бассенов Ньютона
 static void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->newton.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -452,6 +463,7 @@ static void newton_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
+// отрисовка интерфейса фрактала дракона
 static void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Depth: %d", (int) params->dragon.depth));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -494,6 +506,7 @@ static void dragon_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     }
 }
 
+// отрисовка интерфейса полиномиального множества Мандельброта
 static void polynom_mandel_gui(FractalParameters* params, Camera2D* cam, bool* update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Iterations: %d", (int) params->polynom_mandel.iterations));
     if (GuiSlider((Rectangle){20, 80, 200, 20}, NULL, NULL,
@@ -536,8 +549,10 @@ static void polynom_mandel_gui(FractalParameters* params, Camera2D* cam, bool* u
     }
 }
 
+// статическая переменная для доступа к выпадающему меню
 static bool dropdown_edit = false;
 
+// отрисовка интерфейса фрактала ляпунова
 static void lyapunov_gui(FractalParameters *params, bool *update) {
     GuiLabel((Rectangle){20, 50, 200, 20}, TextFormat("Palette:"));
     GuiLabel((Rectangle){20, 80, 200, 20}, TextFormat("Red factor: %d", (int) params->lyapunov.red));
@@ -590,6 +605,7 @@ static void lyapunov_gui(FractalParameters *params, bool *update) {
     }
 }
 
+// создание узла списка
 static ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle field, Texture2D texture, AppState state) {
     ImageNode* node = malloc(sizeof(ImageNode));
     node->img_name = img_name;
@@ -601,6 +617,7 @@ static ImageNode* create_image_node(char* fract_name, char* img_name, Rectangle 
     return node;
 }
 
+// загрузка узлов галереи
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], const size_t size, Rectangle* img_fields)
 {
     *head = create_image_node("", "", (Rectangle) {0,0,0,0}, (Texture2D) {0}, STATE_MENU);
@@ -630,6 +647,7 @@ void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], cons
     }
 }
 
+// отрисовка изображений
 void draw_pics(ImageNode* head) {
     const ImageNode* temp = head;
 
@@ -645,6 +663,7 @@ void draw_pics(ImageNode* head) {
     }
 }
 
+// рендер фрактала в зависимости от типа
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update) {
     switch (*state) {
         case STATE_TREE:
@@ -788,6 +807,7 @@ void render_fractals(const Camera2D* cam, const AppState* state, FractalParamete
     }
 }
 
+// выбор интерфейса фрактала
 void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update) {
     switch (*state) {
         case STATE_TREE:
@@ -828,6 +848,7 @@ void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState
     }
 }
 
+// сохранение изображения фрактала
 void save_image(const AppState state, const AppState random_type, FractalParameters* params,
     FractalParameters* random_params, bool* needs_update) {
     Image finalImage = {0};
@@ -867,22 +888,22 @@ void save_image(const AppState state, const AppState random_type, FractalParamet
             // создаем холст (RenderTexture) размером 1920x1080
             RenderTexture2D target = LoadRenderTexture(WIDTH, HEIGHT);
 
-            // 3. Рендерим дерево на этот холст с использованием новой камеры
+            // рендерим дерево на этот холст с использованием новой камеры
             BeginTextureMode(target);
-            ClearBackground(BLACK); // Очищаем фон (черный, как в приложении)
+            ClearBackground(BLACK);
             BeginMode2D(saveCamera);
 
             render_fractals(&saveCamera, &state, currentParams, needs_update);
             EndMode2D();
             EndTextureMode();
 
-            // 4. Переводим полученную текстуру в изображение для сохранения
+            // переводим полученную текстуру в изображение для сохранения
             finalImage = LoadImageFromTexture(target.texture);
 
             // в OpenGL текстуры рендерятся перевернутыми по вертикали, зеркалим обратно
             ImageFlipVertical(&finalImage);
 
-            // Освобождаем память холста
+            // освобождаем память холста
             UnloadRenderTexture(target);
             break;
         }
@@ -903,16 +924,16 @@ void save_image(const AppState state, const AppState random_type, FractalParamet
 }
 
 void show_slideshow(ImageNode* head, AppState* state) {
-    // Добавили next_slide для эффекта перехода
+    // next_slide для эффекта перехода
     static double last_slide_time = 0.0;
     static ImageNode* current_slide = NULL;
     static ImageNode* next_slide = NULL;
 
-    // Настройки таймингов (в секундах)
+    // настройки таймингов (в секундах)
     const double SLIDE_DURATION = 4.0;
     const double TRANSITION_DURATION = 1.0;
 
-    // Инициализация при первом входе
+    // инициализация при первом входе
     if (current_slide == NULL && head != NULL && head->next != NULL) {
         current_slide = head->next;
         next_slide = current_slide->next ? current_slide->next : head->next;
@@ -923,7 +944,7 @@ void show_slideshow(ImageNode* head, AppState* state) {
         double current_time = GetTime();
         double elapsed = current_time - last_slide_time;
 
-        // Логика переключения на следующий кадр
+        // логика переключения на следующий кадр
         if (elapsed > SLIDE_DURATION) {
             current_slide = next_slide;
             next_slide = current_slide->next ? current_slide->next : head->next;
@@ -947,10 +968,10 @@ void show_slideshow(ImageNode* head, AppState* state) {
         };
         DrawTexturePro(current_slide->texture_slideshow, source_curr, dest_curr, (Vector2){0, 0}, 0.0f, WHITE);
 
-        // --- 2. Эффект ПЕРЕХОДА (Crossfade) ---
+        // эффект перехода Crossfade
         float alpha = 0.0f;
         if (elapsed > SLIDE_DURATION - TRANSITION_DURATION) {
-            // Вычисляем прозрачность от 0.0 до 1.0
+            // вычисляем прозрачность от 0.0 до 1.0
             alpha = (elapsed - (SLIDE_DURATION - TRANSITION_DURATION)) / TRANSITION_DURATION;
             if (alpha > 1.0f) alpha = 1.0f; // Защита от выхода за пределы
 
@@ -964,7 +985,7 @@ void show_slideshow(ImageNode* head, AppState* state) {
                 next_slide->texture_slideshow.height * scale_next
             };
 
-            // Рисуем следующий слайд поверх текущего, постепенно увеличивая его непрозрачность
+            // рисуем следующий слайд поверх текущего, постепенно увеличивая его непрозрачность
             DrawTexturePro(next_slide->texture_slideshow, source_next, dest_next, (Vector2){0, 0}, 0.0f, Fade(WHITE, alpha));
         }
 
@@ -973,7 +994,7 @@ void show_slideshow(ImageNode* head, AppState* state) {
         DrawText(current_slide->fract_name, 32, 32, 40, text_color_bg);
         DrawText(current_slide->fract_name, 30, 30, 40, text_color_fg);
 
-        // Текст следующего слайда плавно появляется
+        // текст следующего слайда плавно появляется
         if (alpha > 0.0f) {
             Color next_text_fg = Fade(RAYWHITE, alpha);
             Color next_text_bg = Fade(BLACK, alpha);

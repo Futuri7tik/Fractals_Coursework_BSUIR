@@ -1,10 +1,12 @@
 #include "raylib.h"
 #include "functions.h"
 
+// получение количества итерационного процесс множества жюлиа для точки
 static int julia_iterations(float re_z, float im_z, const float re_c, const float im_c, const int max_iterations) {
     int iterations = 0;
     float re_z2 = re_z * re_z, im_z2 = im_z * im_z, prod = re_z * im_z;
 
+    // запуск итераций пока точка в круге радиуса 2
     while (re_z2 + im_z2 < 4.0f && iterations < max_iterations) {
         im_z = prod + prod + im_c;
         re_z = re_z2 - im_z2 + re_c;
@@ -18,12 +20,16 @@ static int julia_iterations(float re_z, float im_z, const float re_c, const floa
     return iterations;
 }
 
+// получение цвета точки
 static Color get_color_julia(const int iteration, const int max_iterations, const JuliaParameters* params) {
     if (iteration == max_iterations) {
         return BLACK;
     }
 
+    // получение множителя градиента
     const float t = (float)iteration / (float)max_iterations;
+
+    // рассчет компонент
     unsigned char r = (unsigned char)(params->red * (1-t) * t * t * t * 255),
     g = (unsigned char)(params->green * (1-t) * (1-t) * t * t * 255),
     b = (unsigned char)(params->blue * (1-t) * (1-t) * (1-t) * t * 255);
@@ -31,16 +37,21 @@ static Color get_color_julia(const int iteration, const int max_iterations, cons
     return (Color) {r, g, b, 255};
 }
 
+// рендер фрактала жюлиа в текстуру
 void render_julia(float zoom, float offset_x,
     float offset_y, const int max_iterations, const JuliaParameters* params) {
     static Color pixels[WIDTH * HEIGHT];
 
+    // переменные преобразования координат экрана в комплексные
     const float scale_x = 4.0f / (WIDTH * zoom),
     center_x = WIDTH / 2.0f,
     center_y = HEIGHT / 2.0f;
 
+    // распараллеливание вычислений через OpenMP
     #pragma omp parallel for schedule(dynamic) default(none) \
     shared(pixels, offset_x, offset_y, max_iterations, params, center_y, center_x, scale_x)
+
+    // запуск вычислений для каждого пикселя
     for (int y = 0; y < HEIGHT; ++y) {
         const float im_z = ((float)y - center_y) * scale_x + offset_y;
 
@@ -52,5 +63,6 @@ void render_julia(float zoom, float offset_x,
         }
     }
 
+    // обновление текстуры фрактала
     UpdateTexture(params->texture, pixels);
 }

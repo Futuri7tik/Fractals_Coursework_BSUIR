@@ -192,72 +192,96 @@ void init_dragon_parameters(DragonParameters* params, bool is_default);
 void init_polynom_mandel_parameters(PolynomMandelParameters* params, bool is_default);
 void init_lyapunov_parameters(LyapunovParameters* params, bool is_default);
 
+// инициализация параметров случайного фрактала
 void init_random_config(FractalParameters* params, Camera2D* cam,AppState* type);
 
 void rewrite_fractal_parameters(const FractalParameters* params);
 
 // UI
 void handle_movement(float speed, Camera2D* cam, bool* update);
+
+// отрисовка главного меню
 void menu_gui(AppState* state, bool* show_msg_box, bool* should_close, Texture2D font_texture, Texture2D dev);
+
+// загрузка изображений в список
 void load_pics(ImageNode** head);
-void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img,
-                 bool *update);
+
+// отрисовка интерфейса галереи
+void gallery_gui(AppState *state, FractalParameters *params, Camera2D *cam, ImageNode **head_img, bool *update);
+
+// выбор интерфейса фрактала
 void render_fractal_gui(Camera2D* cam, FractalParameters* params, const AppState* state, bool* update);
 
-// saving image
+// сохранение изображения фрактала
 void save_image(AppState state, AppState random_type, FractalParameters* params,
     FractalParameters* random_params, bool* needs_update);
 
+// загрузка узлов галереи
 void load_gallery(ImageNode** head, char* fract_names[], char* img_names[], size_t size, Rectangle* img_fields);
+
+// отрисовка изображений
 void draw_pics(ImageNode* head);
 
-// Дерево
+// отрисовка дерева пифагора на экран
 void draw_tree(float x_start, float y_start, float length, float angle,
                int depth, TreeParameters* params);
 
-// Ковёр
-void draw_carpet(Image* img, float x, float y, float length, int depth);
+// рендер ковра
 void render_carpet(int depth, float start_length, Color color, const CarpetParameters* params);
 
-// Треугольник
+// отрисовка базового треугольника
 void draw_triangle_base(float x, float y, float length, Color color);
+
+// отрисовка треугольника серпинского на экран
 void draw_sierpinski_triangle(float x, float y, float length,
                               int depth, TriangleParameters* params);
 
-// Множество мандельброта
+// рендер фрактала мандельброта в текстуру
 void render_mandelbrot(float zoom, float offset_x, float offset_y, int max_iterations, const MandelbrotParameters *params);
 
-// Множество Жюлиа
+// рендер фрактала жюлиа в текстуру
 void render_julia(float zoom, float offset_x, float offset_y, int max_iterations, const JuliaParameters* params);
 
-// Круговой фрактал
+// отрисовка кругового фрактала
 void draw_circle_fractal(float x, float y, float r, int depth, Color color);
 
-// Папоротник Барнсли
+// отрисовка папоротника Барнсли в текстуру
 Texture2D render_barnsley_fern(Vector2 pos, int depth, FernParameters params);
 
 // Бассейны ньютона
 void render_newton(float zoom, float offset_x, float offset_y, int max_iterations, NewtonParameters *params);
 
-// Фрактал дракона
+// отрисовка фрактала дракона на экран. запуск рекурсии
 void draw_dragon(float x_start, float y_start, float* start_angle, float tilt_angle, float length, int depth, Color color);
 
+// рендер фрактала в зависимости от типа
 void render_fractals(const Camera2D* cam, const AppState* state, FractalParameters* params, bool* update);
 
+// рендер фрактала полиномиального мандельброта в текстуру
 void render_polynom_mandel(float zoom, float offset_x, float offset_y, int max_iterations, const PolynomMandelParameters *params);
 
-float lyapunov_exponent(float rx, float ry, const char* sequence, int seq_len,
-                        int iterations, float x0);
+// рендер фрактала Ляпунова в текстуру
 Texture2D render_lyapunov(LyapunovParameters* params);
 
+// очистка стека
 void clear_undo(void);
+
+// добавление элемента в стек
 void push(FractalParameters* params);
+
+// удаление верхнего элемента стека
 bool pop(FractalParameters* out);
 
-// Сортировка списка
+// сортировка слиянием связного списка
 ImageNode* merge_sort(ImageNode* head);
+
+// обновление изображение после сортировки
 void update_gallery_positions(ImageNode* head);
+
+// копирование списка
 void copy_list(ImageNode* dest_head, const ImageNode* src_head);
+
+// очистка памяти списка
 void free_list(ImageNode* head);
 
 void show_slideshow(ImageNode* head, AppState* state);

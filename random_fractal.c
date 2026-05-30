@@ -1,17 +1,18 @@
-#include <math.h>
 #include <string.h>
 #include "functions.h"
 #include "raylib.h"
-#include "raygui.h"
 #include "stdlib.h"
-#include "time.h"
 
+// инициализация параметров случайного фрактала
 void init_random_config(FractalParameters* params, Camera2D* cam, AppState* type) {
+    // загрузка параметров
     init_fractals_parameters(params);
 
+    // получение типа случайного фрактала
     *type = STATE_MANDELBROT + GetRandomValue(0, 10);
     cam->target = (Vector2){WIDTH/2.0f, HEIGHT/2.0f};
 
+    // задание случайных параметров
     switch (*type) {
         case STATE_TREE:
             params->tree.depth = 8 + GetRandomValue(0,8);
